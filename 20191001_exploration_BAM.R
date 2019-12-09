@@ -2026,13 +2026,7 @@ reptrak_statements <- temp %>%
   dplyr::filter(!is.na(score)) %>%
   dplyr::filter(type %in% c("reptrak1_value", "reptrak2_value", 
                             "reptrak3_value", "reptrak4_value")) %>% 
-  dplyr::filter(score %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) %>% 
-  dplyr::mutate(
-    score = dplyr::case_when(
-      grepl("^reptrak", type) & score == 8 ~ NA_real_,
-      TRUE ~ score
-    )
-  ) %>% 
+  dplyr::filter(score %in% c(1, 2, 3, 4, 5, 6, 7)) %>%
   dplyr::group_by(b_value, country, quarter_measurement, type) %>% 
   dplyr::summarise(
     mean_score = mean(score * Weight, na.rm = T)
@@ -2040,20 +2034,20 @@ reptrak_statements <- temp %>%
   dplyr::ungroup() %>% 
   dplyr::mutate(
     rep_trak1 = dplyr::case_when(
-      grepl("^reptrak1_value", type) ~ mean_score / 7,
-      TRUE ~ mean_score)) %>%
+      grepl("^reptrak1", type) ~ mean_score / 7,
+      TRUE ~ NA_real_)) %>%
   dplyr::mutate(
     rep_trak2 = dplyr::case_when(
-      grepl("^reptrak2_value", type) ~ mean_score / 7,
-      TRUE ~ mean_score)) %>%
+      grepl("^reptrak2", type) ~ mean_score / 7,
+      TRUE ~ NA_real_)) %>%
   dplyr::mutate(
     rep_trak3 = dplyr::case_when(
-      grepl("^reptrak3_value", type) ~ mean_score / 7,
-      TRUE ~ mean_score)) %>%
+      grepl("^reptrak3", type) ~ mean_score / 7,
+      TRUE ~ NA_real_)) %>%
   dplyr::mutate(
     rep_trak4 = dplyr::case_when(
-    grepl("^reptrak4_value", type) ~ mean_score / 7,
-    TRUE ~ mean_score
+    grepl("^reptrak4", type) ~ mean_score / 7,
+    TRUE ~ NA_real_
     )
   ) 
 
@@ -2097,88 +2091,33 @@ proximity_overview <- result %>%
 data <- full_join(data, proximity_overview, by=c("country", "quarter_measurement", "b_value"))
 rm(proximity_overview) 
 
-
-### nps ###
-### dont forget to filter for clients!
-temp4 <- result %>%
+### NPS ###
+NPS_trial <-result %>%
   dplyr::filter(!is.na(nps_value)) %>%
-  #dplyr::filter(nps_value %in% c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) %>% 
-  dplyr::mutate(
-    score_category = case_when(
-      nps_value == 0 ~ "Zero",
-      nps_value == 1 ~ "One",
-      nps_value == 2 ~ "Two",
-      nps_value == 3 ~ "Three",
-      nps_value == 4 ~ "Four",
-      nps_value == 5 ~ "Five",
-      nps_value == 6 ~ "Six",
-      nps_value == 7 ~ "Seven",
-      nps_value == 8 ~ "Eight",
-      nps_value == 9 ~ "Nine",
-      nps_value == 10 ~ "Ten",
-      TRUE ~ "No Score"
-    )
+  dplyr::group_by(country, quarter_measurement, b_value, client_value) %>%
+  dplyr::mutate(nps_cat = case_when(
+      nps_value %in% c(9:10) ~ "promotors",
+      nps_value %in% c(7:8) ~ "neutrals",
+      nps_value %in% c(0,1,2,3,4,5,6) ~ "detractors",
+      TRUE ~ "NA_real_")) %>%
+  dplyr::summarise(
+    tot_promotors = nps_cat[nps_cat=="promotors"] * weight_nps %>%
+    tot_neutrals = nps_cat[nps_cat=="neutrals"] * weight_nps %>%
+    tot_detractors = nps_cat[nps_cat=="detractors"] * weight_nps 
   ) %>%
-  dplyr::group_by(b_value, country, quarter_measurement, client_value) %>%
-  dplyr::summarize(
-    score_one = sum(weight_nps[score_category == "One"]),
-    score_zero = sum(weight_nps[score_category == "Zero"]),
-    score_two = sum(weight_nps[score_category == "Two"]),
-    score_three = sum(weight_nps[score_category == "Three"]),
-    score_four = sum(weight_nps[score_category == "Four"]),
-    score_five = sum(weight_nps[score_category == "Five"]),
-    score_six = sum(weight_nps[score_category == "Six"]),
-    score_seven = sum(weight_nps[score_category == "Seven"]),
-    score_eight = sum(weight_nps[score_category == "Eight"]),
-    score_nine = sum(weight_nps[score_category == "Nine"]),
-    score_ten = sum(weight_nps[score_category == "Ten"]),
-    score_total = sum(weight_nps)
-  ) %>%
-  dplyr::ungroup() %>% 
-  dplyr::mutate(
-    detractors = (score_one + score_zero + score_two + score_three + score_four + score_five + score_six) / score_total,
-    neutrals = (score_seven + score_eight) / score_total,
-    promotors = (score_nine + score_ten) / score_total,
-    nps = promotors - detractors
-  ) 
+  dplyr::ungroup()
+      
+NPS_trial$nps_cat[NPS_trial$nps_cat=="promotors"]
 
-temp4$score_one <- NULL
-temp4$score_zero <- NULL
-temp4$score_two <- NULL
-temp4$score_three <- NULL
-temp4$score_four <- NULL
-temp4$score_five <- NULL
-temp4$score_six <- NULL
-temp4$score_seven <- NULL
-temp4$score_eight <- NULL
-temp4$score_nine <- NULL
-temp4$score_ten <- NULL
-temp4$score_total <- NULL
-temp4$type <- NULL
+### Desirability
 
-temp4$client <- temp4$client_value
-data <- full_join(data, temp4, by=c("b_value", "country", "quarter_measurement", "client"))
-rm(temp4)
+desi <- data %>%
+  dplyr::select(b_value, country, quarter_measurement, desirability) %>%
+  dplyr::filter(b_value %in% c(1)) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::ungroup()
+  
 
-temp_nps <- temp4 %>%
-  dplyr::select("nps", "b_value", "country", "quarter_measurement", "client") %>%
-  dplyr::filter(!is.na(nps), b_value==1, quarter_measurement==19, client==1) 
-
-## NPS
-nps <- data %>%
-  dplyr::select("nps", "b_value", "country", "quarter_measurement", "client") %>%
-  dplyr::filter(!is.na(nps), b_value==1, quarter_measurement==19, client==1) 
-
-## does not work yet
-
-## consideration
-consideration<- data %>%
-  dplyr::select("preference", "country", "quarter_measurement", "b_value") %>%
-  dplyr::filter(quarter_measurement==19, b_value==1) 
-
-
-
-write.csv(data, file="data.csv")
 
 
 
