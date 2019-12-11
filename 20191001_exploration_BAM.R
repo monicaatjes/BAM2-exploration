@@ -2115,9 +2115,14 @@ desi <- data %>%
   dplyr::select(b_value, country, quarter_measurement, desirability) %>%
   dplyr::filter(b_value %in% c(1)) %>%
   dplyr::group_by(b_value, country, quarter_measurement) %>%
-  dplyr::ungroup()
+  dplyr::distinct()
+
   
 
+Awareness <- data %>%
+  dplyr::select(b_value, country, quarter_measurement, toma, aided, unaided) %>%
+  dplyr::filter(b_value==1, country==6) %>%
+  dplyr::group_by(quarter_measurement) %>%
+  dplyr::distinct() 
 
-
-
+"C:/Lokaal/BAM2/exploration/Awareness.csv"
