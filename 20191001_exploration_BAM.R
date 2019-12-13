@@ -2117,7 +2117,88 @@ desi <- data %>%
   dplyr::group_by(b_value, country, quarter_measurement) %>%
   dplyr::distinct()
 
+labels_countries <-desi %>%
+  dplyr::select(country) %>%
+  dplyr::mutate(
+    labels_countries = case_when(
+      country == 1 ~ "Autralia",
+      country == 2 ~ "Austria",
+      country == 3 ~ "Belgium",
+      country == 4 ~ "Czech",
+      country == 5 ~ "France",
+      country == 6 ~ "Germany",
+      country == 7 ~ "Italy",
+      country == 8 ~ "Luxembourg",
+      country == 9 ~ "Netherlands",
+      country == 10 ~ "Poland",
+      country == 11 ~ "Romania",
+      country == 12 ~ "Spain",
+      country == 13 ~ "Turkey",
+      country == 14 ~ "The Philippines",
+      TRUE ~ "NA_real_"))
+
+### NEED TO BE ADJUSTED
+labels_quarters <-desi %>%
+  dplyr::select(quarter_measurement) %>%
+  dplyr::mutate(
+    labels_countries = case_when(
+      quarter_measurement == 1 ~ "Q4_2014",
+      quarter_measurement == 2 ~ "Q1_2015",
+      quarter_measurement == 3 ~ "Q2_2015",
+      quarter_measurement == 4 ~ "Q3_2015",
+      quarter_measurement == 5 ~ "Q4_2015",
+      quarter_measurement == 6 ~ "Q1_2016",
+      quarter_measurement == 7 ~ "Q2_2016",
+      quarter_measurement == 8 ~ "Q3_2016",
+      quarter_measurement == 9 ~ "Q4_2016",
+      quarter_measurement == 10 ~ "Q1_2017",
+      quarter_measurement == 11 ~ "Q2_2017",
+      quarter_measurement == 12 ~ "Q3_2017",
+      quarter_measurement == 13 ~ "Q4_2017",
+      quarter_measurement == 14 ~ "Q1_2018",
+      quarter_measurement == 15 ~ "Q2_2018",
+      quarter_measurement == 16 ~ "Q3_2018",
+      quarter_measurement == 17 ~ "Q4_2018",
+      quarter_measurement == 18 ~ "Q1_2019",
+      quarter_measurement == 19 ~ "Q2_2019",
+      TRUE ~ "NA_real_"))
+
+desi$labels_countries <- labels_countries$labels_countries
+
+desi %>%
+  filter(quarter_measurement==19) %>%
+  plot_ly(x = ~labels_countries, y =~desirability *100, type='bar', 
+          marker = list(color = 'rgb(255,098,000)', width = 1.5)) %>%
+  layout(title = "Desirability",
+         xaxis = list(title = "countries"),
+         yaxis = list(title = "desirability"), range =c(0:100)
+         )
+
+yaxis = list(
+  title = '# of Items in Stock',
+  range = c(0,7)
+)
+
+
+
   
+
+
+
+p <- plot_ly(data, labels = ~Categorie, values = ~X1960, type = 'pie',
+             textposition = 'inside',
+             textinfo = 'label+percent',
+             insidetextfont = list(color = '#FFFFFF'),
+             hoverinfo = 'text',
+             text = ~paste('$', X1960, ' billions'),
+             marker = list(colors = colors,
+                           line = list(color = '#FFFFFF', width = 1)),
+             #The 'pull' attribute can also be used to create space between the sectors
+             showlegend = FALSE) %>%
+  layout(title = 'United States Personal Expenditures by Categories in 1960',
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
 
 Awareness <- data %>%
   dplyr::select(b_value, country, quarter_measurement, toma, aided, unaided) %>%
