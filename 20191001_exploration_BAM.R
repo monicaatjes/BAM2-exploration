@@ -2112,12 +2112,13 @@ NPS_trial$nps_cat[NPS_trial$nps_cat=="promotors"]
 ### Desirability
 
 desi <- data %>%
-  dplyr::select(b_value, country, quarter_measurement, desirability) %>%
+  dplyr::select(b_value, labels_countries, labels_quarters, desirability) %>%
   dplyr::filter(b_value %in% c(1)) %>%
-  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::group_by(b_value, labels_countries, labels_quarters) %>%
   dplyr::distinct()
+  
 
-labels_countries <-desi %>%
+desi$labels_countries <-desi %>%
   dplyr::select(country) %>%
   dplyr::mutate(
     labels_countries = case_when(
@@ -2136,12 +2137,12 @@ labels_countries <-desi %>%
       country == 13 ~ "Turkey",
       country == 14 ~ "The Philippines",
       TRUE ~ "NA_real_"))
+data$labels_countries <- labels_countries$labels_countries
 
-### NEED TO BE ADJUSTED
-labels_quarters <-desi %>%
+desi$labels_quarters <-desi %>%
   dplyr::select(quarter_measurement) %>%
   dplyr::mutate(
-    labels_countries = case_when(
+    labels_quarters = case_when(
       quarter_measurement == 0 ~ "Q4_2014",
       quarter_measurement == 1 ~ "Q1_2015",
       quarter_measurement == 2 ~ "Q2_2015",
@@ -2163,26 +2164,30 @@ labels_quarters <-desi %>%
       quarter_measurement == 18 ~ "Q2_2019",
       quarter_measurement == 19 ~ "Q3_2019",
       TRUE ~ "NA_real_"))
-
-desi$labels_countries <- labels_countries$labels_countries
+data$labels_quarters <- labels_quarters$labels_quarters
 
 desi %>%
-  filter(quarter_measurement==19) %>%
-  plot_ly(x = ~labels_countries, y =~desirability *100, type='bar', 
+  filter(labels_quarters=="Q3_2019") %>%
+  plot_ly(x = ~labels_countries, y =~desirability *100, type='bar',
           marker = list(color = 'rgb(255,098,000)', width = 1.5)) %>%
   layout(title = "Desirability",
          xaxis = list(title = "countries"),
-         yaxis = list(title = "desirability"), range =c(0:100)
+         yaxis = list(title = "desirability", range= c(0,100),
+         annotations = annotations)
          )
 
-yaxis = list(
-  title = '# of Items in Stock',
-  range = c(0,7)
-)
+desi$labels_countries <- labels_countries$labels_countries
 
+annotations <- list()
+for (i in 1:length(desi$desirability)) {
+  annotations[[i]] <- list(y = desi$desirability[[i]],
+                           text = desi$desirability[[i]],
+                           yanchor='bottom',
+                           showarrow = FALSE)
+}
 
+desi$desirability
 
-  
 
 
 
