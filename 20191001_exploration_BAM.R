@@ -2025,7 +2025,12 @@ rm(temp4)
 reptrak_statements <- temp %>%
   dplyr::filter(!is.na(score)) %>%
   dplyr::filter(type %in% c("reptrak1_value", "reptrak2_value", 
-                            "reptrak3_value", "reptrak4_value")) %>% 
+                            "reptrak3_value", "reptrak4_value"
+                           # "reptrak5_value", "reptrak6_value", 
+                           # "reptrak7_value", "reptrak8_value",
+                           # "reptrak9_value", "reptrak10_value", 
+                           # "reptrak11_value"
+                            )) %>% 
   dplyr::filter(score %in% c(1, 2, 3, 4, 5, 6, 7)) %>%
   dplyr::group_by(b_value, country, quarter_measurement, type) %>% 
   dplyr::summarise(
@@ -2047,11 +2052,43 @@ reptrak_statements <- temp %>%
   dplyr::mutate(
     rep_trak4 = dplyr::case_when(
     grepl("^reptrak4", type) ~ mean_score / 7,
-    TRUE ~ NA_real_
-    )
-  ) 
+    TRUE ~ NA_real_)) 
+  #dplyr::mutate(
+ # rep_trak5 = dplyr::case_when(
+ #   grepl("^reptrak5", type) ~ mean_score / 7,
+ #   TRUE ~ NA_real_)) %>%
+ # dplyr::mutate(
+ #   rep_trak6 = dplyr::case_when(
+ #     grepl("^reptrak6", type) ~ mean_score / 7,
+ #     TRUE ~ NA_real_)) %>%
+ # dplyr::mutate(
+ #   rep_trak7 = dplyr::case_when(
+ #     grepl("^reptrak7", type) ~ mean_score / 7,
+ #     TRUE ~ NA_real_)) %>%
+ # dplyr::mutate(
+ #   rep_trak8 = dplyr::case_when(
+ #     grepl("^reptrak8", type) ~ mean_score / 7,
+ #     TRUE ~ NA_real_)) %>%
+ # dplyr::mutate(
+ #   rep_trak9 = dplyr::case_when(
+ #     grepl("^reptrak9", type) ~ mean_score / 7,
+ #     TRUE ~ NA_real_)) %>%
+ # dplyr::mutate(
+ #   rep_trak10 = dplyr::case_when(
+ #     grepl("^reptrak10", type) ~ mean_score / 7,
+ #     TRUE ~ NA_real_)) %>%
+ # dplyr::mutate(
+ #   rep_trak11 = dplyr::case_when(
+ #     grepl("^reptrak11", type) ~ mean_score / 7,
+ #     TRUE ~ NA_real_
+ #    )
+ #  ) 
+
+reptrak_statements <- reptrak_statements %>%
+  dplyr:select(b_value, quarter_measurement, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4)
 
 reptrak_statements<- reptrak_statements[,!names(reptrak_statements) %in% c("type","mean_score")]
+reptrak_statements <- reptrak_statements$rep_trak1[!is.na(reptrak_statements$rep_trak1)]
 data <- full_join(data, reptrak_statements, by=c("b_value", "country", "quarter_measurement"))
 rm(reptrak_statements) 
 
@@ -2094,20 +2131,32 @@ rm(proximity_overview)
 ### NPS ###
 NPS_trial <-result %>%
   dplyr::filter(!is.na(nps_value)) %>%
-  dplyr::group_by(country, quarter_measurement, b_value, client_value) %>%
+  dplyr::group_by(country, quarter_measurement, b_value) %>%
+  dplyr::mutate(
+    nps_clients = case_when(
+      client_value == 1 ~ nps_value * weight_nps,
+      TRUE ~ NA_real_)
+  ) %>%
   dplyr::mutate(nps_cat = case_when(
-      nps_value %in% c(9:10) ~ "promotors",
-      nps_value %in% c(7:8) ~ "neutrals",
-      nps_value %in% c(0,1,2,3,4,5,6) ~ "detractors",
-      TRUE ~ "NA_real_")) %>%
-  dplyr::summarise(
-    tot_promotors = nps_cat[nps_cat=="promotors"] * weight_nps %>%
-    tot_neutrals = nps_cat[nps_cat=="neutrals"] * weight_nps %>%
-    tot_detractors = nps_cat[nps_cat=="detractors"] * weight_nps 
+    nps_clients >=9.0 ~ "promotors",
+    nps_clients <= 9.0 & nps_clients >= 7.0 ~ "neutrals",
+    nps_clients  <= 6.0 ~ "detractors",
+    TRUE ~ "NA_real_")) %>%
+  dplyr::group_by(nps_cat, country, b_value, quarter_measurement) %>%
+  dplyr::tally() %>%
+  dplyr::mutate(
+    percentage = n /sum(n)
+  ) %>% 
+  dplyr::ungroup()
+
+NPS_result <- NPS_trial %>%
+  dplyr::filter(nps_cat %in% c("promotors", "detractors", "neutrals")) %>%
+  dplyr::group_by(country, quarter_measurement, b_value) %>%
+  dplyr::mutate(
+    nps = percentage[nps_cat=="promotors"] - percentage[nps_cat=="detractors"]
   ) %>%
   dplyr::ungroup()
-      
-NPS_trial$nps_cat[NPS_trial$nps_cat=="promotors"]
+  
 
 ### Desirability
 
@@ -2116,7 +2165,14 @@ desi <- data %>%
   dplyr::filter(b_value %in% c(1)) %>%
   dplyr::group_by(b_value, labels_countries, labels_quarters) %>%
   dplyr::distinct()
-  
+
+### clients
+
+clients <- data %>%
+  dplyr::select(b_value, labels_countries, labels_quarters, desirability) %>%
+  dplyr::filter(b_value %in% c(1)) %>%
+  dplyr::group_by(b_value, labels_countries, labels_quarters) %>%
+  dplyr::distinct()
 
 desi$labels_countries <-desi %>%
   dplyr::select(country) %>%
@@ -2186,24 +2242,13 @@ for (i in 1:length(desi$desirability)) {
                            showarrow = FALSE)
 }
 
-desi$desirability
+value <- data %>%
+  dplyr::select(b_value, labels_countries, labels_quarters, image7) %>%
+  dplyr::filter(b_value %in% c(1)) %>%
+  dplyr::filter(labels_quarters %in% c("Q1_2019","Q2_2019", "Q3_2019")) %>%
+  dplyr::distinct()
 
-
-
-
-p <- plot_ly(data, labels = ~Categorie, values = ~X1960, type = 'pie',
-             textposition = 'inside',
-             textinfo = 'label+percent',
-             insidetextfont = list(color = '#FFFFFF'),
-             hoverinfo = 'text',
-             text = ~paste('$', X1960, ' billions'),
-             marker = list(colors = colors,
-                           line = list(color = '#FFFFFF', width = 1)),
-             #The 'pull' attribute can also be used to create space between the sectors
-             showlegend = FALSE) %>%
-  layout(title = 'United States Personal Expenditures by Categories in 1960',
-         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+write.table(value, "/Users/xo21bm/Documents/Lokaal/BAM2/exploration/value.txt", sep=",")
 
 
 Awareness <- data %>%
