@@ -2,7 +2,6 @@
 
 ## Writing labels
 
-
 ## Brand Funnel per market for every brand
 funnel <- data %>%
   dplyr::select(unaided, toma, aided, fami, opinion, consideration, preference, quarter_measurement, b_value, country) %>%
@@ -29,18 +28,25 @@ p <- funnel %>%
     x = c(funnel$aided, funnel$fami, funnel$consideration, funnel$preference)) %>%
   layout(yaxis = list(categoryarray = c("aided", "familiarity", "consideration", "preference")))
 
-## Output Reptrak
-reptrak<- data %>%
-  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
-  #dplyr::filter(quarter_measurement ==20 & country==1) %>%
-  # Gather
-  tidyr::gather("reptrak_type", "reptrak_value", rep_trak1:rep_trak4, na.rm = T) %>%
-  dplyr::group_by(b_value, country, quarter_measurement) %>%
-  dplyr::summarise(
-    pulse = mean(reptrak_value)) %>%
-  dplyr::ungroup()
+### Reputation score
+rep <- data %>%
+  dplyr::select(quarter_measurement, country, b_value, pulse) %>%
+  dplyr::filter(quarter_measurement > 19) %>%
+  dplyr::mutate(
+    pulse = pulse *100
+  ) %>%
+  distinct()
 
-## Output desirability
+## Output desirability -> combine this one with perceived expensiveness
+desi <- data %>%
+  dplyr::select(quarter_measurement, country, b_value, desirability) %>%
+  dplyr::filter(quarter_measurement ==19 |20) %>%
+  distinct()
 
+
+
+
+
+  
 
 
