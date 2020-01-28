@@ -2026,10 +2026,6 @@ reptrak_statements <- temp %>%
   dplyr::filter(!is.na(score)) %>%
   dplyr::filter(type %in% c("reptrak1_value", "reptrak2_value", 
                             "reptrak3_value", "reptrak4_value"
-                           # "reptrak5_value", "reptrak6_value", 
-                           # "reptrak7_value", "reptrak8_value",
-                           # "reptrak9_value", "reptrak10_value", 
-                           # "reptrak11_value"
                             )) %>% 
   dplyr::filter(score %in% c(1, 2, 3, 4, 5, 6, 7)) %>%
   dplyr::group_by(b_value, country, quarter_measurement, type) %>% 
@@ -2083,15 +2079,62 @@ reptrak_statements <- temp %>%
  #     TRUE ~ NA_real_
  #    )
  #  ) 
-
-reptrak_statements <- reptrak_statements %>%
-  dplyr:select(b_value, quarter_measurement, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4)
-
-reptrak_statements<- reptrak_statements[,!names(reptrak_statements) %in% c("type","mean_score")]
-reptrak_statements <- reptrak_statements$rep_trak1[!is.na(reptrak_statements$rep_trak1)]
 data <- full_join(data, reptrak_statements, by=c("b_value", "country", "quarter_measurement"))
-rm(reptrak_statements) 
 
+## Output Reptrak
+reptrak<- data %>%
+  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
+  #dplyr::filter(quarter_measurement ==20 & country==1) %>%
+  # Gather
+  tidyr::gather("reptrak_type", "reptrak_value", rep_trak1:rep_trak4, na.rm = T) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::summarise(
+    pulse = mean(reptrak_value)) %>%
+  dplyr::ungroup()
+
+reptrak_sep_statement1 <-data %>%
+  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::filter(!is.na(rep_trak1)) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(-c("rep_trak2", "rep_trak3", "rep_trak4")) 
+
+reptrak_sep_statement2 <-data %>%
+  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::filter(!is.na(rep_trak2)) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(-c("rep_trak1", "rep_trak3", "rep_trak4")) 
+
+reptrak_sep_statement3 <-data %>%
+  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::filter(!is.na(rep_trak3)) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(-c("rep_trak1", "rep_trak2", "rep_trak4")) 
+
+reptrak_sep_statement4 <-data %>%
+  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::filter(!is.na(rep_trak4)) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(-c("rep_trak1", "rep_trak2", "rep_trak3")) 
+
+reptrak_total <- cbind(reptrak, reptrak_sep_statement1, reptrak_sep_statement2, 
+                       reptrak_sep_statement3, reptrak_sep_statement4)
+
+reptrak_total1 <- merge(reptrak, reptrak_sep_statement1, by=c("b_value","country", "quarter_measurement"), all=T)
+reptrak_total2 <- merge(reptrak_sep_statement2, reptrak_sep_statement3, by=c("b_value","country", "quarter_measurement"), all=T)
+reptrak_total3 <- merge(reptrak_sep_statement4, reptrak_total1, by=c("b_value","country", "quarter_measurement"), all=T)
+reptrak_total <- merge(reptrak_total2, reptrak_total3, by=c("b_value","country", "quarter_measurement"), all=T)
+
+rm(reptrak_total1, reptrak_total2, reptrak_total3, reptrak_sep_statement1, 
+   reptrak_sep_statement2, reptrak_sep_statement3, reptrak_sep_statement4, 
+   reptrak_sep_statements, reptrak)
+
+data <- left_join(data, reptrak_total, by=c("quarter_measurement", "country", "b_value"))
+
+### Love overview 
 love_overview <- result %>%
   dplyr::filter(!is.na(love_ING)) %>%
   dplyr::filter(love_ING %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) %>% 
@@ -2174,11 +2217,11 @@ clients <- data %>%
   dplyr::group_by(b_value, labels_countries, labels_quarters) %>%
   dplyr::distinct()
 
-desi$labels_countries <-desi %>%
+labels_countries <-data %>%
   dplyr::select(country) %>%
   dplyr::mutate(
     labels_countries = case_when(
-      country == 1 ~ "Autralia",
+      country == 1 ~ "Australia",
       country == 2 ~ "Austria",
       country == 3 ~ "Belgium",
       country == 4 ~ "Czech",
@@ -2193,9 +2236,9 @@ desi$labels_countries <-desi %>%
       country == 13 ~ "Turkey",
       country == 14 ~ "The Philippines",
       TRUE ~ "NA_real_"))
-data$labels_countries <- labels_countries$labels_countries
+data <- left_join(data, labels_countries, by=c("country"))
 
-desi$labels_quarters <-desi %>%
+labels_quarters <-data %>%
   dplyr::select(quarter_measurement) %>%
   dplyr::mutate(
     labels_quarters = case_when(
@@ -2219,8 +2262,10 @@ desi$labels_quarters <-desi %>%
       quarter_measurement == 17 ~ "Q1_2019",
       quarter_measurement == 18 ~ "Q2_2019",
       quarter_measurement == 19 ~ "Q3_2019",
+      quarter_measurement == 20 ~ "Q4_2019",
       TRUE ~ "NA_real_"))
-data$labels_quarters <- labels_quarters$labels_quarters
+
+data <- left_join(data, labels_quarters, by=c("quarter_measurement"))
 
 desi %>%
   filter(labels_quarters=="Q3_2019") %>%
@@ -2232,7 +2277,6 @@ desi %>%
          annotations = annotations)
          )
 
-desi$labels_countries <- labels_countries$labels_countries
 
 annotations <- list()
 for (i in 1:length(desi$desirability)) {
@@ -2250,6 +2294,13 @@ value <- data %>%
 
 write.table(value, "/Users/xo21bm/Documents/Lokaal/BAM2/exploration/value.txt", sep=",")
 
+## Experienced Empowerment 
+emp <-data %>%
+  dplyr::select(quarter_measurement, labels_quarters, b_value, country, labels_countries, empower1, empower2, empower3, empower4) %>%
+  dplyr::filter(quarter_measurement >16) %>%
+  distinct() 
+
+# write.table(emp, "/Users/xo21bm/Documents/Lokaal/BAM2/exploration/empowerment.csv", sep=",")
 
 Awareness <- data %>%
   dplyr::select(b_value, country, quarter_measurement, toma, aided, unaided) %>%
