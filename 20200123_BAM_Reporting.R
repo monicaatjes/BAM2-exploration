@@ -43,10 +43,29 @@ desi <- data %>%
   dplyr::filter(quarter_measurement ==19 |20) %>%
   distinct()
 
+love <- data %>%
+  dplyr::select(quarter_measurement, labels_countries, love_mean_ING, love_mean_Google) %>%
+  dplyr::filter(quarter_measurement >15) %>%
+  distinct()
+  
 
 
 
+### Desirability
 
+desi <- data %>%
+  dplyr::select(b_value, labels_countries, labels_quarters, desirability) %>%
+  dplyr::filter(b_value %in% c(1)) %>%
+  dplyr::group_by(b_value, labels_countries, labels_quarters) %>%
+  dplyr::distinct()
+
+### clients
+
+clients <- data %>%
+  dplyr::select(b_value, labels_countries, labels_quarters, desirability) %>%
+  dplyr::filter(b_value %in% c(1)) %>%
+  dplyr::group_by(b_value, labels_countries, labels_quarters) %>%
+  dplyr::distinct()
   
 
 
