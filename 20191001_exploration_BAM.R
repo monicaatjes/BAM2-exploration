@@ -2079,7 +2079,10 @@ reptrak_statements <- temp %>%
  #     TRUE ~ NA_real_
  #    )
  #  ) 
+
+reptrak_statements <- reptrak_statements[, -c(4,5)]
 data <- full_join(data, reptrak_statements, by=c("b_value", "country", "quarter_measurement"))
+rm(reptrak_statements)
 
 ## Output Reptrak
 reptrak<- data %>%
@@ -2092,47 +2095,49 @@ reptrak<- data %>%
     pulse = mean(reptrak_value)) %>%
   dplyr::ungroup()
 
-reptrak_sep_statement1 <-data %>%
-  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
-  dplyr::group_by(b_value, country, quarter_measurement) %>%
-  dplyr::filter(!is.na(rep_trak1)) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(-c("rep_trak2", "rep_trak3", "rep_trak4")) 
+######## not run
+#reptrak_sep_statement1 <-data %>%
+#  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
+#  dplyr::group_by(b_value, country, quarter_measurement) %>%
+#  dplyr::filter(!is.na(rep_trak1)) %>%
+#  dplyr::ungroup() %>%
+#  dplyr::select(-c("rep_trak2", "rep_trak3", "rep_trak4")) 
 
-reptrak_sep_statement2 <-data %>%
-  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
-  dplyr::group_by(b_value, country, quarter_measurement) %>%
-  dplyr::filter(!is.na(rep_trak2)) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(-c("rep_trak1", "rep_trak3", "rep_trak4")) 
+#reptrak_sep_statement2 <-data %>%
+#  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
+#  dplyr::group_by(b_value, country, quarter_measurement) %>%
+#  dplyr::filter(!is.na(rep_trak2)) %>%
+#  dplyr::ungroup() %>%
+#  dplyr::select(-c("rep_trak1", "rep_trak3", "rep_trak4")) 
 
-reptrak_sep_statement3 <-data %>%
-  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
-  dplyr::group_by(b_value, country, quarter_measurement) %>%
-  dplyr::filter(!is.na(rep_trak3)) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(-c("rep_trak1", "rep_trak2", "rep_trak4")) 
+#reptrak_sep_statement3 <-data %>%
+#  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
+#  dplyr::group_by(b_value, country, quarter_measurement) %>%
+#  dplyr::filter(!is.na(rep_trak3)) %>%
+#  dplyr::ungroup() %>%
+#  dplyr::select(-c("rep_trak1", "rep_trak2", "rep_trak4")) 
 
-reptrak_sep_statement4 <-data %>%
-  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
-  dplyr::group_by(b_value, country, quarter_measurement) %>%
-  dplyr::filter(!is.na(rep_trak4)) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(-c("rep_trak1", "rep_trak2", "rep_trak3")) 
+#reptrak_sep_statement4 <-data %>%
+#  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
+#  dplyr::group_by(b_value, country, quarter_measurement) %>%
+#  dplyr::filter(!is.na(rep_trak4)) %>%
+#  dplyr::ungroup() %>%
+#  dplyr::select(-c("rep_trak1", "rep_trak2", "rep_trak3")) 
 
-reptrak_total <- cbind(reptrak, reptrak_sep_statement1, reptrak_sep_statement2, 
-                       reptrak_sep_statement3, reptrak_sep_statement4)
+# reptrak_total <- cbind(reptrak, reptrak_sep_statement1, reptrak_sep_statement2, 
+#                       reptrak_sep_statement3, reptrak_sep_statement4)
 
-reptrak_total1 <- merge(reptrak, reptrak_sep_statement1, by=c("b_value","country", "quarter_measurement"), all=T)
-reptrak_total2 <- merge(reptrak_sep_statement2, reptrak_sep_statement3, by=c("b_value","country", "quarter_measurement"), all=T)
-reptrak_total3 <- merge(reptrak_sep_statement4, reptrak_total1, by=c("b_value","country", "quarter_measurement"), all=T)
-reptrak_total <- merge(reptrak_total2, reptrak_total3, by=c("b_value","country", "quarter_measurement"), all=T)
+#reptrak_total1 <- merge(reptrak, reptrak_sep_statement1, by=c("b_value","country", "quarter_measurement"), all=T)
+#reptrak_total2 <- merge(reptrak_sep_statement2, reptrak_sep_statement3, by=c("b_value","country", "quarter_measurement"), all=T)
+#reptrak_total3 <- merge(reptrak_sep_statement4, reptrak_total1, by=c("b_value","country", "quarter_measurement"), all=T)
+#reptrak_total <- merge(reptrak_total2, reptrak_total3, by=c("b_value","country", "quarter_measurement"), all=T)
 
-rm(reptrak_total1, reptrak_total2, reptrak_total3, reptrak_sep_statement1, 
-   reptrak_sep_statement2, reptrak_sep_statement3, reptrak_sep_statement4, 
-   reptrak_sep_statements, reptrak)
-
-data <- left_join(data, reptrak_total, by=c("quarter_measurement", "country", "b_value"))
+#rm(reptrak_total1, reptrak_total2, reptrak_total3, reptrak_sep_statement1, 
+#   reptrak_sep_statement2, reptrak_sep_statement3, reptrak_sep_statement4, 
+#   reptrak_statements, reptrak)
+############################################
+data <- left_join(data, reptrak, by=c("quarter_measurement", "country", "b_value"))
+rm(reptrak)
 
 ### Love overview 
 love_overview <- result %>%
@@ -2158,6 +2163,18 @@ google_overview <- result %>%
 
 data <- full_join(data, google_overview, by=c("country", "quarter_measurement"))
 rm(google_overview) 
+
+price_perc <- result %>%
+  dplyr::select(country, quarter_measurement, b_value, price_perc_value, Weight) %>%
+  dplyr::filter(!is.na(price_perc_value)) %>%
+  dplyr::group_by(country, quarter_measurement, b_value) %>% 
+  dplyr::summarise(
+    price_mean = mean(price_perc_value * Weight, na.rm = T) 
+  ) %>%
+  dplyr::ungroup()
+
+data <- full_join(data, price_perc, by=c("country", "quarter_measurement", "b_value"))
+rm(price_perc) 
 
 proximity_overview <- result %>%
   dplyr::filter(!is.na(proxi_value)) %>%
@@ -2201,21 +2218,9 @@ NPS_result <- NPS_trial %>%
   dplyr::ungroup()
   
 
-### Desirability
 
-desi <- data %>%
-  dplyr::select(b_value, labels_countries, labels_quarters, desirability) %>%
-  dplyr::filter(b_value %in% c(1)) %>%
-  dplyr::group_by(b_value, labels_countries, labels_quarters) %>%
-  dplyr::distinct()
 
-### clients
-
-clients <- data %>%
-  dplyr::select(b_value, labels_countries, labels_quarters, desirability) %>%
-  dplyr::filter(b_value %in% c(1)) %>%
-  dplyr::group_by(b_value, labels_countries, labels_quarters) %>%
-  dplyr::distinct()
+### Labels
 
 labels_countries <-data %>%
   dplyr::select(country) %>%
@@ -2267,6 +2272,20 @@ labels_quarters <-data %>%
 
 data <- left_join(data, labels_quarters, by=c("quarter_measurement"))
 
+
+### non working code, intention to create a dummy for main competition
+data$main_competition <- data %>%
+  dplyr::select(country, b_value) %>%
+  ifelse(country == 1 & b_value <6, 1, 0)
+         
+main_competition <- data %>%
+  dplyr::select(country, b_value) %>%
+  dplyr::case_when(
+    main_competition = country==1 & b_value %in% c(1:5), 
+  )
+
+### Plot exploration
+
 desi %>%
   filter(labels_quarters=="Q3_2019") %>%
   plot_ly(x = ~labels_countries, y =~desirability *100, type='bar',
@@ -2276,15 +2295,6 @@ desi %>%
          yaxis = list(title = "desirability", range= c(0,100),
          annotations = annotations)
          )
-
-
-annotations <- list()
-for (i in 1:length(desi$desirability)) {
-  annotations[[i]] <- list(y = desi$desirability[[i]],
-                           text = desi$desirability[[i]],
-                           yanchor='bottom',
-                           showarrow = FALSE)
-}
 
 value <- data %>%
   dplyr::select(b_value, labels_countries, labels_quarters, image7) %>%
