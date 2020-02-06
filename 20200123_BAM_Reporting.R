@@ -6,7 +6,7 @@
 
 # this code works perfectly fine, it just complains about the kind of plot (funnel), but I installed it according 
 # the description https://plot.ly/r/funnel-charts/#basic-funnel-plot
-funnel <- data %>%
+funnel_data <- data %>%
   dplyr::select(unaided, toma, aided, fami, opinion, consideration, preference, quarter_measurement, b_value, country) %>%
   dplyr::filter(quarter_measurement ==20 & country==1) %>%
   dplyr::mutate(
@@ -18,13 +18,15 @@ funnel <- data %>%
     consideration_best = max(opinion, na.rm=T), 
     preference_best = max(opinion, na.rm=T), 
   ) %>%
-  unique() %>%
-  dplyr::filter(b_value==1) %>%
+  dplyr::distinct() %>% 
+  dplyr::filter(b_value==1)
+
+funnel_data %>%
   plot_ly() %>%
   add_trace(type = "funnel",
             y = c("aided", "fami", "consideration", "preference"),
-            x = c(round(funnel$aided, digits=2), round(funnel$fami, digits=2), 
-                  round(funnel$consideration, digits=2), round(funnel$preference, digits=2)),
+            x = c(round(funnel_data$aided, digits=2), round(funnel_data$fami, digits=2), 
+                  round(funnel_data$consideration, digits=2), round(funnel_data$preference, digits=2)),
             textposition = "inside",
             textinfo = "value+percent initial",
             opacity = 0.65,
@@ -102,38 +104,20 @@ desi_comb <- data %>%
 love <- data %>%
   dplyr::select(quarter_measurement, country, love_mean_ING, love_mean_Google, love_mean_ING_client) %>%
   dplyr::filter(quarter_measurement >17 & country==1) %>%
-  distinct() %>%
-  plotly()
+  distinct()
 
-x =c(18:20)
-p <- plotly(x= ~love$quarter_measurement, y= ~love$love_mean_ING, name = 'general pop') %>%
-  add_trace(y= ~love$love_mean_ING_client, name = 'clients') %>%
-  add_trace(y= ~love$love_mean_Google, name = 'Google') 
 
 love$x <-c("Q2 2019", "Q3 2019", "Q4 2019")
 l<-love %>%
   plot_ly(x = ~x) %>%
           add_lines(y = ~love_mean_ING_client, type='scatter', name='love ING clients', 
-                    line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'markers')) %>%
+                    line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
                       add_lines(y =~love_mean_Google, type='scatter', name='love Google',
-                                line = list(color = 'rgb(255,098,000)', width = 4, mode = 'markers')) %>%
+                                line = list(color = 'rgb(255,098,000)', width = 4, mode = 'lines+markers')) %>%
                                   add_lines(y =~love_mean_ING, type='scatter', name='love ING') %>%
   layout(title = "love",
          xaxis = list(title = "quarters"),
          yaxis = list(title = "", range= c(0,10))
-  )
-  
-
- 
-
-desi %>%
-  filter(labels_quarters=="Q3_2019") %>%
-  plot_ly(x = ~labels_countries, y =~desirability *100, type='bar',
-          marker = list(color = 'rgb(255,098,000)', width = 1.5)) %>%
-  layout(title = "Desirability",
-         xaxis = list(title = "countries"),
-         yaxis = list(title = "desirability", range= c(0,100),
-                      annotations = annotations)
   )
   
   
@@ -148,6 +132,7 @@ desi %>%
 
 # why are the two below not equal to each other?
 data$desirability[max(data$quarter_measurement)]
+data$desirability[20]
 data$desirability[data$quarter_measurement==20]
 
 data$desirability[max$data]
@@ -161,15 +146,22 @@ desi <- data %>%
   dplyr::select(quarter_measurement, country, b_value, desirability) %>%
   dplyr::filter(quarter_measurement >17 & b_value==1) %>%
   dplyr::mutate(
-    desirability = desirability *100) %>%
-  distinct()
-
-## not correct!! 
-desi <- desi %>%
+    desirability = desirability *100
+    ) %>%
+  distinct() %>% 
+  # Spread across quarters
+  tidyr::spread(quarter_measurement, desirability) %>% 
+  # Calculate CAGR
   dplyr::mutate(
-    CAGR = ((desi$desirability[desi$quarter_measurement==20]/ desi$desirability[desi$quarter_measurement==17]) ^(1/3))-1
-) %>%
-  dplyr::group_by(country) %>%
+    cagr = (`20`/`18`)^(1/3) - 1
+  ) %>% 
+  # Gather across quarters
+  tidyr::gather(quarter_measurement, desirability, -country, -b_value, -cagr) %>% 
+  # Filter to per country per time
+  dplyr::select(country, cagr) %>% 
+  dplyr::distinct()
+
+
   
 ### Trial to create a proper table
 
@@ -230,6 +222,70 @@ clients <- data %>%
   dplyr::filter(b_value %in% c(1)) %>%
   dplyr::group_by(b_value, labels_countries, labels_quarters) %>%
   dplyr::distinct()
+
+### Reputation country level multiple competitors
+reptrak_Aus$x <-c("Q1 2019", "Q2 2019", "Q3 2019", "Q4 2019")
+reptrak_Aus <- reptrak_total %>%
+  dplyr::select(country, quarter_measurement, pulse, b_value) %>%
+  dplyr::filter(country==1 & b_value %in% c(1,2,3,4))
+
+ING <- list(
+  xref = '',
+  yref = '',
+  x = 0.05,
+  y = reptrak_Aus$pulse[reptrak_Aus$b_value==1],
+  xanchor = 'right',
+  yanchor = 'middle',
+  text = ~paste('ING', pulse, '%'),
+  font = list(family = 'ING me',
+              size = 16,
+              color = 'rgb(255,098,000)'),
+  showarrow = FALSE)
+
+ANZ <- list(
+  xref = '',
+  yref = '',
+  x = 0.05,
+  y = reptrak_Aus$pulse[reptrak_Aus$b_value==2],
+  xanchor = 'right',
+  yanchor = 'middle',
+  text = ~paste('ING', pulse, '%'),
+  font = list(family = 'ING me',
+              size = 16,
+              color = 'rgb(255,098,000)'),
+  showarrow = FALSE)
+
+Commonwealth <- list(
+  xref = '',
+  yref = '',
+  x = 0.05,
+  y = reptrak_Aus$pulse[reptrak_Aus$b_value==3],
+  xanchor = 'right',
+  yanchor = 'middle',
+  text = ~paste('ING', pulse, '%'),
+  font = list(family = 'ING me',
+              size = 16,
+              color = 'rgb(255,098,000)'),
+  showarrow = FALSE)
+
+r <-plot_ly(reptrak_Aus, x = ~quarter_measurement, y=~ING, typ='scatter', name ='ING') %>%
+  add_lines(y = ~ING, type='scatter', name='ING', 
+            line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines')) %>%
+  add_lines(y =~ANZ, type='scatter', name='ANZ',
+            line = list(color = 'rgb(255,098,000)', width = 4, mode = 'lines')) %>%
+  add_lines(y =~Commonwealth, type='scatter', name='Commonwealth',
+            line = list(color = 'rgb(255,098,000)', width = 4, mode = 'lines')) %>%
+  layout(title = "pulse",
+         xaxis = list(title = "quarters"),
+         yaxis = list(title = "", range= c(0,100)))
+
+
+
+
+
+
   
+  
+
 
 
