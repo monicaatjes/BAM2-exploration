@@ -2095,44 +2095,44 @@ reptrak<- data %>%
     pulse = mean(reptrak_value)) %>%
   dplyr::ungroup()
 
-######## not run
-#reptrak_sep_statement1 <-data %>%
-#  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
-#  dplyr::group_by(b_value, country, quarter_measurement) %>%
-#  dplyr::filter(!is.na(rep_trak1)) %>%
-#  dplyr::ungroup() %>%
-#  dplyr::select(-c("rep_trak2", "rep_trak3", "rep_trak4")) 
 
-#reptrak_sep_statement2 <-data %>%
-#  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
-#  dplyr::group_by(b_value, country, quarter_measurement) %>%
-#  dplyr::filter(!is.na(rep_trak2)) %>%
-#  dplyr::ungroup() %>%
-#  dplyr::select(-c("rep_trak1", "rep_trak3", "rep_trak4")) 
+reptrak_sep_statement1 <-data %>%
+  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::filter(!is.na(rep_trak1)) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(-c("rep_trak2", "rep_trak3", "rep_trak4")) 
 
-#reptrak_sep_statement3 <-data %>%
-#  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
-#  dplyr::group_by(b_value, country, quarter_measurement) %>%
-#  dplyr::filter(!is.na(rep_trak3)) %>%
-#  dplyr::ungroup() %>%
-#  dplyr::select(-c("rep_trak1", "rep_trak2", "rep_trak4")) 
+reptrak_sep_statement2 <-data %>%
+  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::filter(!is.na(rep_trak2)) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(-c("rep_trak1", "rep_trak3", "rep_trak4")) 
 
-#reptrak_sep_statement4 <-data %>%
-#  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
-#  dplyr::group_by(b_value, country, quarter_measurement) %>%
-#  dplyr::filter(!is.na(rep_trak4)) %>%
-#  dplyr::ungroup() %>%
-#  dplyr::select(-c("rep_trak1", "rep_trak2", "rep_trak3")) 
+reptrak_sep_statement3 <-data %>%
+  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::filter(!is.na(rep_trak3)) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(-c("rep_trak1", "rep_trak2", "rep_trak4")) 
 
-# reptrak_total <- cbind(reptrak, reptrak_sep_statement1, reptrak_sep_statement2, 
-#                       reptrak_sep_statement3, reptrak_sep_statement4)
+reptrak_sep_statement4 <-data %>%
+  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::filter(!is.na(rep_trak4)) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(-c("rep_trak1", "rep_trak2", "rep_trak3")) 
 
-#reptrak_total1 <- merge(reptrak, reptrak_sep_statement1, by=c("b_value","country", "quarter_measurement"), all=T)
-#reptrak_total2 <- merge(reptrak_sep_statement2, reptrak_sep_statement3, by=c("b_value","country", "quarter_measurement"), all=T)
-#reptrak_total3 <- merge(reptrak_sep_statement4, reptrak_total1, by=c("b_value","country", "quarter_measurement"), all=T)
-#reptrak_total <- merge(reptrak_total2, reptrak_total3, by=c("b_value","country", "quarter_measurement"), all=T)
+reptrak_total <- cbind(reptrak, reptrak_sep_statement1, reptrak_sep_statement2, 
+                       reptrak_sep_statement3, reptrak_sep_statement4)
 
-#rm(reptrak_total1, reptrak_total2, reptrak_total3, reptrak_sep_statement1, 
+reptrak_total1 <- merge(reptrak, reptrak_sep_statement1, by=c("b_value","country", "quarter_measurement"), all=T)
+reptrak_total2 <- merge(reptrak_sep_statement2, reptrak_sep_statement3, by=c("b_value","country", "quarter_measurement"), all=T)
+reptrak_total3 <- merge(reptrak_sep_statement4, reptrak_total1, by=c("b_value","country", "quarter_measurement"), all=T)
+reptrak_total <- merge(reptrak_total2, reptrak_total3, by=c("b_value","country", "quarter_measurement"), all=T)
+
+rm(reptrak_total1, reptrak_total2, reptrak_total3, reptrak_sep_statement1, reptrak_sep_statement2, reptrak_sep_statement3, reptrak_sep_statement4) 
 #   reptrak_sep_statement2, reptrak_sep_statement3, reptrak_sep_statement4, 
 #   reptrak_statements, reptrak)
 ############################################
@@ -2151,6 +2151,19 @@ love_overview <- result %>%
 
 data <- full_join(data, love_overview, by=c("country", "quarter_measurement"))
 rm(love_overview) 
+
+love_overview_client <- result %>%
+  dplyr::select(country, quarter_measurement, b_value, client_value, price_perc_value, Weight, love_ING) %>%
+  dplyr::filter(b_value==1 & client_value==1 & !is.na(love_ING)) %>%
+  dplyr::filter(love_ING %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) %>% 
+  dplyr::group_by(country, quarter_measurement) %>% 
+  dplyr::summarise(
+    love_mean_ING_client = mean(love_ING * Weight, na.rm = T) 
+  ) %>%
+  dplyr::ungroup()
+
+data <- full_join(data, love_overview_client, by=c("country", "quarter_measurement"))
+rm(love_overview_client) 
 
 google_overview <- result %>%
   dplyr::filter(!is.na(love_Google)) %>%
@@ -2217,13 +2230,10 @@ NPS_result <- NPS_trial %>%
   ) %>%
   dplyr::ungroup()
   
-
-
-
 ### Labels
-
-labels_countries <-data %>%
+labels_countries <- data %>%
   dplyr::select(country) %>%
+  dplyr::distinct() %>% 
   dplyr::mutate(
     labels_countries = case_when(
       country == 1 ~ "Australia",
@@ -2240,11 +2250,13 @@ labels_countries <-data %>%
       country == 12 ~ "Spain",
       country == 13 ~ "Turkey",
       country == 14 ~ "The Philippines",
-      TRUE ~ "NA_real_"))
+      TRUE ~ "NA_real_")
+    )
 data <- left_join(data, labels_countries, by=c("country"))
 
 labels_quarters <-data %>%
   dplyr::select(quarter_measurement) %>%
+  dplyr::distinct() %>% 
   dplyr::mutate(
     labels_quarters = case_when(
       quarter_measurement == 0 ~ "Q4_2014",
@@ -2272,17 +2284,29 @@ labels_quarters <-data %>%
 
 data <- left_join(data, labels_quarters, by=c("quarter_measurement"))
 
-
-### non working code, intention to create a dummy for main competition
-data$main_competition <- data %>%
-  dplyr::select(country, b_value) %>%
-  ifelse(country == 1 & b_value <6, 1, 0)
+### dummy for main competition
+main_competition <- data %>% 
+   dplyr::mutate(
+     main_competition = dplyr::case_when(
+       country == 1 & b_value < 6 ~ 1,
+       country == 2 & b_value < 7 ~ 1,
+       country == 3 & b_value < 5 ~ 1,
+       country == 4 & b_value < 6 ~ 1,
+       country == 5 & b_value < 8 ~ 1,
+       country == 6 & b_value < 6 ~ 1,
+       country == 7 & (b_value < 8 | b_value == 10) ~ 1,
+       country == 8 & b_value < 7 ~ 1,
+       country == 9 & b_value < 5 ~ 1,
+       country == 10 & b_value < 7 ~ 1,
+       country == 11 & b_value < 6 ~ 1,
+       country == 12 & b_value < 5 ~ 1,
+       country == 13 & b_value < 7 ~ 1,
+       country == 14 & b_value < 8 ~ 1,
+       TRUE ~ 0
+     )
+   )
+data <- left_join(data, main_competition, by=c("quarter_measurement", "b_value", "country"))
          
-main_competition <- data %>%
-  dplyr::select(country, b_value) %>%
-  dplyr::case_when(
-    main_competition = country==1 & b_value %in% c(1:5), 
-  )
 
 ### Plot exploration
 
@@ -2306,11 +2330,18 @@ write.table(value, "/Users/xo21bm/Documents/Lokaal/BAM2/exploration/value.txt", 
 
 ## Experienced Empowerment 
 emp <-data %>%
-  dplyr::select(quarter_measurement, labels_quarters, b_value, country, labels_countries, empower1, empower2, empower3, empower4) %>%
-  dplyr::filter(quarter_measurement >16) %>%
+  dplyr::select(quarter_measurement, b_value, country, empower1, empower2, empower3, empower4) %>%
+  dplyr::filter(quarter_measurement >12) %>%
   distinct() 
 
 # write.table(emp, "/Users/xo21bm/Documents/Lokaal/BAM2/exploration/empowerment.csv", sep=",")
+
+## Input NL & BE reputation
+repNL <- data %>%
+  dplyr::select(consideration, preference, trust4, country, quarter_measurement, b_value) %>%
+  dplyr::filter(quarter_measurement >16, country ==3 | country ==9) %>%
+  dplyr::group_by(quarter_measurement, country, b_value) %>%
+  distinct()
 
 Awareness <- data %>%
   dplyr::select(b_value, country, quarter_measurement, toma, aided, unaided) %>%
@@ -2319,3 +2350,10 @@ Awareness <- data %>%
   dplyr::distinct() 
 
 "C:/Lokaal/BAM2/exploration/Awareness.csv"
+
+Reputation_Romania <- data %>%
+  dplyr::select(rep_trak1, rep_trak2, rep_trak3, rep_trak4, pulse, country, quarter_measurement, b_value) %>%
+  dplyr::filter(quarter_measurement >12, country ==11, b_value <6) %>%
+  distinct()
+write.table(Reputation_Romania, "/Users/xo21bm/Documents/Lokaal/BAM2/exploration/Reputation_Romania.csv", sep=",")
+
