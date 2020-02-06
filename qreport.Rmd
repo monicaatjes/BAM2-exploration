@@ -18,7 +18,8 @@ desi <- data %>%
   dplyr::select(quarter_measurement, country, b_value, desirability) %>%
   dplyr::filter(quarter_measurement >17 & b_value==1) %>%
   dplyr::mutate(
-    desirability = desirability *100) %>%
+    desirability = desirability *100
+    ) %>%
   distinct()
 
 c <- c("Australia", "Austria", "Belgium", "Czech", "France", "Germany", "Italy", "Luxembourg", 
@@ -31,7 +32,7 @@ desi<- plot_ly(
   header = list(
     values = c("country","Q3 2019", "Q4 2019", "Q1 2020"),
     align = c("center", "center", "center", "center"),
-    line = list(width = 1, color = 'black'),
+    line = list(width = 1, color = c("rgb 168, 168, 168")),
     fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
     font = list(family = "ING me", size = 14, color = "white")
   ),
@@ -41,8 +42,8 @@ desi<- plot_ly(
                    round(desi$desirability[desi$quarter_measurement==19], digits=2), 
                    round(desi$desirability[desi$quarter_measurement==20], digits=2)),
     align = c("center", "center", "center", "center"),
-    line = list(color = "black", width = 1),
-    font = list(family = "ING me", size = 12, color = c("black"))
+    line = list(color = c("rgb 168, 168, 168"), width = 1),
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
 desi
 ```
@@ -68,7 +69,7 @@ r <- plot_ly(
   header = list(
     values = c("country","Q2 2019", "Q3 2019", "Q4 2019"),
     align = c("center", "center", "center", "center"),
-    line = list(width = 1, color = 'black'),
+    line = list(width = 1, color = c("rgb 168, 168, 168")),
     fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
     font = list(family = "ING me", size = 14, color = "white")
   ),
@@ -77,8 +78,8 @@ r <- plot_ly(
                    round(rep$pulse[rep$quarter_measurement==19], digits=2), 
                    round(rep$pulse[rep$quarter_measurement==20], digits=2)),
     align = c("center", "center", "center", "center"),
-    line = list(color = "black", width = 1),
-    font = list(family = "ING me", size = 12, color = c("black"))
+    line = list(color = c("rgb 168, 168, 168"), width = 1),
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
 r
 
@@ -93,43 +94,135 @@ r
 
 ## Brand funnel
 ```{r Australia brand funnel, echo=F, eval=T}
-funnel <- data %>%
+funnel_data <- data %>%
   dplyr::select(unaided, toma, aided, fami, opinion, consideration, preference, quarter_measurement, b_value, country) %>%
   dplyr::filter(quarter_measurement ==20 & country==1) %>%
   dplyr::mutate(
-    unaided_best = max(unaided, na.rm=T), 
-    aided_best = max(aided, na.rm=T), 
-    toma_best = max(toma, na.rm=T), 
-    fami_best = max(fami, na.rm=T), 
-    opinion_best = max(opinion, na.rm=T), 
-    consideration_best = max(opinion, na.rm=T), 
-    preference_best = max(opinion, na.rm=T), 
+    unaided_best = max(unaided, na.rm=T) *100, 
+    aided_best = max(aided, na.rm=T) * 100, 
+    toma_best = max(toma, na.rm=T) * 100, 
+    fami_best = max(fami, na.rm=T) * 100, 
+    opinion_best = max(opinion, na.rm=T) * 100, 
+    consideration_best = max(opinion, na.rm=T) * 100, 
+    preference_best = max(opinion, na.rm=T) * 100, 
+    unaided = unaided * 100,
+    aided = aided * 100,
+    toma = toma * 100,
+    fami = fami * 100,
+    consideration = consideration *100,
+    preference = preference *100
   ) %>%
-  unique() %>%
-  dplyr::filter(b_value==1) %>%
+  dplyr::distinct() %>% 
+  dplyr::filter(b_value==1)
+
+funnel_data %>%
   plot_ly() %>%
   add_trace(type = "funnel",
             y = c("aided", "fami", "consideration", "preference"),
-            x = c(round(funnel$aided, digits=2), round(funnel$fami, digits=2), 
-                  round(funnel$consideration, digits=2), round(funnel$preference, digits=2)),
+            x = c(round(funnel_data$aided, digits=2), round(funnel_data$fami, digits=2), 
+                  round(funnel_data$consideration, digits=2), round(funnel_data$preference, digits=2)),
             textposition = "inside",
-            textinfo = "value+percent initial",
+            textinfo = "value initial",
             opacity = 0.65,
             marker = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)"),
                           line = list(width = c(4, 2, 2, 3), color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)"))),
             connector = list(line = list(color = "royalblue", dash = "dot", width = 3))) %>%
   layout(yaxis = list(categoryarray = c("aided", "fami", "consideration", "preference")))
+
 ```
 ## Love 
 
-love$x <-c("Q2 2019", "Q3 2019", "Q4 2019")
+```{r Australia love, echo=F, eval=T}
+love <- data %>%
+  dplyr::select(quarter_measurement, country, love_mean_ING, love_mean_Google, love_mean_ING_client) %>%
+  dplyr::filter(quarter_measurement >17 & country==1) %>%
+  distinct()
+
+xaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              ticklen = 5,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(204, 204, 204)'))
+
+yaxis <- list(title = "",
+              showgrid = FALSE,
+              zeroline = FALSE,
+              showline = FALSE,
+              showticklabels = FALSE,
+              range =c(0,10))
+margin <- list(autoexpand = F)
+
+# Build the annotations
+
+love_ING_clients <- list(
+  xref = '',
+  yref = '',
+  x = 0.05,
+  y = love$love_mean_ING_client[1],
+  xanchor = 'right',
+  yanchor = 'middle',
+  text = ~paste('love ING clients ', love_mean_ING_client[1], '%'),
+  font = list(family = 'ING me',
+              size = 16,
+              color = 'rgb(255,098,000)'),
+  showarrow = FALSE)
+
+love_mean_ING <- list(
+  xref = '',
+  yref = '',
+  x = 0.05,
+  y = love$love_mean_ING[1],
+  xanchor = 'right',
+  yanchor = 'middle',
+  text = ~paste('love ING general pop', love_mean_ING[1], '%'),
+  font = list(family = 'ING me',
+              size = 16,
+              color = c('rgb(52, 150, 81')),
+  showarrow = FALSE)
+
+love_mean_Google <- list(
+  xref = 'paper',
+  x = 0.95,
+  y = love$love_mean_Google[1],
+  xanchor = 'left',
+  yanchor = 'middle',
+  text = paste('love Google', love$love_mean_Google[1], '%'),
+  font = list(family = 'ING me',
+              size = 16,
+              color = 'rgb(82,81,153)'),
+  showarrow = FALSE)
+
 l<-love %>%
   plot_ly(x = ~x) %>%
-          add_lines(y = ~love_mean_ING_client, type='scatter', name='love ING clients') %>%
-                      add_lines(y =~love_mean_Google, type='scatter', name='love Google') %>%
-                                  add_lines(y =~love_mean_ING, type='scatter', name='love ING') %>%
-  layout(title = "love",
-         xaxis = list(title = "quarters"),
-         yaxis = list(title = "", range= c(0,10))
-  )
+  add_lines(y = ~love_mean_ING_client, type='scatter', name='love ING clients', 
+            line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~love_mean_Google, type='scatter', name='love Google',
+            line = list(color = 'rgb(82,81,153)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~love_mean_ING, type='scatter', name='love ING',
+            line = list(color = 'rgb(52, 150, 81', width = 4, mode = 'lines+markers')) %>%
+  layout(title = "Love scores",
+         xaxis = xaxis,
+         yaxis = yaxis)
+l
+```
 
+Australia has shown stable love scores since last quarter. 
+
+## Reputation
+
+```{r Australia pulse, echo=F, eval=T}
+
+
+
+
+
+```
