@@ -22,31 +22,55 @@ desi <- data %>%
     ) %>%
   distinct()
 
+desi_CAGR <- data %>%
+  dplyr::select(quarter_measurement, country, b_value, desirability) %>%
+  dplyr::filter(quarter_measurement >17 & b_value==1) %>%
+  dplyr::mutate(
+    desirability = desirability *100
+    ) %>%
+  distinct() %>% 
+  # Spread across quarters
+  tidyr::spread(quarter_measurement, desirability) %>% 
+  # Calculate CAGR
+  dplyr::mutate(
+    cagr = (`20`/`18`)^(1/3) - 1
+  ) %>% 
+  # Gather across quarters
+  tidyr::gather(quarter_measurement, desirability, -country, -b_value, -cagr) %>% 
+  # Filter to per country per time
+  dplyr::select(country, cagr) %>% 
+  dplyr::distinct()
+
 c <- c("Australia", "Austria", "Belgium", "Czech", "France", "Germany", "Italy", "Luxembourg", 
        "Netherlands", "Poland", "Romania", "Spain", "Turkey", "The Philippines")
 
-desi<- plot_ly(
+desi_p<- plot_ly(
   type = 'table',
-  columnwidth = c(70, 40, 40, 40),
-  columnorder = c(0, 1, 2, 3),
+  columnwidth = c(70, 40, 40, 40, 40),
+  columnorder = c(0, 1, 2, 3, 4),
   header = list(
-    values = c("country","Q3 2019", "Q4 2019", "Q1 2020"),
-    align = c("center", "center", "center", "center"),
+    values = c("country","Q3 2019", "Q4 2019", "Q1 2020", "CAGR"),
+    align = c("center", "center", "center", "center", "center"),
     line = list(width = 1, color = c("rgb 168, 168, 168")),
-    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
+    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
     font = list(family = "ING me", size = 14, color = "white")
   ),
   cells = list(
     values = rbind(c,
                    round(desi$desirability[desi$quarter_measurement==18], digits=2),
                    round(desi$desirability[desi$quarter_measurement==19], digits=2), 
-                   round(desi$desirability[desi$quarter_measurement==20], digits=2)),
-    align = c("center", "center", "center", "center"),
+                   round(desi$desirability[desi$quarter_measurement==20], digits=2),
+                   round(desi_CAGR$cagr, digits=2)),
+    align = c("center", "center", "center", "center", "center"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
-desi
+desi_p
 ```
+
+
+CAGR: Compound annual growth rate, i.e. constant % variance period-on-period for the periods presented (3)
+
 # Reputation pulse score
 
 ```{r overview Reputation, echo=F, eval=T}
@@ -59,25 +83,45 @@ rep <- data %>%
   ) %>%
   distinct()
 
+rep_CAGR <- data %>%
+  dplyr::select(quarter_measurement, country, b_value, pulse) %>%
+  dplyr::filter(quarter_measurement >17 & b_value==1) %>%
+  dplyr::mutate(
+    pulse = pulse *100
+  ) %>%
+  distinct() %>% 
+  # Spread across quarters
+  tidyr::spread(quarter_measurement, pulse) %>% 
+  # Calculate CAGR
+  dplyr::mutate(
+    cagr = (`20`/`18`)^(1/3) - 1
+  ) %>% 
+  # Gather across quarters
+  tidyr::gather(quarter_measurement, pulse, -country, -b_value, -cagr) %>% 
+  # Filter to per country per time
+  dplyr::select(country, cagr) %>% 
+  dplyr::distinct()
+
 c <- c("Australia", "Austria", "Belgium", "Czech", "France", "Germany", "Italy", "Luxembourg", 
        "Netherlands", "Poland", "Romania", "Spain", "Turkey", "The Philippines")
 
 r <- plot_ly(
   type = 'table',
-  columnwidth = c(70, 40, 40, 40),
-  columnorder = c(0, 1, 2, 3),
+  columnwidth = c(70, 40, 40, 40, 40),
+  columnorder = c(0, 1, 2, 3, 4),
   header = list(
-    values = c("country","Q2 2019", "Q3 2019", "Q4 2019"),
-    align = c("center", "center", "center", "center"),
+    values = c("country","Q2 2019", "Q3 2019", "Q4 2019", "CAGR"),
+    align = c("center", "center", "center", "center", "center"),
     line = list(width = 1, color = c("rgb 168, 168, 168")),
-    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
+    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
     font = list(family = "ING me", size = 14, color = "white")
   ),
   cells = list(
     values = rbind(c, round(rep$pulse[rep$quarter_measurement==18], digits=2),
                    round(rep$pulse[rep$quarter_measurement==19], digits=2), 
-                   round(rep$pulse[rep$quarter_measurement==20], digits=2)),
-    align = c("center", "center", "center", "center"),
+                   round(rep$pulse[rep$quarter_measurement==20], digits=2),
+                   round(rep_CAGR$cagr, digits=2)),
+    align = c("center", "center", "center", "center", "center"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -103,31 +147,78 @@ funnel_data <- data %>%
     toma_best = max(toma, na.rm=T) * 100, 
     fami_best = max(fami, na.rm=T) * 100, 
     opinion_best = max(opinion, na.rm=T) * 100, 
-    consideration_best = max(opinion, na.rm=T) * 100, 
-    preference_best = max(opinion, na.rm=T) * 100, 
+    consideration_best = max(consideration, na.rm=T) * 100, 
+    preference_best = max(preference, na.rm=T) * 100, 
     unaided = unaided * 100,
     aided = aided * 100,
     toma = toma * 100,
     fami = fami * 100,
     consideration = consideration *100,
-    preference = preference *100
+    preference = preference *100,
   ) %>%
-  dplyr::distinct() %>% 
-  dplyr::filter(b_value==1)
+  dplyr::distinct() 
 
+funnel_data_diff <- funnel_data %>%
+  dplyr::select(unaided_best, aided_best, toma_best, fami_best, opinion_best, 
+                consideration_best, preference_best, unaided, aided, toma, fami, 
+                opinion, consideration, preference, b_value, quarter_measurement, country) %>%
+  dplyr::mutate(
+    diff_aided = dplyr::case_when(
+      b_value==1 ~ (aided_best - aided),
+      TRUE ~ 0),
+    diff_fami = dplyr::case_when(
+      b_value==1 ~ (fami_best - fami),
+      TRUE ~ 0),
+    diff_cons = dplyr::case_when(
+      b_value==1 ~ (consideration_best - consideration),
+      TRUE ~ 0),
+    diff_pref = dplyr::case_when(
+      b_value==1 ~ (preference_best - preference),
+      TRUE ~ 0),
+    ) %>%
+  dplyr::filter(diff_aided!=0, diff_fami!=0, diff_cons!=0, diff_pref!=0)
+
+par(mfrow = c(1, 2))
+
+funnel_data <- funnel_data %>%
+  dplyr::filter(b_value==1)
 funnel_data %>%
   plot_ly() %>%
   add_trace(type = "funnel",
-            y = c("aided", "fami", "consideration", "preference"),
+            y = c("Aided", "Familiarity", "Consideration", "Preference"),
             x = c(round(funnel_data$aided, digits=2), round(funnel_data$fami, digits=2), 
                   round(funnel_data$consideration, digits=2), round(funnel_data$preference, digits=2)),
             textposition = "inside",
-            textinfo = "value initial",
-            opacity = 0.65,
+            textinfo = "value",
+            opacity = 1.0,
             marker = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)"),
-                          line = list(width = c(4, 2, 2, 3), color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)"))),
-            connector = list(line = list(color = "royalblue", dash = "dot", width = 3))) %>%
-  layout(yaxis = list(categoryarray = c("aided", "fami", "consideration", "preference")))
+                          line = list(width = c(2, 2, 2, 2), color = c("white", "white", "white", "white"))),
+            textfont = list(family = "ING me", size = 14, color = "white"),
+            connector = list(line = list(color = "white"))) %>%
+  layout(yaxis = list(categoryarray = c("Aided", "Familiarity", "Consideration", "Preference")))
+
+tab <- plot_ly(
+  type = 'table',
+  columnwidth = c(1),
+  columnorder = c(0),
+  header = list(
+    values = c("best comp"),
+    align = c("center"),
+    line = list(width = 1, color = 'black'),
+    fill = list(color = "rgb(255,098,000)"),
+    font = list(family = "ING me", size = 14, color = "white")
+  ),
+  cells = list(
+    values = cbind(round(funnel_data_diff$diff_aided, digits=2),
+                   round(funnel_data_diff$diff_fami, digits=2),
+                   round(funnel_data_diff$diff_cons, digits=2),
+                   round(funnel_data_diff$diff_pref, digits=2)),
+    align = c("center", "center", "center", "center"),
+    line = list(color = c("rgb 168, 168, 168"), width = 1),
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
+  ))
+tab
+par(mfrow = c(1, 2))
 
 ```
 ## Love 
@@ -201,6 +292,7 @@ love_mean_Google <- list(
               color = 'rgb(82,81,153)'),
   showarrow = FALSE)
 
+love$x <-c("Q2 2019", "Q3 2019", "Q4 2019")
 l<-love %>%
   plot_ly(x = ~x) %>%
   add_lines(y = ~love_mean_ING_client, type='scatter', name='love ING clients', 
@@ -220,9 +312,32 @@ Australia has shown stable love scores since last quarter.
 ## Reputation
 
 ```{r Australia pulse, echo=F, eval=T}
+rep_brand <- data %>%
+  dplyr::select(quarter_measurement, country, b_value, pulse) %>%
+  dplyr::filter(quarter_measurement > 16 & country==1 & b_value <6) %>%
+  dplyr::mutate(
+    pulse = pulse *100
+  ) %>%
+  distinct() %>%
+  # Gather across brands
+  tidyr::spread(b_value, pulse) 
 
-
-
-
-
+rep_brand$x <-c("Q1 2019", "Q2 2019", "Q3 2019", "Q4 2019")
+rep_b<-rep_brand %>%
+  plot_ly(x = ~x) %>%
+  add_lines(y = ~rep_brand$'1', type='scatter', name='ING',
+            line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~rep_brand$'2', type='scatter', name='ANZ',
+            line = list(color = 'rgb(96,166,218)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~rep_brand$'3', type='scatter', name='Commonwealth Bank',
+            line = list(color = 'rgb(171,0,102)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~rep_brand$'4', type='scatter', name='NAB',
+            line = list(color = 'rgb(208,217,60)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~rep_brand$'5', type='scatter', name='Westpac',
+          line = list(color = 'rgb(52,150,81)', width = 4, mode = 'lines+markers')) %>%
+  layout(title = "Pulse",
+         xaxis = list(title = "quarters"),
+         yaxis = list(title = "", range= c(0,100))
+  )
+rep_b
 ```
