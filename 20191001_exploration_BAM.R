@@ -2200,35 +2200,6 @@ proximity_overview <- result %>%
 
 data <- full_join(data, proximity_overview, by=c("country", "quarter_measurement", "b_value"))
 rm(proximity_overview) 
-
-### NPS ###
-NPS_trial <-result %>%
-  dplyr::filter(!is.na(nps_value)) %>%
-  dplyr::group_by(country, quarter_measurement, b_value) %>%
-  dplyr::mutate(
-    nps_clients = case_when(
-      client_value == 1 ~ nps_value * weight_nps,
-      TRUE ~ NA_real_)
-  ) %>%
-  dplyr::mutate(nps_cat = case_when(
-    nps_clients >=9.0 ~ "promotors",
-    nps_clients <= 9.0 & nps_clients >= 7.0 ~ "neutrals",
-    nps_clients  <= 6.0 ~ "detractors",
-    TRUE ~ "NA_real_")) %>%
-  dplyr::group_by(nps_cat, country, b_value, quarter_measurement) %>%
-  dplyr::tally() %>%
-  dplyr::mutate(
-    percentage = n /sum(n)
-  ) %>% 
-  dplyr::ungroup()
-
-NPS_result <- NPS_trial %>%
-  dplyr::filter(nps_cat %in% c("promotors", "detractors", "neutrals")) %>%
-  dplyr::group_by(country, quarter_measurement, b_value) %>%
-  dplyr::mutate(
-    nps = percentage[nps_cat=="promotors"] - percentage[nps_cat=="detractors"]
-  ) %>%
-  dplyr::ungroup()
   
 ### Labels
 labels_countries <- data %>%
@@ -2305,55 +2276,8 @@ main_competition <- data %>%
        TRUE ~ 0
      )
    )
-data <- left_join(data, main_competition, by=c("quarter_measurement", "b_value", "country"))
+data <- main_competition
+rm(main_competition)
          
 
-### Plot exploration
-
-desi %>%
-  filter(labels_quarters=="Q3_2019") %>%
-  plot_ly(x = ~labels_countries, y =~desirability *100, type='bar',
-          marker = list(color = 'rgb(255,098,000)', width = 1.5)) %>%
-  layout(title = "Desirability",
-         xaxis = list(title = "countries"),
-         yaxis = list(title = "desirability", range= c(0,100),
-         annotations = annotations)
-         )
-
-value <- data %>%
-  dplyr::select(b_value, labels_countries, labels_quarters, image7) %>%
-  dplyr::filter(b_value %in% c(1)) %>%
-  dplyr::filter(labels_quarters %in% c("Q1_2019","Q2_2019", "Q3_2019")) %>%
-  dplyr::distinct()
-
-write.table(value, "/Users/xo21bm/Documents/Lokaal/BAM2/exploration/value.txt", sep=",")
-
-## Experienced Empowerment 
-emp <-data %>%
-  dplyr::select(quarter_measurement, b_value, country, empower1, empower2, empower3, empower4) %>%
-  dplyr::filter(quarter_measurement >12) %>%
-  distinct() 
-
-# write.table(emp, "/Users/xo21bm/Documents/Lokaal/BAM2/exploration/empowerment.csv", sep=",")
-
-## Input NL & BE reputation
-repNL <- data %>%
-  dplyr::select(consideration, preference, trust4, country, quarter_measurement, b_value) %>%
-  dplyr::filter(quarter_measurement >16, country ==3 | country ==9) %>%
-  dplyr::group_by(quarter_measurement, country, b_value) %>%
-  distinct()
-
-Awareness <- data %>%
-  dplyr::select(b_value, country, quarter_measurement, toma, aided, unaided) %>%
-  dplyr::filter(b_value==1, country==6) %>%
-  dplyr::group_by(quarter_measurement) %>%
-  dplyr::distinct() 
-
-"C:/Lokaal/BAM2/exploration/Awareness.csv"
-
-Reputation_Romania <- data %>%
-  dplyr::select(rep_trak1, rep_trak2, rep_trak3, rep_trak4, pulse, country, quarter_measurement, b_value) %>%
-  dplyr::filter(quarter_measurement >12, country ==11, b_value <6) %>%
-  distinct()
-write.table(Reputation_Romania, "/Users/xo21bm/Documents/Lokaal/BAM2/exploration/Reputation_Romania.csv", sep=",")
 
