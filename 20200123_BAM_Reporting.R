@@ -326,12 +326,6 @@ rep_b<-rep_brand %>%
   )
 
 
-
-
-
-
-
-data <-write_csv(data, "data.csv")
   
 ### Plot exploration ################################## COPIED FROM EXPLORATION SCRIPT
 
