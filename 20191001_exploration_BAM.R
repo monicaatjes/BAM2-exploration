@@ -2254,6 +2254,7 @@ labels_quarters <-data %>%
       TRUE ~ "NA_real_"))
 
 data <- left_join(data, labels_quarters, by=c("quarter_measurement"))
+rm(labels_countries, labels_quarters)
 
 ### dummy for main competition
 main_competition <- data %>% 
@@ -2278,6 +2279,10 @@ main_competition <- data %>%
    )
 data <- main_competition
 rm(main_competition)
-         
+
+X20200209_Competitorlist <- read.csv("20200209_Competitorlist.csv", sep=";")
+data <-left_join(data, X20200209_Competitorlist, by=c("country", "b_value"))
+rm(X20200209_Competitorlist)        
+data <-write_csv(data, "data.csv")
 
 
