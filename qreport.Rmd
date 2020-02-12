@@ -1,5 +1,5 @@
 ---
-title: "Reporting BAM results"
+title: "Communication & Brand experience update"
 output: ingmarkdowntemplates::ing_html_document
 ---
 
@@ -7,11 +7,11 @@ output: ingmarkdowntemplates::ing_html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-###### Management summary results Q1 2020
+## Management summary results Q1 2020
 
 This document provides you an overview of the KPI's of the CoE Communications and Brand Experience. 
 
-# Desirability
+## Desirability
 
 ```{r overview Desirability, echo=F, eval=T}
 desi <- data %>%
@@ -49,7 +49,7 @@ desi_p<- plot_ly(
   columnwidth = c(70, 40, 40, 40, 40),
   columnorder = c(0, 1, 2, 3, 4),
   header = list(
-    values = c("country","Q3 2019", "Q4 2019", "Q1 2020", "CAGR"),
+    values = c("country","Q2 2019", "Q3 2019", "Q4 2019", "CAGR"),
     align = c("center", "center", "center", "center", "center"),
     line = list(width = 1, color = c("rgb 168, 168, 168")),
     fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
@@ -68,11 +68,9 @@ desi_p<- plot_ly(
 desi_p
 ```
 
-
 CAGR: Compound annual growth rate, i.e. constant % variance period-on-period for the periods presented (3)
 
-# Reputation pulse score
-
+## Reputation pulse score
 ```{r overview Reputation, echo=F, eval=T}
 
 rep <- data %>%
@@ -126,18 +124,15 @@ r <- plot_ly(
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
 r
-
-
 ```
-# Internal NPS
-
+## Internal NPS
 ```{r overview Internal NPS, echo=F, eval=T}
 
 ```
-# Australia
-
-## Brand funnel
+## Australia
+### Brand funnel
 ```{r Australia brand funnel, echo=F, eval=T}
+par(mfrow = c(1, 2))
 funnel_data <- data %>%
   dplyr::select(unaided, toma, aided, fami, opinion, consideration, preference, quarter_measurement, b_value, country) %>%
   dplyr::filter(quarter_measurement ==20 & country==1) %>%
@@ -202,7 +197,7 @@ tab <- plot_ly(
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
-    values = c("best comp"),
+    values = c("delta best comp"),
     align = c("center"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
@@ -218,11 +213,11 @@ tab <- plot_ly(
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
 tab
-par(mfrow = c(1, 2))
-
 ```
-## Love 
 
+ING is still behind the best competitor regarding awareness, which is translated to the lower level of the funnel as well. 
+
+### Love
 ```{r Australia love, echo=F, eval=T}
 love <- data %>%
   dplyr::select(quarter_measurement, country, love_mean_ING, love_mean_Google, love_mean_ING_client) %>%
@@ -309,8 +304,50 @@ l
 
 Australia has shown stable love scores since last quarter. 
 
-## Reputation
+### Desirability and price perception
 
+```{r Australia Desirability vs price perception, echo=F, eval=T, warning=F}
+desi_comb <- data %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==1) %>%
+  dplyr::mutate(
+    desirability = desirability *100,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              ticklen = 5,
+              #range = c(20, 80), 
+              seq(0, 100, by = 10),
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(204, 204, 204)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(color = 'rgb(204, 204, 204)', size = 11)) %>%
+  layout(title = 'Q4 2019',
+         xaxis = xaxis,
+         yaxis = list(title = 'Desirability',
+                      range = c(0, 50)
+                      ))
+desi_combi  
+```
+
+Commonwealth is the most desired brand in the market, closely followed by ING. It is an important advantage that ING is not considered as expensive. 
+
+### Reputation
 ```{r Australia pulse, echo=F, eval=T}
 rep_brand <- data %>%
   dplyr::select(quarter_measurement, country, b_value, pulse) %>%
