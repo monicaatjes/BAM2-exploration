@@ -16,7 +16,11 @@ library(plotly)
 library(dplyr)
 library(stringr)
 library(ingmarkdowntemplates)
-
+library(ggplot2)
+library(ggflags)
+library(png)
+library(emoGG)
+library(ggimage)
 
 ### Functions ###
 
