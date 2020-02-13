@@ -166,9 +166,27 @@ r
 
 ## Output desirability -> combine this one with perceived expensiveness
 desi_comb <- data %>%
-  dplyr::select(quarter_measurement, country, b_value, desirability, price_mean) %>%
-  dplyr::filter(quarter_measurement >18 & b_value==1) %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==1) %>%
+  dplyr::mutate(
+    desirability = desirability *100,
+    price_mean = price_mean *100
+  ) %>%
   distinct()
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(color = 'rgb(204, 204, 204)', size = 11)) %>%
+  layout(title = 'Price perception * desirability',
+         xaxis = list(title = 'Price perception',
+                      range = c(20, 80)
+                      ),
+         yaxis = list(title = 'Desirability',
+                      range = c(0, 50)
+                      ))
+
+
 
 love <- data %>%
   dplyr::select(quarter_measurement, country, love_mean_ING, love_mean_Google, love_mean_ING_client) %>%
@@ -324,6 +342,112 @@ rep_b<-rep_brand %>%
          xaxis = list(title = "quarters"),
          yaxis = list(title = "", range= c(0,100))
   )
+
+### Awareness graphic country
+
+awa <- data %>%
+  dplyr::select(b_value, country, labels_countries, labels_quarters,
+                quarter_measurement, unaided, toma, aided, main_competition, label) %>%
+  dplyr::filter(quarter_measurement > 17 & country==1) %>%
+  distinct() %>%
+  dplyr::group_by(quarter_measurement) %>%
+  dplyr::mutate(
+    market_average_unaided = case_when(
+      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    market_average_aided = case_when(
+      main_competition == 1 ~ mean(aided *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    market_average_toma = case_when(
+      main_competition == 1 ~ mean(toma *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    best_unaided = case_when(
+      main_competition == 1 ~ max(unaided *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    best_aided = case_when(
+      main_competition == 1 ~ max(aided *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    best_toma = case_when(
+      main_competition == 1 ~ max(toma *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    unaided_ING = case_when(
+      b_value ==1 ~ unaided *100,
+      TRUE ~ NA_real_),
+    aided_ING = case_when(
+      b_value ==1 ~ aided *100,
+      TRUE ~ NA_real_),
+    toma_ING = case_when(
+      b_value ==1 ~ toma *100,
+      TRUE ~ NA_real_),
+  ) %>%
+    # Gather across quarters
+   # tidyr::spread(quarter_measurement, market_average_unaided) %>%
+  dplyr::ungroup() %>%
+  distinct() %>%
+  dplyr::select(b_value, quarter_measurement, labels_quarters, market_average_unaided, best_unaided, unaided_ING) %>%
+  gather(variable, value, -(b_value:labels_quarters)) %>%
+  dplyr::filter(b_value==1)
+  #unite(temp, quarter_measurement, variable) %>%
+  #spread(temp, value)
+  
+awa$value[awa$variable==""]
+    
+x <-unique(awa$labels_quarters)
+y1 <- awa$value[awa$variable=='market_average_unaided']
+y2 <- awa$value[awa$variable=='best_unaided']
+y3 <- awa$value[awa$variable=='unaided_ING']
+
+
+datatest <- data.frame(x, y1, y2, y3)
+
+xaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              ticklen = 5,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(204, 204, 204)'))
+
+yaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              range =c(0,100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(204, 204, 204)'))
+datatest$x <- factor(datatest$x, levels = data[["x"]])
+
+p <- plot_ly(data, x = ~x, y = ~y1, type = 'bar', name = 'market average', marker = list(color = 'rgb(82,81,153)')) %>%
+  add_trace(y = ~y2, name = 'best', marker = list(color = "rgb 105, 105, 105")) %>%
+  add_trace(y = ~y3, name = 'ING', marker = list(color = 'rgb(255,098,000)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         #margin = list(b = 100),
+         barmode = 'group', title= "Unaided")
+
+p
+
+
+              
+
+
+
 
 
   
