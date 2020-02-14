@@ -13,7 +13,7 @@ This document provides you an overview of the KPI's of the CoE Communications an
 
 ## Desirability
 
-```{r overview Desirability, echo=F, eval=T}
+```{r overview Desirability, echo=F, eval=T, fig.align='left', fig.width=8, fig.height=4}
 desi <- data %>%
   dplyr::select(quarter_measurement, country, b_value, desirability) %>%
   dplyr::filter(quarter_measurement >17 & b_value==1) %>%
@@ -71,7 +71,7 @@ desi_p
 CAGR: Compound annual growth rate, i.e. constant % variance period-on-period for the periods presented (3)
 
 ## Reputation pulse score
-```{r overview Reputation, echo=F, eval=T}
+```{r overview Reputation, echo=F, eval=T, fig.align='left', fig.width=8, fig.height=4}
 
 rep <- data %>%
   dplyr::select(quarter_measurement, country, b_value, pulse) %>%
@@ -125,13 +125,20 @@ r <- plot_ly(
   ))
 r
 ```
+
+
 ## Internal NPS
+
 ```{r overview Internal NPS, echo=F, eval=T}
 
 ```
-## Australia
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/au.png) Australia
+
+
 ### Brand funnel
-```{r Australia brand funnel, echo=F, eval=T}
+
+```{r Australia brand funnel, echo=F, eval=T, fig.width=5, fig.height=4}
 funnel_data <- data %>%
   dplyr::select(unaided, toma, aided, fami, opinion, consideration, preference, quarter_measurement, b_value, country) %>%
   dplyr::filter(quarter_measurement ==20 & country==1) %>%
@@ -189,7 +196,9 @@ funnel_data %>%
             textfont = list(family = "ING me", size = 14, color = "white"),
             connector = list(line = list(color = "white"))) %>%
   layout(yaxis = list(categoryarray = c("Aided", "Familiarity", "Consideration", "Preference")))
+```
 
+```{r Australia diff, echo=F, eval=T, fig.width=3, fig.height=4}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
@@ -213,10 +222,10 @@ tab <- plot_ly(
 tab
 ```
 
-ING is still behind the best competitor regarding awareness, which is translated to the lower level of the funnel as well. 
+* ING is still behind the best competitor regarding awareness, which is translated to the lower level of the funnel as well. 
 
 ### Love
-```{r Australia love, echo=F, eval=T}
+```{r Australia love, echo=F, eval=T, fig.align='left', fig.width=8}
 love <- data %>%
   dplyr::select(quarter_measurement, country, love_mean_ING, love_mean_Google, love_mean_ING_client) %>%
   dplyr::filter(quarter_measurement >17 & country==1) %>%
@@ -224,25 +233,33 @@ love <- data %>%
 
 xaxis <- list(title = "",
               showline = TRUE,
-              showgrid = FALSE,
+              showgrid = TRUE,
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
-              autotick = FALSE,
+              autotick = TRUE,
               ticks = 'inside',
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
               tickfont = list(family = "ING me",
                               size = 12,
-                              color = 'rgb(204, 204, 204)'))
+                              color = 'rgb(105, 105, 105)'))
 
 yaxis <- list(title = "",
-              showgrid = FALSE,
-              zeroline = FALSE,
-              showline = FALSE,
-              showticklabels = FALSE,
-              range =c(0,10))
+              range =c(0,10),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 1,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
 margin <- list(autoexpand = F)
 
 # Build the annotations
@@ -294,17 +311,17 @@ l<-love %>%
             line = list(color = 'rgb(82,81,153)', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~love_mean_ING, type='scatter', name='love ING',
             line = list(color = 'rgb(52, 150, 81', width = 4, mode = 'lines+markers')) %>%
-  layout(title = "Love scores",
+  layout(title = "",
          xaxis = xaxis,
          yaxis = yaxis)
 l
 ```
 
-Australia has shown stable love scores since last quarter. 
+* Australia has shown stable love scores since last quarter. 
 
 ### Desirability and price perception
 
-```{r Australia Desirability vs price perception, echo=F, eval=T, warning=F}
+```{r Australia Desirability vs price perception, eval=T, echo=F, fig.align='left', fig.width=6.5, fig.height=5, warning=FALSE}
 desi_comb <- data %>%
   dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
   dplyr::filter(quarter_measurement ==20 & country==1) %>%
@@ -315,8 +332,58 @@ desi_comb <- data %>%
   distinct()
 
 xaxis <- list(title = "Price perception",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
               range =c(20:90),
               dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              range =c(0:50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Q4 2019',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+
+
+* Commonwealth is the most desired brand in the market, closely followed by ING. 
+* It is an important advantage that ING is not considered as expensive. 
+
+### Reputation
+```{r Australia pulse, echo=F, eval=T, fig.align='left', fig.width=8}
+rep_brand <- data %>%
+  dplyr::select(quarter_measurement, country, b_value, pulse) %>%
+  dplyr::filter(quarter_measurement > 16 & country==1 & b_value <6) %>%
+  dplyr::mutate(
+    pulse = pulse *100
+  ) %>%
+  distinct() %>%
+  # Gather across brands
+  tidyr::spread(b_value, pulse) 
+
+xaxis <- list(title = "",
               showline = TRUE,
               showgrid = FALSE,
               showticklabels = TRUE,
@@ -331,31 +398,21 @@ xaxis <- list(title = "Price perception",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
 
-desi_combi <- desi_comb %>%
-  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
-           mode = 'text+markers', text = ~label, textposition = 'middle right',
-           textfont = list(color = 'rgb(204, 204, 204)', size = 11)) %>%
-  layout(title = 'Q4 2019',
-         xaxis = xaxis,
-         yaxis = list(title = 'Desirability',
-                      range = c(0, 50)
-                      ))
-desi_combi  
-```
-
-Commonwealth is the most desired brand in the market, closely followed by ING. It is an important advantage that ING is not considered as expensive. 
-
-### Reputation
-```{r Australia pulse, echo=F, eval=T}
-rep_brand <- data %>%
-  dplyr::select(quarter_measurement, country, b_value, pulse) %>%
-  dplyr::filter(quarter_measurement > 16 & country==1 & b_value <6) %>%
-  dplyr::mutate(
-    pulse = pulse *100
-  ) %>%
-  distinct() %>%
-  # Gather across brands
-  tidyr::spread(b_value, pulse) 
+yaxis <- list(title = "",
+              range =c(0,100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+margin <- list(autoexpand = F)
 
 rep_brand$x <-c("Q1 2019", "Q2 2019", "Q3 2019", "Q4 2019")
 rep_b<-rep_brand %>%
@@ -370,16 +427,17 @@ rep_b<-rep_brand %>%
             line = list(color = 'rgb(208,217,60)', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~rep_brand$'5', type='scatter', name='Westpac',
           line = list(color = 'rgb(52,150,81)', width = 4, mode = 'lines+markers')) %>%
-  layout(title = "Pulse",
-         xaxis = list(title = "quarters"),
-         yaxis = list(title = "", range= c(0,100))
-  )
+  layout(title = "",
+         xaxis = xaxis,
+         yaxis = yaxis)
 rep_b
 ```
 
+* Australia has a strong and stabile pulse score and outperforms the market. 
+
 ### Unaided awareness
 
-```{r Australia unaided, echo=F, eval=T}
+```{r Australia unaided, echo=F, eval=T, message=F, error=F, warning=F, fig.align='left', fig.width=8}
 awa <- data %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
@@ -419,7 +477,8 @@ awa <- data %>%
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
   distinct() %>%
-  dplyr::select(b_value, quarter_measurement, labels_quarters, market_average_unaided, best_unaided, unaided_ING) %>%
+  dplyr::select(b_value, quarter_measurement, labels_quarters, market_average_unaided, 
+                best_unaided, unaided_ING) %>%
   gather(variable, value, -(b_value:labels_quarters)) %>%
   dplyr::filter(b_value==1)
   #unite(temp, quarter_measurement, variable) %>%
@@ -476,18 +535,40 @@ p1
 
 
 
-```{r flags, echo=F, eval=T}
-dat <- data.frame(
-   country = c('Australia', 'Austria', 'Belgium', 'Czech', 'France', 'Germany', 'Italy', 
-               'Luxembourg', 'Netherlands', 'Poland', 'Romania', 'Spain', 'Turkey', 'The Phillippines'),
-   abbr = c('au', 'at', 'be', 'cz', 'fr', 'ge', 'it', 'lu', 'nl', 'po', 'ro', 'sp', 'tu', 'ph'),
-   var1 = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14))
-dat$flag <- sprintf('![](http://flagpedia.net/data/flags/mini/%s.png)', dat$abbr)
-dat$file <- paste0(dat$abbr, '.png')
-dat$link <- paste0('http://flagpedia.net/data/flags/mini/', dat$file)
-dat$flag <- sprintf('![](%s)', dat$file)
-for (i in seq_len(nrow(dat))) {
-  if (!file.exists(dat$file[i])) xfun::download_file(dat$link[i])
-}
-knitr::kable(dat[, -c(5, 6)])
-```
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/at.png)   Austria
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/be.png)   Belgium
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/cz.png)   Czech Republic
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/fr.png)   France
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/ge.png)   Germany
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/it.png)   Italy
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/lu.png)   Luxembourg
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/nl.png)   The Netherlands 
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/po.png)   Poland
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/ro.png)   Romania
+
+
+##   Spain
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/tu.png)   Turkey
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/ph.png)   The Philippines
