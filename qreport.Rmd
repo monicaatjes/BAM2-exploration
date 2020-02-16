@@ -126,6 +126,9 @@ r <- plot_ly(
 r
 ```
 
+* Please note that the reported pulse scores above have a different source than last year. The source of these scores is the Brand Affinity Monitor. The pulse score for the countries with an extended Reptrek contract (NL, AUT, GE & BE) will be reported by the Reputation Insitute. 
+* Differences will be monitored over time. The methodology is equal, the main difference is that The Reputation Institute corrects for cultural difference. This factor is unknown, so cannot be applied on the BAM pulse scores. 
+
 
 ## Internal NPS
 
