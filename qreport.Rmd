@@ -136,7 +136,7 @@ r
 
 ```
 
-##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/au.png) Australia
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/aus.png) Australia
 
 
 ### Brand funnel
@@ -538,40 +538,40 @@ p1
 
 
 
-##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/at.png)   Austria
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/aut.png)   Austria
 
 
-##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/be.png)   Belgium
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/BE.png)   Belgium
 
 
-##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/cz.png)   Czech Republic
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/cz.png)   Czech Republic
 
 
-##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/fr.png)   France
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/fr.png)   France
 
 
-##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/ge.png)   Germany
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/ge.png)   Germany
 
 
-##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/it.png)   Italy
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/it.png)   Italy
 
 
-##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/lu.png)   Luxembourg
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/lu.png)   Luxembourg
 
 
-##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/nl.png)   The Netherlands 
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/nl.png)   The Netherlands 
 
 
-##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/po.png)   Poland
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/po.png)   Poland
 
 
-##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/ro.png)   Romania
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/ro.png)   Romania
 
 
-##   Spain
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/sp.png)   Spain
 
 
-##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/tu.png)   Turkey
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/tu.png)   Turkey
 
 
-##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/ph.png)   The Philippines
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/ph.png)   The Philippines
