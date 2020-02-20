@@ -7,7 +7,7 @@ output: ingmarkdowntemplates::ing_html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Management summary results Q1 2020
+## Management summary Q1 2020
 
 This document provides you an overview of the KPI's of the CoE Communications and Brand Experience. 
 
@@ -198,7 +198,8 @@ funnel_data %>%
                           line = list(width = c(2, 2, 2, 2), color = c("white", "white", "white", "white"))),
             textfont = list(family = "ING me", size = 14, color = "white"),
             connector = list(line = list(color = "white"))) %>%
-  layout(yaxis = list(categoryarray = c("Aided", "Familiarity", "Consideration", "Preference")))
+  layout(yaxis = list(categoryarray = c("Aided", "Familiarity", "Consideration", "Preference")),
+         legend =list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)'))
 ```
 
 ```{r Australia diff, echo=F, eval=T, fig.width=3, fig.height=4}
@@ -363,7 +364,7 @@ yaxis <- list(title = "Desirability",
 desi_combi <- desi_comb %>%
   plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
            mode = 'text+markers', text = ~label, textposition = 'middle right',
-           textfont = list(color = 'rgb(105, 105, 105)', size = 11)) %>%
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
   layout(title = 'Q4 2019',
          xaxis = xaxis,
          yaxis = yaxis)
@@ -487,8 +488,7 @@ awa <- data %>%
   #unite(temp, quarter_measurement, variable) %>%
   #spread(temp, value)
   
-awa$value[awa$variable==""]
-    
+#awa$value[awa$variable==""]
 x <-unique(awa$labels_quarters)
 y1 <- awa$value[awa$variable=='market_average_unaided']
 y2 <- awa$value[awa$variable=='best_unaided']
@@ -532,9 +532,16 @@ p1 <- plot_ly(data, x = ~x, y = ~y1, type = 'bar', name = 'market average', mark
   layout(xaxis = xaxis,
          yaxis = yaxis,
          #margin = list(b = 100),
-         barmode = 'group', title= "Unaided")
+         barmode = 'group', title= "Unaided",
+         legend =list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
 p1
 ```
+
+
+### Customer 
+
 
 
 
