@@ -444,16 +444,9 @@ p <- plot_ly(data, x = ~x, y = ~y1, type = 'bar', name = 'market average', marke
 p
 
 
-customerthing <- data_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019") & country ==1) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(country) %>%
-  dplyr::mutate(
-    Diff_year = 1,  
-    Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
-    Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100) 
+
+
+
 x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
 
 xaxis <- list(title = "",
@@ -467,15 +460,14 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryorder = "array",
               categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
-yaxis <- list(title = "",
+yaxis <- list(title = "Primary customer *1000",
               showline = TRUE,
               showgrid = FALSE,
-              range =c(100.000:1000.000),
+              range =c(100.000:2000.000),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -491,19 +483,30 @@ yaxis <- list(title = "",
               
 p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
               type = 'bar', name = '', marker = list(color = 'rgb(82,81,153)')) %>%
- add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
+ #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
          yaxis = yaxis,
          #margin = list(b = 100),
-         barmode = 'group', title= "",
+         barmode = 'group', title= "Primary customers",
          legend =list(family = "ING me",
                       size = 12,
                       color = 'rgb(105, 105, 105)'))
 p1
 
+x <-'Q3_2019'
+i <- gsub("Q", "0", x)
 
+as.yearqtr("201903", "%Y%q")
+as.yearqtr("data_dateQQ", "%q%Y")
 
+data_dateQ <- gsub("Q", "0", data_customer_fig$labels_quarters)
+data_dateQQ <- gsub("_", "", data_dateQ)
+data_dateQQ <- as.yearqtr(data_dateQQ, "%q%Y")
 
+as.yearqtr(i, "%q%Y")
+
+p1 <- plot_ly(data, x = ~data$labels_quarters, y = ~data$desirability, 
+              type = 'scatter', name = '', marker = list(color = 'rgb(82,81,153)'))
   
 ### Plot exploration ################################## COPIED FROM EXPLORATION SCRIPT
 
