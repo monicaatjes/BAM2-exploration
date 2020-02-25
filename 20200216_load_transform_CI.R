@@ -74,7 +74,44 @@ customer2019_three$`Payment with r.income` <- as.numeric(as.character(customer20
 customer2019_three$`Primary bank customers` <- as.numeric(as.character(customer2019_three$`Primary bank customers`)) * 1000
 customer2019_three$`Avg number of product categories per active customer` <- as.numeric(as.character(customer2019_three$`Avg number of product categories per active customer`)) 
 
-customer <- dplyr::bind_rows(list(customer2019_latest, customer2019_one), list(customer2019_two, customer2019_three))
+## open data
+customer2019_q2 <-read_excel("/Users/xo21bm/Documents/Lokaal/BAM2/exploration/data/Customer figures update Q2 2019.xlsx", range = "B2:P8")
+# Transpose data
+customer2019_q2 <- as.data.frame(t(customer2019_q2))
+colnames(customer2019_q2) = as.character(unlist(customer2019_q2[1,]))
+customer2019_q2$country <-rownames(customer2019_q2)
+# Add column for quarter
+customer2019_q2$quarter <-rownames(customer2019_q2)[1]
+customer2019_q2 = customer2019_q2[-1,]
+customer2019_q2 <- as_tibble(customer2019_q2)
+
+customer2019_q2$`Active customers` <- as.numeric(as.character(customer2019_q2$`Active customers`)) * 1000
+customer2019_q2$`Total (operative) customers` <- as.numeric(as.character(customer2019_q2$`Total (operative) customers`)) * 1000
+customer2019_q2$`Payment customers` <- as.numeric(as.character(customer2019_q2$`Payment customers`)) * 1000
+customer2019_q2$`Payment with r.income` <- as.numeric(as.character(customer2019_q2$`Payment with r.income`)) * 1000
+customer2019_q2$`Primary bank customers` <- as.numeric(as.character(customer2019_q2$`Primary bank customers`)) * 1000
+customer2019_q2$`Avg number of product categories per active customer` <- as.numeric(as.character(customer2019_q2$`Avg number of product categories per active customer`)) 
+
+##
+customer2019_q1 <-read_excel("/Users/xo21bm/Documents/Lokaal/BAM2/exploration/data/Customer figures update Q2 2019.xlsx", range = "B10:P16")
+# Transpose data
+customer2019_q1 <- as.data.frame(t(customer2019_q1))
+colnames(customer2019_q1) = as.character(unlist(customer2019_q1[1,]))
+customer2019_q1$country <-rownames(customer2019_q1)
+# Add column for quarter
+customer2019_q1$quarter <-rownames(customer2019_q1)[1]
+customer2019_q1 = customer2019_q1[-1,]
+customer2019_q1 <- as_tibble(customer2019_q1)
+
+customer2019_q1$`Active customers` <- as.numeric(as.character(customer2019_q1$`Active customers`)) * 1000
+customer2019_q1$`Total (operative) customers` <- as.numeric(as.character(customer2019_q1$`Total (operative) customers`)) * 1000
+customer2019_q1$`Payment customers` <- as.numeric(as.character(customer2019_q1$`Payment customers`)) * 1000
+customer2019_q1$`Payment with r.income` <- as.numeric(as.character(customer2019_q1$`Payment with r.income`)) * 1000
+customer2019_q1$`Primary bank customers` <- as.numeric(as.character(customer2019_q1$`Primary bank customers`)) * 1000
+customer2019_q1$`Avg number of product categories per active customer` <- as.numeric(as.character(customer2019_q1$`Avg number of product categories per active customer`)) 
+
+
+customer <- dplyr::bind_rows(list(customer2019_latest, customer2019_one), list(customer2019_two, customer2019_three), list(customer2019_q1, customer2019_q2))
 
 ## rename
 customer <-customer %>%
@@ -103,6 +140,8 @@ customer <-customer %>%
       quarter =="Y2019 September"~ "Q3_2019",
       quarter =="Y2018 December" ~ "Q4_2018",
       quarter =="Y2018 September"~ "Q3_2018",
+      quarter =="Y2019 June" ~ "Q2_2019",
+      quarter =="Y2019 March"~ "Q1_2019",
       TRUE ~ "NA_real_") 
   ) %>%
   distinct()
@@ -113,8 +152,12 @@ customer$b_value <- 1
 
 rm(customer2019_latest, customer2019_one, customer2019_three, customer2019_two)
 data_customer_fig <- left_join(data, customer, by=c("labels_countries", "labels_quarters", "b_value"))  
-   
-  
+
+data_customer_fig <- data_customer_fig %>%
+  dplyr::mutate(
+    labels_quarters = as.yearqtr(labels_quarters, format='Q%q_%Y'))
+
+data_customer_fig <-write_csv(data_customer_fig, "data_customer_fig.csv")
   
 
 
