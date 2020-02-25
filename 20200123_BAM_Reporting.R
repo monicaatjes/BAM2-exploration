@@ -444,6 +444,20 @@ p <- plot_ly(data, x = ~x, y = ~y1, type = 'bar', name = 'market average', marke
 p
 
 
+### Overview customer figures
+customerthing <- data_customer_fig %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
+                "Avg number of product categories per active customer") %>%
+  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==1) %>%
+  dplyr::distinct() %>%
+  dplyr::arrange(country)
+
+customerthing <- customerthing %>%
+  dplyr::mutate(
+    Diff_year = 1,  
+    Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
+    Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
+  )
 
 
 
@@ -464,49 +478,85 @@ xaxis <- list(title = "",
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
-yaxis <- list(title = "Primary customer *1000",
+yaxis <- list(title = "",
               showline = TRUE,
-              showgrid = FALSE,
-              range =c(100.000:2000.000),
+              showgrid = TRUE,
+              range =c(1:2),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
-              autotick = FALSE,
-              dtick = 50.000,
+              autotick = TRUE,
+              #dtick = 0.01,
               ticks = 'inside',
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 1,
-              ticklen = 1,
+              #ticklen = 5,
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
               
-p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$"Avg number of product categories per active customer", 
               type = 'bar', name = '', marker = list(color = 'rgb(82,81,153)')) %>%
  #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
          yaxis = yaxis,
          #margin = list(b = 100),
-         barmode = 'group', title= "Primary customers",
+         barmode = 'group', title= "Average # products",
          legend =list(family = "ING me",
                       size = 12,
                       color = 'rgb(105, 105, 105)'))
 p1
 
-x <-'Q3_2019'
-i <- gsub("Q", "0", x)
 
-as.yearqtr("201903", "%Y%q")
-as.yearqtr("data_dateQQ", "%q%Y")
 
-data_dateQ <- gsub("Q", "0", data_customer_fig$labels_quarters)
-data_dateQQ <- gsub("_", "", data_dateQ)
-data_dateQQ <- as.yearqtr(data_dateQQ, "%q%Y")
 
-as.yearqtr(i, "%q%Y")
 
-p1 <- plot_ly(data, x = ~data$labels_quarters, y = ~data$desirability, 
-              type = 'scatter', name = '', marker = list(color = 'rgb(82,81,153)'))
+#data_customer_fig$labels_quarters <- as.yearqtr(data_customer_fig$labels_quarters,format='Q%q_%Y')
+#data$labels_quarters <- as.yearqtr(data$labels_quarters,format='Q%q_%Y')
+
+#data <- data %>%
+#  dplyr::mutate(
+#    labels_quarters = as.yearqtr(labels_quarters, format='Q%q_%Y'))
+    
+
+#desi_combi <- desi_comb %>%
+#  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+#          mode = 'text+markers', text = ~label, textposition = 'middle right',
+#          textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+#  layout(title = 'Q4 2019',
+#         xaxis = xaxis,
+#         yaxis = yaxis)
+#desi_combi  
+
+
+
+## over time desirability per brand
+desi_time <- data %>%
+  dplyr::select(country, quarter_measurement, desirability, labels_quarters, label) %>%
+  dplyr::filter(country==1) %>%
+  dplyr::mutate(
+    desirability = desirability *100
+  ) %>%
+  distinct() %>%
+  # Gather across brands
+  tidyr::spread(label, desirability) 
+
+desi_timep1 <-desi_time %>%
+  plot_ly(x = ~labels_quarters) %>%
+  add_lines(y = ~ING, type='scatter', name='ING',
+            line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~ANZ, type='scatter', name='ANZ',
+            line = list(color = 'rgb(96,166,218)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~`Commonwealth Bank`, type='scatter', name='Commonwealth Bank',
+            line = list(color = 'rgb(171,0,102)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~NAB, type='scatter', name='NAB',
+            line = list(color = 'rgb(208,217,60)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~Westpac, type='scatter', name='Westpac',
+            line = list(color = 'rgb(52,150,81)', width = 4, mode = 'lines+markers')) %>%
+  layout(title = "",
+         xaxis = xaxis,
+         yaxis = yaxis)
+
   
 ### Plot exploration ################################## COPIED FROM EXPLORATION SCRIPT
 
