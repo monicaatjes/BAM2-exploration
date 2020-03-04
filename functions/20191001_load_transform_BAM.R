@@ -2022,54 +2022,78 @@ data <- full_join(data, temp4, by=c("b_value", "country", "quarter_measurement")
 rm(temp4)
 
 ### Reptrak statements
+tempREP <- temp %>%
+  dplyr::filter(!is.na(score)) %>%
+  dplyr::filter(score %in% c(1, 2, 3, 4, 5, 6, 7)) %>% 
+  dplyr::mutate(
+    score = score * Weight
+    ) %>%
+  dplyr::group_by(type, b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    rep_trak1 =mean(score)/7 *100
+  ) %>% 
+  dplyr::filter(type == "reptrak1_value")
+ 
+tempREP$type <- NULL
 
-## Output Reptrak
-reptrak_sep_statement1 <-data %>%
-  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
-  dplyr::group_by(b_value, country, quarter_measurement) %>%
-  dplyr::filter(!is.na(rep_trak1)) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(-c("rep_trak2", "rep_trak3", "rep_trak4")) 
+data <- full_join(data, tempREP, by=c("b_value", "country", "quarter_measurement"))
+rm(tempREP)
+  
+tempREP2 <- temp %>%
+  dplyr::filter(!is.na(score)) %>%
+  dplyr::filter(score %in% c(1, 2, 3, 4, 5, 6, 7)) %>% 
+  dplyr::mutate(
+    score = score * Weight
+  ) %>%
+  dplyr::group_by(type, b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    rep_trak2 =mean(score)/7 *100
+  ) %>% 
+  dplyr::filter(type == "reptrak2_value")
 
-reptrak_sep_statement2 <-data %>%
-  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
-  dplyr::group_by(b_value, country, quarter_measurement) %>%
-  dplyr::filter(!is.na(rep_trak2)) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(-c("rep_trak1", "rep_trak3", "rep_trak4")) 
+tempREP2$type <- NULL
 
-reptrak_sep_statement3 <-data %>%
-  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
-  dplyr::group_by(b_value, country, quarter_measurement) %>%
-  dplyr::filter(!is.na(rep_trak3)) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(-c("rep_trak1", "rep_trak2", "rep_trak4")) 
+data <- full_join(data, tempREP2, by=c("b_value", "country", "quarter_measurement"))
+rm(tempREP2)
 
-reptrak_sep_statement4 <-data %>%
-  dplyr::select(quarter_measurement, b_value, country, rep_trak1, rep_trak2, rep_trak3, rep_trak4) %>%
-  dplyr::group_by(b_value, country, quarter_measurement) %>%
-  dplyr::filter(!is.na(rep_trak4)) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(-c("rep_trak1", "rep_trak2", "rep_trak3")) 
+tempREP3 <- temp %>%
+  dplyr::filter(!is.na(score)) %>%
+  dplyr::filter(score %in% c(1, 2, 3, 4, 5, 6, 7)) %>% 
+  dplyr::mutate(
+    score = score * Weight
+  ) %>%
+  dplyr::group_by(type, b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    rep_trak3 =mean(score)/7 *100
+  ) %>% 
+  dplyr::filter(type == "reptrak3_value")
 
-reptrak_total <- cbind(reptrak_sep_statement1, reptrak_sep_statement2, 
-                       reptrak_sep_statement3, reptrak_sep_statement4)
+tempREP3$type <- NULL
 
-reptrak_total1 <- merge(reptrak_sep_statement2, reptrak_sep_statement1, by=c("b_value","country", "quarter_measurement"), all=T)
-reptrak_total2 <- merge(reptrak_sep_statement3, reptrak_sep_statement4, by=c("b_value","country", "quarter_measurement"), all=T)
-reptrak_total3 <- merge(reptrak_total1, reptrak_total2, by=c("b_value","country", "quarter_measurement"), all=T)
+data <- full_join(data, tempREP3, by=c("b_value", "country", "quarter_measurement"))
+rm(tempREP3)
 
-reptrak_total_pulse <- reptrak_total3 %>%
+tempREP4 <- temp %>%
+  dplyr::filter(!is.na(score)) %>%
+  dplyr::filter(score %in% c(1, 2, 3, 4, 5, 6, 7)) %>% 
+  dplyr::mutate(
+    score = score * Weight
+  ) %>%
+  dplyr::group_by(type, b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    rep_trak4 =mean(score)/7 *100
+  ) %>% 
+  dplyr::filter(type == "reptrak4_value")
+
+tempREP4$type <- NULL
+
+data <- full_join(data, tempREP4, by=c("b_value", "country", "quarter_measurement"))
+rm(tempREP4)
+
+data<- data %>%
   dplyr::mutate(
     pulse = (rep_trak1 + rep_trak2 + rep_trak3 + rep_trak4) /4
   )
-
-rm(reptrak_total1, reptrak_total2, reptrak_total3, reptrak_sep_statement1, reptrak_sep_statement2, 
-   reptrak_sep_statement3, reptrak_sep_statement, reptrak_sep_statement2, reptrak_sep_statement3, reptrak_sep_statement4, 
-reptrak_statements, reptrak, reptrak_total_pulse, reptrak_total)
-############################################
-data <- left_join(data1, reptrak_total_pulse, by=c("quarter_measurement", "country", "b_value"))
-rm(reptrak)
 
 ### Love overview 
 love_overview <- result %>%
