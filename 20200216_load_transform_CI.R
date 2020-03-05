@@ -113,6 +113,8 @@ customer2019_q1$`Avg number of product categories per active customer` <- as.num
 
 customer <- dplyr::bind_rows(list(customer2019_latest, customer2019_one), list(customer2019_two, customer2019_three), list(customer2019_q1, customer2019_q2))
 
+rm(customer2019_latest, customer2019_one, customer2019_q1, customer2019_q2, customer2019_three, customer2019_two)
+
 ## rename
 customer <-customer %>%
   dplyr::select("country", "Total (operative) customers","Active customers", "Payment customers", "Payment with r.income", 
@@ -136,12 +138,12 @@ customer <-customer %>%
     ) %>%
   dplyr::mutate(
     labels_quarters = case_when(
-      quarter =="Y2019 December" ~ "Q4_2019",
-      quarter =="Y2019 September"~ "Q3_2019",
-      quarter =="Y2018 December" ~ "Q4_2018",
-      quarter =="Y2018 September"~ "Q3_2018",
-      quarter =="Y2019 June" ~ "Q2_2019",
-      quarter =="Y2019 March"~ "Q1_2019",
+      quarter =="Y2019 December" ~ "2019 Q4",
+      quarter =="Y2019 September"~ "2019 Q3",
+      quarter =="Y2018 December" ~ "2018 Q4",
+      quarter =="Y2018 September"~ "2018 Q3",
+      quarter =="Y2019 June" ~ "2019 Q2",
+      quarter =="Y2019 March"~ "2019 Q1",
       TRUE ~ "NA_real_") 
   ) %>%
   distinct()
@@ -150,18 +152,19 @@ customer$quarter <- NULL
 customer$country <- NULL
 customer$b_value <- 1
 
-rm(customer2019_latest, customer2019_one, customer2019_three, customer2019_two)
+data$labels_quarters <- as.yearqtr(unlist(data$labels_quarters), format='%Y Q%q')
+customer$labels_quarters <- as.yearqtr(unlist(customer$labels_quarters), format='%Y Q%q')
 data_customer_fig <- left_join(data, customer, by=c("labels_countries", "labels_quarters", "b_value"))  
 
 data_customer_fig <- data_customer_fig %>%
   dplyr::mutate(
-    labels_quarters = as.yearqtr(labels_quarters, format='Q%q_%Y'))
+    labels_quarters = as.yearqtr(labels_quarters, format='%Y Q%q')
+  )
 
 data_customer_fig <-write_csv(data_customer_fig, "data_customer_fig.csv")
   
 
-
-                            
+                     
 
 
      
