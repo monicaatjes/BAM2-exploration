@@ -2245,5 +2245,5 @@ rm(X20200209_Competitorlist)
 data$labels_quarters <- as.yearqtr(unlist(data$labels_quarters), format='%Y Q%q')
 
 data <-write_csv(data, "data.csv")
-
+data$labels_quarters <- as.yearqtr(unlist(data$labels_quarters), format='%Y Q%q')
 
