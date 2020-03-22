@@ -1,7 +1,6 @@
 #### main ###
 
 ### open libaries ###
-
 library(haven)
 library(tidyr)
 library(tidyverse)
@@ -19,17 +18,17 @@ library(ingmarkdowntemplates)
 library(ggplot2)
 library(ggflags)
 library(png)
-library(emoGG)
 library(ggimage)
-
-### Functions ###
-
-source("functions.R")
+library(readxl)
+library(tidyxl)
+library(data.table)
+library(zoo)
+library(shiny)
 
 ### Open data ###
+raw_data <- read.csv("~/Documents/Lokaal/BAM2/exploration/data/200122_ING_Global_Data_Set_Q4Y14-Q4Y19_CSV.csv", header = T)
+raw_data1 <- read.csv("~/Documents/Lokaal/BAM2/exploration/data/200318_ING_JAN_2020_CSV.sav.csv", header = T)
 
-
-raw_data <- read.csv("200122_ING_Global_Data_Set_Q4Y14-Q4Y19_CSV.csv", header = T)
 # Add in X1 which is a row count
 raw_data <- raw_data %>% 
   dplyr::mutate(
@@ -37,6 +36,11 @@ raw_data <- raw_data %>%
   )
 
 ID_char <- c("X1", "quarter_measurement", "country", "age", "gender", "income", "Weight", "weight_nps", "love_ING", "love_Google")
+
+# and for Q1 onwards
+ID_char_Q1 <- c("X1", "quarter_measurement", "country", "age", "age_groups", "id",
+             "gender", "income", "Weight", "weight_nps", "love_ING", "love_Google")
+
 
 base_data <- raw_data %>% 
   select(ID_char)
@@ -54,9 +58,11 @@ categories <- c("unaided", "relationship", "aided", "fami", "opinion", "consider
 # Confirm that categories has distinct arguments
 categories <- unique(categories)
 
-# cat_to_change <- c("product_usage_p1", "product_usage_p2", "product_usage_p3","product_usage_p4",
-#                    "product_usage_p5", "product_usage_p6", "product_usage_p7", "product_usage_p8", "product_usage_p9")
 
 # Markdown renders
 rmarkdown::render("/Users/xo21bm/Documents/Lokaal/BAM2/exploration/qreport.Rmd", output_file = "kpi.html")
+rmarkdown::render("/Users/xo21bm/Documents/Lokaal/BAM2/exploration/germany.Rmd", output_file = "germnany.html")
+
+rmarkdown::render("/Users/xo21bm/Documents/Lokaal/BAM2/exploration/Untitled.Rmd", output_file = "test.html")
+instvalidateCssUnit(funnel_plot)
 
