@@ -1,4 +1,6 @@
 ### exploration
+source("add_questionnaire_responds_category.R")
+source("changed_messed_up_variable_names.R")
 
 ### apply function to change names ###
 raw_data <- changed_messed_up_variable_names(raw_data, cat = "product_usage")
@@ -2156,6 +2158,39 @@ proximity_overview <- result %>%
 
 data <- full_join(data, proximity_overview, by=c("country", "quarter_measurement", "b_value"))
 rm(proximity_overview) 
+
+## NPS
+NPS_trial <- result %>%
+  dplyr::filter(!is.na(nps_value)) %>%
+  dplyr::group_by(country, quarter_measurement, b_value) %>%
+  dplyr::mutate(
+    nps_clients = case_when(
+      client_value == 1 ~ as.numeric(nps_value) * weight,
+      TRUE ~ NA_real_)
+  ) %>%
+  dplyr::mutate(nps_cat = case_when(
+    nps_clients >=9.0 ~ "promotors",
+    nps_clients <= 9.0 & nps_clients >= 7.0 ~ "neutrals",
+    nps_clients  <= 6.0 ~ "detractors",
+    TRUE ~ "NA_real_")) %>%
+  dplyr::filter(nps_cat %in% c("detractors", "neutrals", "promotors")) %>%
+  dplyr::group_by(country, b_value, quarter_measurement, nps_cat) %>%
+  dplyr::tally() %>%
+  dplyr::mutate(
+    percentage = n /sum(n)
+  ) %>% 
+  dplyr::ungroup()
+
+NPS_score <- NPS_trial %>%
+  select(-n) %>%
+  tidyr::spread(nps_cat, percentage) %>%
+  dplyr::mutate(
+    nps_score = promotors - detractors
+  )
+
+data <- left_join(NPS_score, data, by=c("country", "b_value", "quarter_measurement"))
+
+rm(NPS_trial, NPS_score)
   
 ### Labels
 labels_countries <- data %>%
@@ -2166,12 +2201,12 @@ labels_countries <- data %>%
       country == 1 ~ "Australia",
       country == 2 ~ "Austria",
       country == 3 ~ "Belgium",
-      country == 4 ~ "Czech",
+      country == 4 ~ "Czech Republic",
       country == 5 ~ "France",
       country == 6 ~ "Germany",
       country == 7 ~ "Italy",
       country == 8 ~ "Luxembourg",
-      country == 9 ~ "Netherlands",
+      country == 9 ~ "The Netherlands",
       country == 10 ~ "Poland",
       country == 11 ~ "Romania",
       country == 12 ~ "Spain",
