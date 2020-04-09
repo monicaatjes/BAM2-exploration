@@ -1,0 +1,813 @@
+---
+title: "Desirability and price perception"
+author: "Moniek"
+date: "4/7/2020"
+output: ingmarkdowntemplates::ing_html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Deepdive price perception vs desirability
+
+### Overview per country
+<div class="row">  
+
+  <div class="col-md-4" markdown="1"> <br>
+```{r AUS, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==1) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Australia', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+  </div>
+  
+  <div class="col-md-4" markdown="1">
+  <br>
+```{r AUT, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==2) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+   layout(title = 'Austria', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+  </div>
+  
+  <div class="col-md-4" markdown="1">
+  <br>
+```{r BEL, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==3) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Belgium', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+  </div>  
+</div> 
+
+  <div class="col-md-4" markdown="1"> <br>
+```{r CZE, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==4) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+   layout(title = 'Czech', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+  </div>
+  
+  <div class="col-md-4" markdown="1">
+  <br>
+```{r FRA, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==5) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+   layout(title = 'France', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+  </div>
+  
+  <div class="col-md-4" markdown="1">
+  <br>
+```{r GER, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==6) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+   layout(title = 'Germany', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+  </div>  
+</div> 
+
+  <div class="col-md-4" markdown="1">  <br> 
+```{r ITA, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==7) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+   layout(title = 'Italy', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+ </div>
+  
+  <div class="col-md-4" markdown="1">
+  <br>
+```{r LUX, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==8) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+   layout(title = 'Luxembourg', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+ </div>
+  
+  <div class="col-md-4" markdown="1">
+  <br>
+```{r POL, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==9) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'The Netherlands', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+   </div> <div class="row">  
+</div> 
+
+  <div class="col-md-4" markdown="1">  <br>
+```{r ROM, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==10) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+   layout(title = 'Poland', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+ </div>
+  
+  <div class="col-md-4" markdown="1">
+  <br>
+```{r SPA, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==11) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Romania', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+ </div>
+  
+  <div class="col-md-4" markdown="1">
+  <br>
+```{r NL, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==12) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Spain', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+   </div> <div class="row">  
+</div> 
+
+  <div class="col-md-4" markdown="1">  <br>
+```{r TPH, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==13) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+   layout(title = 'Turkey', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+ </div>
+  
+  <div class="col-md-4" markdown="1">
+  <br>
+```{r TUR, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==20 & country==14) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean *100
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+   layout(title = 'The Philippines', textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11),
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+ </div>
+  
+  <div class="col-md-4" markdown="1">
+  <br>
+```{r xx, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+
+```
+   </div> <div class="row">  
+</div> 
+
+  <div class="col-md-4" markdown="1">  <br> 
+  
+### All Countries
+```{r overview Desirability, echo=F, eval=T, fig.width=4, fig.height=4, warning =F}
+desi_price <- test %>%
+  dplyr::select(quarter_measurement, labels_countries, b_value, desirability, label, price_mean) %>%
+  dplyr::filter(quarter_measurement == 20 & b_value==1) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price = price_mean *100
+    ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(20,80),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_pricep <- desi_price %>%
+  plot_ly(x = ~desi_price$price, y = ~desi_price$desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~desi_price$labels_countries, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = '',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_pricep 
+```
+   </div> <div class="row">  
+</div> 
+
+  <div class="col-md-8" markdown="1">  <br> 
+  
+### Correlation price perception * desirability
+
+```{r corr, echo=F, eval=T, fig.width=8, fig.height=4, warning =F, message=F}
+trial <- result %>%
+  dplyr::select(X1, quarter_measurement, country, weight, b_value, price_perception_value, 
+                desirability_value, easy_value, Love_ING, digital_experience_value) %>%
+  dplyr::filter(b_value <10 & !is.na(desirability_value) & !is.na(price_perception_value) & country==1) %>%
+  dplyr::mutate(
+    desi = desirability_value * weight,
+    price = price_perception_value * weight,
+    easy = easy_value * weight,
+    digi = digital_experience_value * weight,
+    love = Love_ING * weight)
+
+trial_cor <- trial %>%
+    correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, 
+          mirror= TRUE) %>% 
+   rearrange() 
+fashion(trial_cor)
+
+
+```
+ </div>
+  
+  <div class="col-md-4" markdown="1">
+  <br> <br> <br>
+```{r corp, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE, message=F}
+rplot(trial_cor)
+simple.fit = lm(desi~price, data=trial)
+summary(simple.fit)
+```
+   </div> <div class="row">  
+</div> 
