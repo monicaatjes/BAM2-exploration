@@ -12,7 +12,26 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Deepdive price perception vs desirability
 
+<br><br>
+The aim of this overview is to get better understanding of the relation between the perception consumers have of the prices in the market and desirability. 
+
+* Desirability: “If fees were no object, which of the brands would you choose?”  
+* Price perception: 
+
+Both questions as evaluated on a scale from 0-100 where people are asked to rank the brands they are familair with (max 5 brands). 
+
+Next to these two questions, the relationship of other variables and desirability are explored. 
+
+**First impression based on aggregated data (Jan 2020)** <br>
+To get an idea of the current market situation in each country, desirability is plotted against price perception. This provides an overview of how expensive people *think* a brand is, against which brand they would choose if money was no object. Obviously, being considered as not expensive increases the chance that people actually will prefer the brand. Desirability is the brand they choose if money was no object, the higher the better. 
+
+**Correlation analysis individial level** <br>
+To explore the relationships better, an analysis on individual respondent level is performed. This is relevant to lower the error which allows stronger conclusions. The relationship between price perception and desirability is performed regardless of the brand and specifically for ING per market. 
+
+<br><br>
+
 ### Overview per country
+<br>
 <div class="row">  
 
   <div class="col-md-4" markdown="1"> <br>
@@ -715,10 +734,14 @@ desi_combi
  </div>
   
   <div class="col-md-4" markdown="1">
-  <br>
-```{r xx, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE}
+<br>  
+**Remarks** 
+<br>
 
-```
+* Effect of message 'no fees' clearly visible in former ING Direct countries
+* What a good position in this plot is depends of the competition. Countries with a good position: Australia, Germany, Italy, The Netherlands, Romania, Spain
+* *Data Januari 2020*
+
    </div> <div class="row">  
 </div> 
 
@@ -771,8 +794,17 @@ desi_pricep <- desi_price %>%
          yaxis = yaxis)
 desi_pricep 
 ```
-   </div> <div class="row">  
-</div> 
+</div>
+  <div class="col-md-8" markdown="1">
+  <br><br>
+  
+  TEXT
+  </div> <div class="row">  
+</div>
+
+
+
+
 
   <div class="col-md-8" markdown="1">  <br> 
   
@@ -782,7 +814,7 @@ desi_pricep
 trial <- result %>%
   dplyr::select(X1, quarter_measurement, country, weight, b_value, price_perception_value, 
                 desirability_value, easy_value, Love_ING, digital_experience_value) %>%
-  dplyr::filter(b_value <10 & !is.na(desirability_value) & !is.na(price_perception_value) & country==1) %>%
+  dplyr::filter(b_value <10 & !is.na(desirability_value) & !is.na(price_perception_value)) %>%
   dplyr::mutate(
     desi = desirability_value * weight,
     price = price_perception_value * weight,
@@ -790,24 +822,220 @@ trial <- result %>%
     digi = digital_experience_value * weight,
     love = Love_ING * weight)
 
-trial_cor <- trial %>%
-    correlate() %>% 
+trial_cor_AUS <- trial %>%
+  dplyr::filter(country==1) %>%
+  correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
-                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, 
-          mirror= TRUE) %>% 
-   rearrange() 
-fashion(trial_cor)
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    Australia = desi
+  ) %>%
+  dplyr::select(rowname, Australia)
 
+trial_cor_AUT <- trial %>%
+  dplyr::filter(country==2) %>%
+  correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    Austria = desi
+  ) %>%
+  dplyr::select(rowname, Austria)
 
+trial_cor_BEL <- trial %>%
+  dplyr::filter(country==3) %>%
+  correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    Belgium = desi
+  ) %>%
+  dplyr::select(rowname, Belgium)
+
+trial_cor_CZ <- trial %>%
+  dplyr::filter(country==4) %>%
+  correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    Czech = desi
+  ) %>%
+  dplyr::select(rowname, Czech)
+
+trial_cor_FR <- trial %>%
+  dplyr::filter(country==5) %>%
+  correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    France = desi
+  ) %>%
+  dplyr::select(rowname, France)
+
+trial_cor_GER <- trial %>%
+  dplyr::filter(country==6) %>%
+  correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    Germany = desi
+  ) %>%
+  dplyr::select(rowname, Germany)
+
+trial_cor_ITA <- trial %>%
+  dplyr::filter(country==7) %>%
+  correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    Italy = desi
+  ) %>%
+  dplyr::select(rowname, Italy)
+
+trial_cor_LUX <- trial %>%
+  dplyr::filter(country==8) %>%
+  correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    Luxembourg = desi
+  ) %>%
+  dplyr::select(rowname, Luxembourg)
+
+trial_cor_NL <- trial %>%
+  dplyr::filter(country==9) %>%
+  correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    Netherlands = desi
+  ) %>%
+  dplyr::select(rowname, Netherlands)
+
+trial_cor_POL <- trial %>%
+  dplyr::filter(country==10) %>%
+  correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    Poland = desi
+  ) %>%
+  dplyr::select(rowname, Poland)
+
+trial_cor_ROM <- trial %>%
+  dplyr::filter(country==11) %>%
+  correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    Romania = desi
+  ) %>%
+  dplyr::select(rowname, Romania)
+
+trial_cor_SPA <- trial %>%
+  dplyr::filter(country==12) %>%
+  correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    Spain = desi
+  ) %>%
+  dplyr::select(rowname, Spain)
+
+trial_cor_TUR <- trial %>%
+  dplyr::filter(country==13) %>%
+  correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    Turkey = desi
+  ) %>%
+  dplyr::select(rowname, Turkey)
+
+trial_cor_PH <- trial %>%
+  dplyr::filter(country==14) %>%
+  correlate() %>% 
+    focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
+                -desirability_value, -easy_value, -Love_ING, -digital_experience_value, -digi,-easy, -love, mirror= FALSE) %>%
+  fashion() %>%
+  dplyr::mutate(
+    Philippines = desi
+  ) %>%
+  dplyr::select(rowname, Philippines)
+
+df_list <- list(trial_cor_AUS, 
+                trial_cor_AUT,
+                trial_cor_BEL,
+                trial_cor_CZ,
+                trial_cor_FR,
+                trial_cor_GER,
+                trial_cor_ITA,
+                trial_cor_LUX,
+                trial_cor_NL,
+                trial_cor_POL,
+                trial_cor_PH,
+                trial_cor_TUR,
+                trial_cor_SPA,
+                trial_cor_ROM) 
+
+cortab <- Reduce(function(d1, d2) merge(d1, d2, by = "rowname", all.x = TRUE, all.y = FALSE), 
+       df_list)
+cortab <- cortab[-c(1,2,3,5,7,9,11,12,13),]
+
+# Transpose data
+cortab <- as.data.frame(t(cortab))
+colnames(cortab) = as.character(unlist(cortab[1,]))
+cortab$country <-rownames(cortab)
+cortab = cortab[-1,]
+rownames(cortab) <- NULL
+cortab <- as.tibble(cortab)
+cortab$digi <- as.numeric(as.character(cortab$digi))
+cortab$easy <- as.numeric(as.character(cortab$easy))
+cortab$love <- as.numeric(as.character(cortab$love))
+cortab$price_perception_value <- as.numeric(as.character(cortab$price_perception_value))
+
+r <- plot_ly(
+  type = 'table',
+  columnwidth = c(70, 40, 40, 40, 40),
+  columnorder = c(0, 1, 2, 3, 4),
+  header = list(
+    values = c("country","digi", "easy", "love", "price"),
+    align = c("center", "center", "center", "center", "center"),
+    line = list(width = 1, color = c("rgb 168, 168, 168")),
+    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)",
+                          "rgb(255,098,000)", "rgb(255,098,000)")),
+    font = list(family = "ING me", size = 14, color = "white")
+    ),
+  cells = list(values = rbind(cortab$country, 
+                              cortab$digi, 
+                              cortab$easy, 
+                              cortab$love, 
+                              cortab$price_perception_value),
+    align = c("center", "center", "center", "center", "center"),
+    line = list(color = c("rgb 168, 168, 168"), width = 1),
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))))
+r
 ```
- </div>
-  
+</div>
   <div class="col-md-4" markdown="1">
-  <br> <br> <br>
-```{r corp, eval=T, echo=F, fig.width=4, fig.height=4, warning=FALSE, message=F}
-rplot(trial_cor)
-simple.fit = lm(desi~price, data=trial)
-summary(simple.fit)
-```
-   </div> <div class="row">  
-</div> 
+  <br><br>
+  
+* check whether other scales need to be standardized
+* Describe table shows these variables in correlation desirability
+* add table for ING specifically
+
+  </div>
+</div>
