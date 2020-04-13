@@ -17,11 +17,11 @@ knitr::opts_chunk$set(echo = TRUE)
 The aim of this overview is to get better understanding of the relation between the perception consumers have of the prices in the market and desirability. 
 
 * Desirability: “If fees were no object, which of the brands would you choose?”  
-* Price perception: 
+* Price perception: "could you rank the brands on a scale from not expensive to expensive"
 
 Both questions as evaluated on a scale from 0-100 where people are asked to rank the brands they are familair with (max 5 brands). 
 
-Next to these two questions, the relationship of other variables and desirability are explored. 
+Because of the formulation of the desirability question, a direct relation between price perception and desirability is not expected. To evaluate the premium value of the brand, price is not a factor for desirability. To understand the impact of price perception on people's choice, preference is explored as well. A reasonable set of possible independent variables are taken into account. 
 
 **First impression based on aggregated data (Jan 2020)** <br>
 To get an idea of the current market situation in each country, desirability is plotted against price perception. This provides an overview of how expensive people *think* a brand is, against which brand they would choose if money was no object. Obviously, being considered as not expensive increases the chance that people actually will prefer the brand. Desirability is the brand they choose if money was no object, the higher the better. 
@@ -815,7 +815,7 @@ desi_pricep
 
   <div class="col-md-8" markdown="1">  <br> 
   
-### Correlation price perception * desirability
+### Correlation with desirability
 
 ```{r corr, echo=F, eval=T, fig.width=8, fig.height=4, warning =F, message=F}
 trial <- result %>%
@@ -1016,10 +1016,10 @@ cortab$price_perception_value <- as.numeric(as.character(cortab$price_perception
 
 r <- plot_ly(
   type = 'table',
-  columnwidth = c(70, 40, 40, 40, 40),
-  columnorder = c(0, 1, 2, 3, 4),
+  columnwidth = c(70, 40, 40, 40),
+  columnorder = c(0, 1, 2, 3),
   header = list(
-    values = c("country","digi", "easy", "love", "price"),
+    values = c("country", "easy", "love", "price"),
     align = c("center", "center", "center", "center", "center"),
     line = list(width = 1, color = c("rgb 168, 168, 168")),
     fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)",
@@ -1027,7 +1027,7 @@ r <- plot_ly(
     font = list(family = "ING me", size = 14, color = "white")
     ),
   cells = list(values = rbind(cortab$country, 
-                              cortab$digi, 
+                              #cortab$digi, 
                               cortab$easy, 
                               cortab$love, 
                               cortab$price_perception_value),
@@ -1058,7 +1058,7 @@ check whether other scales need to be standardized
 
   <div class="col-md-8" markdown="1">  <br> 
   
-### Correlation price perception * desirability for ING specifically
+### Correlation with desirability for ING specifically
 
 ```{r corri, echo=F, eval=T, fig.width=8, fig.height=4, warning =F, message=F}
 trial2 <- result %>%
@@ -1259,10 +1259,10 @@ cortab$price_perception_value <- as.numeric(as.character(cortab$price_perception
 
 r2 <- plot_ly(
   type = 'table',
-  columnwidth = c(70, 40, 40, 40, 40),
-  columnorder = c(0, 1, 2, 3, 4),
+  columnwidth = c(70, 40, 40, 40),
+  columnorder = c(0, 1, 2, 3),
   header = list(
-    values = c("country","digi", "easy", "love", "price"),
+    values = c("country","easy", "love", "price"),
     align = c("center", "center", "center", "center", "center"),
     line = list(width = 1, color = c("rgb 168, 168, 168")),
     fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)",
@@ -1270,7 +1270,7 @@ r2 <- plot_ly(
     font = list(family = "ING me", size = 14, color = "white")
     ),
   cells = list(values = rbind(cortab$country, 
-                              cortab$digi, 
+                              #cortab$digi, 
                               cortab$easy, 
                               cortab$love, 
                               cortab$price_perception_value),
@@ -1296,13 +1296,13 @@ r2
 
   <div class="col-md-8" markdown="1">  <br> 
   
-### Correlation price perception * preference
+### Correlation with preference
 
 ```{r corrp, echo=F, eval=T, fig.width=8, fig.height=4, warning =F, message=F}
 trialp <- result %>%
   dplyr::select(X1, quarter_measurement, country, weight, b_value, price_perception_value, 
                 desirability_value, easy_value, Love_ING, digital_experience_value,
-                preference_value) %>%
+                preference_value, smart_value, meets_needs_value,) %>%
   dplyr::filter(!is.na(preference_value) & !is.na(price_perception_value)) %>%
   dplyr::mutate(
     desi = desirability_value * weight,
@@ -1310,14 +1310,17 @@ trialp <- result %>%
     easy = easy_value * weight,
     digi = digital_experience_value * weight,
     love = Love_ING * weight,
-    preference = preference_value * weight)
+    preference = preference_value * weight,
+    smart = smart_value * weight,
+    meets_needs = meets_needs_value * weight)
 
 trial_cor_AUSp <- trialp %>%
   dplyr::filter(country==1) %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     Australia = preference
@@ -1329,7 +1332,8 @@ trial_cor_AUTp <- trialp %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     Austria = preference
@@ -1341,7 +1345,8 @@ trial_cor_BELp <- trialp %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     Belgium = preference
@@ -1353,7 +1358,8 @@ trial_cor_CZp <- trialp %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     Czech = preference
@@ -1365,7 +1371,8 @@ trial_cor_FRp <- trialp %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     France = preference
@@ -1377,7 +1384,8 @@ trial_cor_GERp <- trialp %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     Germany = preference
@@ -1389,7 +1397,8 @@ trial_cor_ITAp <- trialp %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     Italy = preference
@@ -1401,7 +1410,8 @@ trial_cor_LUXp <- trialp %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     Luxembourg = preference
@@ -1413,7 +1423,8 @@ trial_cor_NLp <- trialp %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     Netherlands = preference
@@ -1425,7 +1436,8 @@ trial_cor_POLp <- trialp %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     Poland = preference
@@ -1437,7 +1449,8 @@ trial_cor_ROMp <- trialp %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     Romania = preference
@@ -1449,7 +1462,8 @@ trial_cor_SPAp <- trialp %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     Spain = preference
@@ -1461,7 +1475,8 @@ trial_cor_TURp <- trialp %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     Turkey = preference
@@ -1473,7 +1488,8 @@ trial_cor_PHp <- trialp %>%
   correlate() %>% 
     focus(-X1, -quarter_measurement, -country, -weight, -b_value, -price_perception_value, 
           -desirability_value, -easy_value, -Love_ING, -digital_experience_value,
-          -digi,-easy, -love, -preference_value, mirror= FALSE) %>%
+          -digi,-easy, -love, -preference_value, -smart_value, -meets_needs_value,
+          mirror= FALSE) %>%
   fashion() %>%
   dplyr::mutate(
     Philippines = preference
@@ -1497,7 +1513,7 @@ df_listp <- list(trial_cor_AUSp,
 
 cortabp <- Reduce(function(d1, d2) merge(d1, d2, by = "rowname", all.x = TRUE, all.y = FALSE),
        df_listp)
-cortabp <- cortabp[-c(1,2,3,5,7,9,12,13),]
+cortabp <- cortabp[-c(1,2,4,5,8,13,15,16),]
 
 # Transpose data
 cortabp <- as.data.frame(t(cortabp))
@@ -1506,17 +1522,17 @@ cortabp$country <-rownames(cortabp)
 cortabp = cortabp[-1,]
 rownames(cortabp) <- NULL
 cortabp <- as.tibble(cortabp)
-cortabp$digi <- as.numeric(as.character(cortabp$digi))
+#cortabp$digi <- as.numeric(as.character(cortabp$digi))
 cortabp$easy <- as.numeric(as.character(cortabp$easy))
 cortabp$love <- as.numeric(as.character(cortabp$love))
 cortabp$price_perception_value <- as.numeric(as.character(cortabp$price_perception_value))
 
 r2p <- plot_ly(
   type = 'table',
-  columnwidth = c(70, 40, 40, 40, 40),
-  columnorder = c(0, 1, 2, 3, 4),
+  columnwidth = c(70, 40, 40, 40),
+  columnorder = c(0, 1, 2, 3),
   header = list(
-    values = c("country","digi", "easy", "love", "price"),
+    values = c("country", "easy", "love", "price"),
     align = c("center", "center", "center", "center", "center"),
     line = list(width = 1, color = c("rgb 168, 168, 168")),
     fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)",
@@ -1524,7 +1540,7 @@ r2p <- plot_ly(
     font = list(family = "ING me", size = 14, color = "white")
     ),
   cells = list(values = rbind(cortabp$country, 
-                              cortabp$digi, 
+                             # cortabp$digi, 
                               cortabp$easy, 
                               cortabp$love, 
                               cortabp$price_perception_value),
@@ -1549,3 +1565,69 @@ r2p
 
   </div> <div class="row">  
 </div>
+
+  <div class="col-md-8" markdown="1">  <br> 
+  
+### Correlation with preference - more variables
+
+
+density <- density((result$desirability_value, na.rm=T)
+
+fig <- plot_ly(x = ~density$x, y = ~density$y, type = 'scatter', mode = 'lines', fill = 'tozeroy')
+fig <- fig %>% layout(xaxis = list(title = 'desi'),
+         yaxis = list(title = 'Density'))
+
+fig
+
+```{r corrpr, echo=F, eval=T, fig.width=8, fig.height=4, warning =F, message=F}
+trialpr <- result %>%
+  dplyr::select(X1, quarter_measurement, country, weight, b_value, price_perception_value, 
+                desirability_value, easy_value, Love_ING, smart_value, meets_needs_value,
+                preference_value, digital_experience_value) %>%
+  dplyr::filter(!is.na(preference_value) & !is.na(price_perception_value)) %>%
+  dplyr::mutate(
+    desi = desirability_value * weight,
+    price = price_perception_value * weight,
+    easy = easy_value * weight,
+    digi = digital_experience_value * weight,
+    love = Love_ING * weight,
+    preference = preference_value * weight,
+    smart = smart_value * weight,
+    meets_needs = meets_needs_value * weight,
+    )
+
+den_AUS <- density(trialpr$desirability_value[trialpr$country==1], na.rm=T)
+den_AUT <- density(trialpr$desirability_value[trialpr$country==2], na.rm=T)
+den_BEL <- density(trialpr$desirability_value[trialpr$country==3], na.rm=T)
+den_CZE <- density(trialpr$desirability_value[trialpr$country==4], na.rm=T)
+den_GER <- density(trialpr$desirability_value[trialpr$country==5], na.rm=T)
+den_FRA <- density(trialpr$desirability_value[trialpr$country==6], na.rm=T)
+den_ITA <- density(trialpr$desirability_value[trialpr$country==7], na.rm=T)
+den_LUX <- density(trialpr$desirability_value[trialpr$country==8], na.rm=T)
+den_NLD <- density(trialpr$desirability_value[trialpr$country==9], na.rm=T)
+den_POL <- density(trialpr$desirability_value[trialpr$country==10], na.rm=T)
+den_ROM <- density(trialpr$desirability_value[trialpr$country==11], na.rm=T)
+den_SPA <- density(trialpr$desirability_value[trialpr$country==12], na.rm=T)
+den_TUR <- density(trialpr$desirability_value[trialpr$country==13], na.rm=T)
+den_PHI <- density(trialpr$desirability_value[trialpr$country==14], na.rm=T)
+
+figAUS <- plot_ly(
+  x = ~den_AUS$x, y = ~den_AUS$y, type = 'scatter', mode = 'lines', fill = 'tozeroy') %>% layout(xaxis = list(title = 'Desirability'),
+                      yaxis = list(title = 'Density'))
+
+figAUS
+
+
+figAUT <- plot_ly(
+  x = ~den_AUT$x, y = ~den_AUT$y, type = 'scatter', mode = 'lines', fill = 'tozeroy') %>% layout(xaxis = list(title = 'Desirability'),
+                      yaxis = list(title = 'Density'))
+
+figAUT 
+  
+figTUR <- plot_ly(
+  x = ~den_TUR$x, y = ~den_TUR$y, type = 'scatter', mode = 'lines', fill = 'tozeroy') %>% layout(xaxis = list(title = 'Desirability'),
+                      yaxis = list(title = 'Density'))
+
+figTUR 
+
+```
