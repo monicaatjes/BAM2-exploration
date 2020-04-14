@@ -1048,11 +1048,105 @@ r
 * The most important conclusion is that there is a strong relationship between how easy the brands are perceived and desirability. 
 * The results do not proof a (negative) relationship between price perception and desirability. Because of the question behind desirability, this is in line with expectation. 
 
-check whether other scales need to be standardized
 
 
+ </div> <div class="row">  
+</div>
 
-  </div>
+  <div class="col-md-8" markdown="1">  <br> 
+  
+### Density plot desirability
+
+
+```{r denplot, echo=F, eval=T, fig.width=8, fig.height=4, warning =F, message=F}
+trialpr <- result %>%
+  dplyr::select(X1, quarter_measurement, country, weight, b_value, price_perception_value, 
+                desirability_value, easy_value, Love_ING, smart_value, meets_needs_value,
+                preference_value, digital_experience_value) %>%
+  dplyr::filter(!is.na(preference_value) & !is.na(price_perception_value)) %>%
+  dplyr::mutate(
+    desi = desirability_value * weight,
+    price = price_perception_value * weight,
+    easy = easy_value * weight,
+    digi = digital_experience_value * weight,
+    love = Love_ING * weight,
+    preference = preference_value * weight,
+    smart = smart_value * weight,
+    meets_needs = meets_needs_value * weight,
+    )
+
+xaxis <- list(title = "Desirability", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              #range =c(20,80),
+              #dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Density",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              #range =c(0,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = TRUE,
+              #dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+
+den_AUS <- density(trialpr$desirability_value[trialpr$country==1], na.rm=T)
+den_AUT <- density(trialpr$desirability_value[trialpr$country==2], na.rm=T)
+den_BEL <- density(trialpr$desirability_value[trialpr$country==3], na.rm=T)
+den_CZE <- density(trialpr$desirability_value[trialpr$country==4], na.rm=T)
+den_GER <- density(trialpr$desirability_value[trialpr$country==5], na.rm=T)
+den_FRA <- density(trialpr$desirability_value[trialpr$country==6], na.rm=T)
+den_ITA <- density(trialpr$desirability_value[trialpr$country==7], na.rm=T)
+den_LUX <- density(trialpr$desirability_value[trialpr$country==8], na.rm=T)
+den_NLD <- density(trialpr$desirability_value[trialpr$country==9], na.rm=T)
+den_POL <- density(trialpr$desirability_value[trialpr$country==10], na.rm=T)
+den_ROM <- density(trialpr$desirability_value[trialpr$country==11], na.rm=T)
+den_SPA <- density(trialpr$desirability_value[trialpr$country==12], na.rm=T)
+den_TUR <- density(trialpr$desirability_value[trialpr$country==13], na.rm=T)
+den_PHI <- density(trialpr$desirability_value[trialpr$country==14], na.rm=T)
+
+figAUS <- plot_ly(
+  x = ~den_AUS$x, y = ~den_AUS$y, type = 'scatter', mode = 'lines', fill = 'tozeroy',
+  color ='rgb(255,098,000)') %>% layout(xaxis = xaxis,                                                                                yaxis = yaxis)
+figAUS
+
+
+#figAUT <- plot_ly(
+# x = ~den_AUT$x, y = ~den_AUT$y, type = 'scatter', mode = 'lines', fill = 'tozeroy') %>% #layout(xaxis = list(title = 'Desirability'),
+                     # yaxis = list(title = 'Density'))
+
+#figAUT 
+  
+#figTUR <- plot_ly(
+#  x = ~den_TUR$x, y = ~den_TUR$y, type = 'scatter', mode = 'lines', fill = 'tozeroy') %>% #layout(xaxis = list(title = 'Desirability'),
+                     # yaxis = list(title = 'Density'))
+
+#figTUR 
+
+```
+</div>
+  <div class="col-md-4" markdown="1">
+  <br><br>
+ 
+**Remarks** 
+<br>  
+
+* This density plot shows the distribution of desirability for Australia. Other countries show equal results. 
+* Relevant to be aware that the distribution is skewed to the left, with a peak score of +/-30. 
+ </div> <div class="row">  
 </div>
 
 
@@ -1513,7 +1607,7 @@ df_listp <- list(trial_cor_AUSp,
 
 cortabp <- Reduce(function(d1, d2) merge(d1, d2, by = "rowname", all.x = TRUE, all.y = FALSE),
        df_listp)
-cortabp <- cortabp[-c(1,2,4,5,8,13,15,16),]
+cortabp <- cortabp[-c(1,2,4,5,13,15,16),]
 
 # Transpose data
 cortabp <- as.data.frame(t(cortabp))
@@ -1548,6 +1642,7 @@ r2p <- plot_ly(
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))))
 r2p
+
 ```
 </div>
   <div class="col-md-4" markdown="1">
@@ -1566,68 +1661,4 @@ r2p
   </div> <div class="row">  
 </div>
 
-  <div class="col-md-8" markdown="1">  <br> 
-  
-### Correlation with preference - more variables
 
-
-density <- density((result$desirability_value, na.rm=T)
-
-fig <- plot_ly(x = ~density$x, y = ~density$y, type = 'scatter', mode = 'lines', fill = 'tozeroy')
-fig <- fig %>% layout(xaxis = list(title = 'desi'),
-         yaxis = list(title = 'Density'))
-
-fig
-
-```{r corrpr, echo=F, eval=T, fig.width=8, fig.height=4, warning =F, message=F}
-trialpr <- result %>%
-  dplyr::select(X1, quarter_measurement, country, weight, b_value, price_perception_value, 
-                desirability_value, easy_value, Love_ING, smart_value, meets_needs_value,
-                preference_value, digital_experience_value) %>%
-  dplyr::filter(!is.na(preference_value) & !is.na(price_perception_value)) %>%
-  dplyr::mutate(
-    desi = desirability_value * weight,
-    price = price_perception_value * weight,
-    easy = easy_value * weight,
-    digi = digital_experience_value * weight,
-    love = Love_ING * weight,
-    preference = preference_value * weight,
-    smart = smart_value * weight,
-    meets_needs = meets_needs_value * weight,
-    )
-
-den_AUS <- density(trialpr$desirability_value[trialpr$country==1], na.rm=T)
-den_AUT <- density(trialpr$desirability_value[trialpr$country==2], na.rm=T)
-den_BEL <- density(trialpr$desirability_value[trialpr$country==3], na.rm=T)
-den_CZE <- density(trialpr$desirability_value[trialpr$country==4], na.rm=T)
-den_GER <- density(trialpr$desirability_value[trialpr$country==5], na.rm=T)
-den_FRA <- density(trialpr$desirability_value[trialpr$country==6], na.rm=T)
-den_ITA <- density(trialpr$desirability_value[trialpr$country==7], na.rm=T)
-den_LUX <- density(trialpr$desirability_value[trialpr$country==8], na.rm=T)
-den_NLD <- density(trialpr$desirability_value[trialpr$country==9], na.rm=T)
-den_POL <- density(trialpr$desirability_value[trialpr$country==10], na.rm=T)
-den_ROM <- density(trialpr$desirability_value[trialpr$country==11], na.rm=T)
-den_SPA <- density(trialpr$desirability_value[trialpr$country==12], na.rm=T)
-den_TUR <- density(trialpr$desirability_value[trialpr$country==13], na.rm=T)
-den_PHI <- density(trialpr$desirability_value[trialpr$country==14], na.rm=T)
-
-figAUS <- plot_ly(
-  x = ~den_AUS$x, y = ~den_AUS$y, type = 'scatter', mode = 'lines', fill = 'tozeroy') %>% layout(xaxis = list(title = 'Desirability'),
-                      yaxis = list(title = 'Density'))
-
-figAUS
-
-
-figAUT <- plot_ly(
-  x = ~den_AUT$x, y = ~den_AUT$y, type = 'scatter', mode = 'lines', fill = 'tozeroy') %>% layout(xaxis = list(title = 'Desirability'),
-                      yaxis = list(title = 'Density'))
-
-figAUT 
-  
-figTUR <- plot_ly(
-  x = ~den_TUR$x, y = ~den_TUR$y, type = 'scatter', mode = 'lines', fill = 'tozeroy') %>% layout(xaxis = list(title = 'Desirability'),
-                      yaxis = list(title = 'Density'))
-
-figTUR 
-
-```
