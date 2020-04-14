@@ -1,0 +1,2182 @@
+---
+title: "Communication & Brand experience update"
+output: ingmarkdowntemplates::ing_html_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Management summary Q1 2020
+
+This document provides you an overview of the KPI's of the CoE Communications and Brand Experience. 
+
+## Desirability
+<div class="row">
+  <div class="col-md-8" markdown="1">
+```{r overview Desirability, echo=F, eval=T, fig.align='left', fig.width=8, fig.height=4}
+desi <- test %>%
+  dplyr::select(quarter_measurement, country, b_value, desirability) %>%
+  dplyr::filter(quarter_measurement >17 & b_value==1) %>%
+  dplyr::mutate(
+    desirability = desirability
+    ) %>%
+  distinct()
+
+desi_CAGR <- test %>%
+  dplyr::select(quarter_measurement, country, b_value, desirability) %>%
+  dplyr::filter(quarter_measurement >17 & b_value==1) %>%
+  dplyr::mutate(
+    desirability = desirability
+    ) %>%
+  distinct() %>% 
+  # Spread across quarters
+  tidyr::spread(quarter_measurement, desirability) %>% 
+  # Calculate CAGR
+  dplyr::mutate(
+    cagr = (`21`/`19`)^(1/3) - 1
+  ) %>% 
+  # Gather across quarters
+  tidyr::gather(quarter_measurement, desirability, -country, -b_value, -cagr) %>% 
+  # Filter to per country per time
+  dplyr::select(country, cagr) %>% 
+  dplyr::distinct()
+
+c <- c("Australia", "Austria", "Belgium", "Czech", "France", "Germany", "Italy", "Luxembourg", 
+       "Netherlands", "Poland", "Romania", "Spain", "Turkey", "The Philippines")
+
+desi_p<- plot_ly(
+  type = 'table',
+  columnwidth = c(70, 40, 40, 40, 40),
+  columnorder = c(0, 1, 2, 3, 4),
+  header = list(
+    values = c("country","Q3 2019", "Q4 2019", "Q1 2020", "CAGR"),
+    align = c("center", "center", "center", "center", "center"),
+    line = list(width = 1, color = c("rgb 168, 168, 168")),
+    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
+    font = list(family = "ING me", size = 14, color = "white")
+  ),
+  cells = list(
+    values = rbind(c,
+                   round(desi$desirability[desi$quarter_measurement==19], digits=2),
+                   round(desi$desirability[desi$quarter_measurement==20], digits=2), 
+                   round(desi$desirability[desi$quarter_measurement==21], digits=2),
+                   round(desi_CAGR$cagr, digits=2)),
+    align = c("center", "center", "center", "center", "center"),
+    line = list(color = c("rgb 168, 168, 168"), width = 1),
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
+  ))
+desi_p
+```
+</div>
+  <div class="col-md-4" markdown="1">
+  <br>
+  
+  TEXT
+  </div>
+</div>
+
+## Reputation
+<div class="row">
+  <div class="col-md-8" markdown="1">
+```{r overview Reputation, eval=T, echo=F, fig.align='left', fig.height=4, fig.width=8}
+rep <- test %>%
+  dplyr::select(quarter_measurement, country, b_value, pulse, `RepTrak® Pulse`) %>%
+  dplyr::filter(quarter_measurement > 16 & b_value==1) %>%
+  dplyr::mutate(
+    pulse = case_when(
+      country == 1 ~ pulse,
+      country == 2 ~ `RepTrak® Pulse`,
+      country == 3 ~ `RepTrak® Pulse`,
+      country == 4 ~ pulse,
+      country == 5 ~ pulse,
+      country == 6 ~ `RepTrak® Pulse`,
+      country == 7 ~ pulse,
+      country == 8 ~ pulse,
+      country == 9 ~ `RepTrak® Pulse`,
+      country == 10 ~ pulse,
+      country == 11 ~ pulse,
+      country == 12 ~ pulse,
+      country == 13 ~ pulse,
+      country == 14 ~ pulse,
+      TRUE ~ NA_real_)
+  ) %>%
+  distinct()
+
+rep_CAGR <- test %>%
+  dplyr::select(quarter_measurement, country, b_value, pulse) %>%
+  dplyr::filter(quarter_measurement >17 & b_value==1) %>%
+  dplyr::mutate(
+    pulse = pulse
+  ) %>%
+  distinct() %>% 
+  # Spread across quarters
+  tidyr::spread(quarter_measurement, pulse) %>% 
+  # Calculate CAGR
+  dplyr::mutate(
+    cagr = (`21`/`19`)^(1/3) - 1
+  ) %>% 
+  # Gather across quarters
+  tidyr::gather(quarter_measurement, pulse, -country, -b_value, -cagr) %>% 
+  # Filter to per country per time
+  dplyr::select(country, cagr) %>% 
+  dplyr::distinct()
+
+c <- c("Australia", "Austria", "Belgium", "Czech", "France", "Germany", "Italy", "Luxembourg", 
+       "Netherlands", "Poland", "Romania", "Spain", "Turkey", "The Philippines")
+
+r <- plot_ly(
+  type = 'table',
+  columnwidth = c(70, 40, 40, 40, 40),
+  columnorder = c(0, 1, 2, 3, 4),
+  header = list(
+    values = c("country","Q3 2019", "Q4 2019", "Q1 2020", "CAGR"),
+    align = c("center", "center", "center", "center", "center"),
+    line = list(width = 1, color = c("rgb 168, 168, 168")),
+    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
+    font = list(family = "ING me", size = 14, color = "white")
+  ),
+  cells = list(
+    values = rbind(c, round(rep$pulse[rep$quarter_measurement==19], digits=2),
+                   round(rep$pulse[rep$quarter_measurement==20], digits=2), 
+                   round(rep$pulse[rep$quarter_measurement==21], digits=2),
+                   round(rep_CAGR$cagr, digits=2)),
+    align = c("center", "center", "center", "center", "center"),
+    line = list(color = c("rgb 168, 168, 168"), width = 1),
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
+  ))
+r
+```
+</div>
+  <div class="col-md-4" markdown="1">
+  <br>
+  
+  * Please note that the reported pulse scores above have a different source than last year. The source of   these scores is the Brand Affinity Monitor. The pulse score for the countries with an extended Reptrek contract (NL, AUT, GE & BE) will be reported by the Reputation Insitute. 
+  * Differences will be monitored over time. The methodology is equal, the main difference is that The Reputation Institute corrects for cultural difference. This factor is unknown, so cannot be applied on the BAM pulse scores. 
+  </div>
+</div>
+
+## Internal NPS
+<div class="row">
+  <div class="col-md-8" markdown="1">
+```{r overview internal NPS, echo=F, eval=T, fig.align='left', fig.width=8, fig.height=4}
+### INTERNAL NPS 
+internal <-read_excel("/Users/xo21bm/Documents/Lokaal/BAM2/exploration/data/20100124 Internal metrics .xlsx", range = "A26:I47")
+
+# throw away empty column
+internal <- internal[,-2]
+
+# without transpose
+internal$labels_countries <- internal$`Row Labels`
+internal$`Row Labels` <- NULL
+colnames(internal) <- as.yearqtr(colnames(internal[1:7]), format= 'Q%q_%Y') 
+names(internal)[8] <- "labels_countries" 
+
+internal1 <- internal %>%
+  dplyr::select(labels_countries, `2019 Q2`, `2019 Q3`, `2019 Q4`) %>%
+  dplyr::filter(!is.na(`2019 Q4`)) %>%
+  dplyr::mutate(
+    # Calculate CAGR
+        cagr = (`2019 Q4`/`2019 Q2`)^(1/3) - 1,
+  )
+  
+internal1 <- internal1 %>%
+  dplyr::mutate(
+    '2019 Q2'= internal1$'2019 Q2' *100,
+    '2019 Q3'= internal1$'2019 Q3' *100,
+    '2019 Q4'= internal1$'2019 Q4' *100)
+
+internal_tab<- plot_ly(
+  type = 'table',
+  columnwidth = c(70, 40, 40, 40, 40),
+  columnorder = c(0, 1, 2, 3, 4),
+  header = list(
+    values = c("country","Q2 2019", "Q3 2019", "Q4 2019", "CAGR"),
+    align = c("center", "center", "center", "center", "center"),
+    line = list(width = 1, color = c("rgb 168, 168, 168")),
+    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
+    font = list(family = "ING me", size = 14, color = "white")
+  ),
+  cells = list(
+    values = rbind(internal1$labels_countries,
+                   round(internal1$`2019 Q2`, digits=2),
+                   round(internal1$`2019 Q3`, digits=2),
+                   round(internal1$`2019 Q4`, digits=2),
+                   round(internal1$cagr, digits=2)),
+    align = c("center", "center", "center", "center", "center"),
+    line = list(color = c("rgb 168, 168, 168"), width = 1),
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
+  ))
+internal_tab
+```
+  </div>
+  <div class="col-md-4" markdown="1">
+  <br>
+  
+  * Please notice that scores of countries with a small amount of colleagues show some fluctuation.
+* HR embedded the NPS question in existing surveys (OHI, WPC, pulse) which all have a different context. This might have some impact on the data. 
+  </div>
+</div>
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/aus.png) Australia
+
+### Brand funnel
+<div class="row">
+  <div class="col-md-4" markdown="1">
+  
+  **Q4**
+```{r fun, echo=FALSE, echo=F, eval=T, fig.width=4, fig.height=3.5}
+funnel_data <- test %>%
+  dplyr::select(unaided, toma, aided, fami, opinion, consideration, preference, quarter_measurement, b_value, country) %>%
+  dplyr::filter(quarter_measurement ==21 & country==1) %>%
+  dplyr::mutate(
+    unaided_best = max(unaided, na.rm=T) *100, 
+    aided_best = max(aided, na.rm=T) * 100, 
+    toma_best = max(toma, na.rm=T) * 100, 
+    fami_best = max(fami, na.rm=T) * 100, 
+    #opinion_best = max(opinion, na.rm=T) * 100, 
+    consideration_best = max(consideration, na.rm=T) * 100, 
+    preference_best = max(preference, na.rm=T) * 100, 
+    unaided = unaided * 100,
+    aided = aided * 100,
+    toma = toma * 100,
+    fami = fami * 100,
+    consideration = consideration *100,
+    preference = preference *100,
+  ) %>%
+  dplyr::distinct() 
+
+funnel_data_diff <- funnel_data %>%
+  dplyr::select(unaided_best, aided_best, toma_best, fami_best,
+                consideration_best, preference_best, unaided, aided, toma, fami, 
+                consideration, preference, b_value, quarter_measurement, country) %>%
+  dplyr::mutate(
+    diff_aided = dplyr::case_when(
+      b_value==1 ~ (aided_best - aided),
+      TRUE ~ 0),
+    diff_fami = dplyr::case_when(
+      b_value==1 ~ (fami_best - fami),
+      TRUE ~ 0),
+    diff_cons = dplyr::case_when(
+      b_value==1 ~ (consideration_best - consideration),
+      TRUE ~ 0),
+    diff_pref = dplyr::case_when(
+      b_value==1 ~ (preference_best - preference),
+      TRUE ~ 0),
+    ) %>%
+  dplyr::filter(diff_aided!=0, diff_fami!=0, diff_cons!=0, diff_pref!=0)
+
+funnel_data <- funnel_data %>%
+  dplyr::filter(b_value==1)
+funnel_plot <- funnel_data %>%
+  plot_ly() %>%
+  add_trace(type = "funnel",
+            y = c("Aided", "Familiarity", "Consideration", "Preference"),
+            x = c(round(funnel_data$aided, digits=2), round(funnel_data$fami, digits=2), 
+                  round(funnel_data$consideration, digits=2), round(funnel_data$preference, digits=2)),
+            textposition = "inside",
+            textinfo = "value",
+            opacity = 1.0,
+            marker = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)",
+                                    "rgb(255,098,000)"),
+                          line = list(width = c(2, 2, 2, 2), color = c("white", "white", "white", "white"))),
+            textfont = list(family = "ING me", size = 14, color = "white"),
+            connector = list(line = list(color = "white"))) %>%
+  layout(yaxis = list(categoryarray = c("Aided", "Familiarity", "Consideration", "Preference"),
+                      tickfont =list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')),
+         xaxis = list(tickfont =list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')),
+        legend =list(textfont = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+##
+funnel_plot
+```
+</div>
+  <div class="col-md-2" markdown="1">
+  
+   **Delta best - ING**
+   
+```{r tab, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+tab <- plot_ly(
+  type = 'table',
+  columnwidth = c(1),
+  columnorder = c(0),
+  header = list(
+    values = c("delta best comp"),
+    align = c("center"),
+    line = list(width = 1, color = 'black'),
+    fill = list(color = "rgb(255,098,000)"),
+    font = list(family = "ING me", size = 14, color = "white")
+  ),
+  cells = list(
+    values = cbind(round(funnel_data_diff$diff_aided, digits=2),
+                   round(funnel_data_diff$diff_fami, digits=2),
+                   round(funnel_data_diff$diff_cons, digits=2),
+                   round(funnel_data_diff$diff_pref, digits=2)),
+    align = c("center", "center", "center", "center"),
+    line = list(color = c("rgb 168, 168, 168"), width = 1),
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
+  ))
+tab
+```
+ </div>
+  <div class="col-md-2" markdown="1">
+  
+   **Unaided awareness**
+   
+```{r Australia unaided, echo=F, eval=T, message=F, error=F, warning=F, fig.width=5, fig.height=3.5}
+awa <- test %>%
+  dplyr::select(b_value, country, labels_countries, labels_quarters,
+                quarter_measurement, unaided, toma, aided, main_competition, label) %>%
+  dplyr::filter(quarter_measurement > 18 & country==1) %>%
+  distinct() %>%
+  dplyr::group_by(quarter_measurement) %>%
+  dplyr::mutate(
+    market_average_unaided = case_when(
+      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    market_average_aided = case_when(
+      main_competition == 1 ~ mean(aided *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    market_average_toma = case_when(
+      main_competition == 1 ~ mean(toma *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    best_unaided = case_when(
+      main_competition == 1 ~ max(unaided *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    best_aided = case_when(
+      main_competition == 1 ~ max(aided *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    best_toma = case_when(
+      main_competition == 1 ~ max(toma *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    unaided_ING = case_when(
+      b_value ==1 ~ unaided *100,
+      TRUE ~ NA_real_),
+    aided_ING = case_when(
+      b_value ==1 ~ aided *100,
+      TRUE ~ NA_real_),
+    toma_ING = case_when(
+      b_value ==1 ~ toma *100,
+      TRUE ~ NA_real_),
+  ) %>%
+    # Gather across quarters
+   # tidyr::spread(quarter_measurement, market_average_unaided) %>%
+  dplyr::ungroup() %>%
+  distinct() %>%
+  dplyr::select(b_value, quarter_measurement, labels_quarters, market_average_unaided, 
+                best_unaided, unaided_ING) %>%
+  gather(variable, value, -(b_value:labels_quarters)) %>%
+  dplyr::filter(b_value==1)
+  #unite(temp, quarter_measurement, variable) %>%
+  #spread(temp, value)
+  
+#awa$value[awa$variable==""]
+x <-unique(awa$labels_quarters)
+y1 <- awa$value[awa$variable=='market_average_unaided']
+y2 <- awa$value[awa$variable=='best_unaided']
+y3 <- awa$value[awa$variable=='unaided_ING']
+datatest <- data.frame(x, y1, y2, y3)
+xaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              ticklen = 5,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              range =c(0,100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+#datatest$x <- factor(datatest$x, levels = data[["x"]])
+
+p1 <- plot_ly(test, x = ~x, y = ~y1, type = 'bar', name = 'market average', marker = list(color = 'rgb(82,81,153)')) %>%
+  add_trace(y = ~y2, name = 'best', marker = list(color = "rgb 168, 168, 168")) %>%
+  add_trace(y = ~y3, name = 'ING', marker = list(color = 'rgb(255,098,000)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         #margin = list(b = 100),
+         barmode = 'group', title= "",
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+p1
+```
+ </div> <div class="row">  
+</div>
+
+### Desirability 
+ </div>
+  <div class="col-md-4" markdown="1">
+  
+   **Evolution over time**
+   
+```{r Australia desi over time, echo=F, eval=T, fig.width=5.6, fig.height=3.5}
+## over time desirability per brand
+desi_time <- test %>%
+  dplyr::select(label, country, quarter_measurement, desirability, labels_quarters) %>%
+  dplyr::filter(country==1) %>%
+  # There are some NA rows, get rid of them
+  tidyr::drop_na() %>%
+  # Gather across brands
+  tidyr::spread(label, desirability) 
+
+xaxis <- list(title = "",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              #range =c(20:90),
+              #dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "",
+              range =c(0,100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+             # autotick = TRUE,
+             # dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+             # tickwidth = 1,
+             # ticklen = 10,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_timep1 <-desi_time %>%
+  plot_ly(x = ~labels_quarters) %>%
+  add_lines(y = ~desi_time$ING, type='scatter', name='ING',
+            line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~desi_time$ANZ , type='scatter', name='ANZ',
+            line = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~desi_time$'Commonwealth Bank', type='scatter', name='Commonwealth',
+            line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~desi_time$NAB, type='scatter', name='NAB',
+            line = list(color = 'rgb(208,217,60)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~desi_time$Westpac, type='scatter', name='Westpac',
+            line = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  layout(title = "",
+         xaxis = xaxis,
+         yaxis = yaxis,
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+desi_timep1
+```
+</div>
+  <div class="col-md-2" markdown="1">
+  
+   ** **
+   
+```{r emp, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+
+```
+
+</div>
+
+  <div class="col-md-4" markdown="1">
+  
+  **Price perception vs Desirability**
+  
+```{r Australia Desirability vs price perception, eval=T, echo=F, fig.width=4, fig.height=3.5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==1) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(30,70),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(30,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = '',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+``` 
+  </div> <div class="row">  
+</div>
+
+  <div class="col-md-12" markdown="1">
+  <br>
+  
+  * Where other brand have shown a declining trend over time, ING has managed to show a positive development since Q4 2014.
+  * Commonwealth is the most desired brand in the market, closely followed by ING. 
+  * It is an important advantage that ING is not considered as expensive. 
+  
+ <div class="row">
+</div>
+
+### Reputation 
+
+ </div>
+  <div class="col-md-4" markdown="1">
+  
+  **Evoluation over time**
+
+
+```{r Australia pulse, echo=F, eval=T, fig.width=5.5, fig.height=3.5}
+rep_brand <- test %>%
+  dplyr::select(quarter_measurement, country, b_value, pulse, labels_quarters) %>%
+  dplyr::filter(quarter_measurement > 17 & country==1 & b_value <6) %>%
+  dplyr::mutate(
+    pulse = pulse
+  ) %>%
+  distinct() %>%
+  # Gather across brands
+  tidyr::spread(b_value, pulse) 
+
+xaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              ticklen = 5,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+yaxis <- list(title = "",
+              range =c(0,100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+margin <- list(autoexpand = F)
+
+rep_b<-rep_brand %>%
+  plot_ly(x = ~labels_quarters) %>%
+  add_lines(y = ~rep_brand$'1', type='scatter', name='ING',
+            line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~rep_brand$'2', type='scatter', name='ANZ',
+            line = list(color = 'rgb(96,166,218)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~rep_brand$'3', type='scatter', name='Commonwealth Bank',
+            line = list(color = 'rgb(171,0,102)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~rep_brand$'4', type='scatter', name='NAB',
+            line = list(color = 'rgb(208,217,60)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~rep_brand$'5', type='scatter', name='Westpac',
+          line = list(color = 'rgb(52,150,81)', width = 4, mode = 'lines+markers')) %>%
+  layout(title = "",
+         xaxis = xaxis,
+         yaxis = yaxis, legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+rep_b
+```
+</div>
+  <div class="col-md-2" markdown="1">
+  
+   ** **
+   
+```{r emp2, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+
+```
+ 
+</div>
+
+<div class="col-md-4" markdown="1">  
+  
+  **Love**
+  
+```{r Australia love, echo=F, eval=T, fig.width=5.5, fig.height=3.5}
+love <- test %>%
+  dplyr::select(quarter_measurement, country, love_mean_ING, love_mean_Google, love_mean_ING_client, labels_quarters) %>%
+  dplyr::filter(quarter_measurement >17 & country==1) %>%
+  distinct()
+
+xaxis <- list(title = "",
+             # showline = TRUE,
+              #showgrid = TRUE,
+              #showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              #autotick = TRUE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              #ticklen = 3,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+yaxis <- list(title = "",
+              range =c(0,10),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 1,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+margin <- list(autoexpand = F)
+
+love$x <-c("2019 Q2", "2019 Q3", "2019 Q4", "2020 Q1")
+
+l<-love %>%
+  plot_ly(x = ~x) %>%
+  add_lines(y = ~love_mean_ING_client, type='scatter', name='love ING clients', 
+            line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~love_mean_Google, type='scatter', name='love Google',
+            line = list(color = 'rgb(82,81,153)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~love_mean_ING, type='scatter', name='love ING',
+            line = list(color = 'rgb(52, 150, 81', width = 4, mode = 'lines+markers')) %>%
+  layout(title = "",
+         xaxis = xaxis,
+         yaxis = yaxis, legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+l
+```
+  </div> <div class="row">  
+</div>
+
+
+  <div class="col-md-12" markdown="1">
+  <br>
+  
+* Australia has a strong and stabile pulse score and outperforms the market.
+* Australia has shown stable love scores since last quarter.
+  
+ <div class="row">
+</div>
+
+
+### Customer
+
+<div class="row">
+
+  <div class="col-md-4" markdown="1">
+  
+  **CX**
+  
+```{r Australia cx, eval=T, echo=F, fig.width=3.5, fig.height=3.5, warning=FALSE}
+easy <- test %>%
+  dplyr::select(easy_mean, meets_needs_mean, smart_mean, labels_countries, label, labels_quarters, quarter_measurement, country) %>%
+  dplyr::filter(quarter_measurement ==21 & country==1) %>%
+  dplyr::filter(!is.na(easy_mean))
+
+yaxis <- list(title = "CX",
+              titlefont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'),
+              range =c(40,70),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+xaxis <- list(title = "",
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+es <- easy %>%
+  plot_ly(x = ~"easy", y = ~easy_mean, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  add_trace(x = ~"smart", y = ~smart_mean, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  add_trace(x = ~"meets needs", y = ~meets_needs_mean, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = '', yaxis= yaxis, 
+         xaxis = xaxis,
+         showlegend = FALSE, 
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+es
+```
+  </div>
+  <div class="col-md-4" markdown="1">
+  
+  **Primairy customer**
+  
+```{r Australia customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
+customerthing <- test_customer_fig %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
+                "Avg number of product categories per active customer") %>%
+  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==1) %>%
+  dplyr::arrange(country)
+
+customerthing <- customerthing %>%
+  dplyr::mutate(
+    Diff_year = 1,  
+    Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
+    Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
+  )
+
+
+x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
+
+xaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              ticklen = 5,
+              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Primary customer *1000",
+              titlefont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'),
+              showline = TRUE,
+              showgrid = FALSE,
+              range =c(100.000:2000.000),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 50.000,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+              
+p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+              type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
+ #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'group', title= "",
+         legend =list(family = "ING me",
+                      size = 12,
+                      color = 'rgb(105, 105, 105)'))
+p1
+```
+  </div>
+  <div class="col-md-4" markdown="1">
+  
+  **Average # products**
+
+```{r Australia avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
+
+customerthing <- test_customer_fig %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
+                "Avg number of product categories per active customer") %>%
+  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==1) %>%
+  dplyr::distinct() %>%
+  dplyr::arrange(country)
+
+xaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              ticklen = 5,
+              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = TRUE,
+              range =c(1:2),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = TRUE,
+              #dtick = 0.01,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 5,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+              
+p2 <- plot_ly(customerthing, x = ~labels_quarters, y = ~customerthing$"Avg number of product categories per active customer", 
+              type = 'bar', name = 'average amount of products', marker = list(color = 'rgb(82,81,153)')) %>%
+ #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         #margin = list(b = 100),
+         barmode = 'group', title= "",
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+
+p2
+```
+  </div>
+</div>
+  <div class="row">
+
+
+  <div class="col-md-12" markdown="1">
+  <br>
+  
+* Australia showed a positive trend in their amount of primary customers. 
+* Australia has shown a positive development in their average amount of products since Q3 2018.
+  
+ <div class="row">
+</div>
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/aut.png)   Austria
+
+### Brand funnel
+<div class="row">
+  <div class="col-md-4" markdown="1">
+  
+  **Q4**
+```{r funAUT, echo=FALSE, echo=F, eval=T, fig.width=4, fig.height=3.5}
+funnel_data <- test %>%
+  dplyr::select(unaided, toma, aided, fami, opinion, consideration, preference, quarter_measurement, b_value, country) %>%
+  dplyr::filter(quarter_measurement ==21 & country==2) %>%
+  dplyr::mutate(
+    unaided_best = max(unaided, na.rm=T) *100, 
+    aided_best = max(aided, na.rm=T) * 100, 
+    toma_best = max(toma, na.rm=T) * 100, 
+    fami_best = max(fami, na.rm=T) * 100, 
+    #opinion_best = max(opinion, na.rm=T) * 100, 
+    consideration_best = max(consideration, na.rm=T) * 100, 
+    preference_best = max(preference, na.rm=T) * 100, 
+    unaided = unaided * 100,
+    aided = aided * 100,
+    toma = toma * 100,
+    fami = fami * 100,
+    consideration = consideration *100,
+    preference = preference *100,
+  ) %>%
+  dplyr::distinct() 
+
+funnel_data_diff <- funnel_data %>%
+  dplyr::select(unaided_best, aided_best, toma_best, fami_best,
+                consideration_best, preference_best, unaided, aided, toma, fami, 
+                consideration, preference, b_value, quarter_measurement, country) %>%
+  dplyr::mutate(
+    diff_aided = dplyr::case_when(
+      b_value==1 ~ (aided_best - aided),
+      TRUE ~ 0),
+    diff_fami = dplyr::case_when(
+      b_value==1 ~ (fami_best - fami),
+      TRUE ~ 0),
+    diff_cons = dplyr::case_when(
+      b_value==1 ~ (consideration_best - consideration),
+      TRUE ~ 0),
+    diff_pref = dplyr::case_when(
+      b_value==1 ~ (preference_best - preference),
+      TRUE ~ 0),
+    ) %>%
+  dplyr::filter(diff_aided!=0, diff_fami!=0, diff_cons!=0, diff_pref!=0)
+
+funnel_data <- funnel_data %>%
+  dplyr::filter(b_value==1)
+funnel_plot <- funnel_data %>%
+  plot_ly() %>%
+  add_trace(type = "funnel",
+            y = c("Aided", "Familiarity", "Consideration", "Preference"),
+            x = c(round(funnel_data$aided, digits=2), round(funnel_data$fami, digits=2), 
+                  round(funnel_data$consideration, digits=2), round(funnel_data$preference, digits=2)),
+            textposition = "inside",
+            textinfo = "value",
+            opacity = 1.0,
+            marker = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)",
+                                    "rgb(255,098,000)"),
+                          line = list(width = c(2, 2, 2, 2), color = c("white", "white", "white", "white"))),
+            textfont = list(family = "ING me", size = 14, color = "white"),
+            connector = list(line = list(color = "white"))) %>%
+  layout(yaxis = list(categoryarray = c("Aided", "Familiarity", "Consideration", "Preference"),
+                      tickfont =list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')),
+         xaxis = list(tickfont =list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')),
+        legend =list(textfont = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+##
+funnel_plot
+```
+</div>
+  <div class="col-md-2" markdown="1">
+  
+   **Delta best - ING**
+   
+```{r tabAUT, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+tab <- plot_ly(
+  type = 'table',
+  columnwidth = c(1),
+  columnorder = c(0),
+  header = list(
+    values = c("delta best comp"),
+    align = c("center"),
+    line = list(width = 1, color = 'black'),
+    fill = list(color = "rgb(255,098,000)"),
+    font = list(family = "ING me", size = 14, color = "white")
+  ),
+  cells = list(
+    values = cbind(round(funnel_data_diff$diff_aided, digits=2),
+                   round(funnel_data_diff$diff_fami, digits=2),
+                   round(funnel_data_diff$diff_cons, digits=2),
+                   round(funnel_data_diff$diff_pref, digits=2)),
+    align = c("center", "center", "center", "center"),
+    line = list(color = c("rgb 168, 168, 168"), width = 1),
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
+  ))
+tab
+```
+ </div>
+  <div class="col-md-2" markdown="1">
+  
+   **Unaided awareness**
+   
+```{r AUT unaided, echo=F, eval=T, message=F, error=F, warning=F, fig.width=5, fig.height=3.5}
+awa <- test %>%
+  dplyr::select(b_value, country, labels_countries, labels_quarters,
+                quarter_measurement, unaided, toma, aided, main_competition, label) %>%
+  dplyr::filter(quarter_measurement > 18 & country==2) %>%
+  distinct() %>%
+  dplyr::group_by(quarter_measurement) %>%
+  dplyr::mutate(
+    market_average_unaided = case_when(
+      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    market_average_aided = case_when(
+      main_competition == 1 ~ mean(aided *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    market_average_toma = case_when(
+      main_competition == 1 ~ mean(toma *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    best_unaided = case_when(
+      main_competition == 1 ~ max(unaided *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    best_aided = case_when(
+      main_competition == 1 ~ max(aided *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    best_toma = case_when(
+      main_competition == 1 ~ max(toma *100, na.rm =T), 
+      TRUE ~ NA_real_),
+    unaided_ING = case_when(
+      b_value ==1 ~ unaided *100,
+      TRUE ~ NA_real_),
+    aided_ING = case_when(
+      b_value ==1 ~ aided *100,
+      TRUE ~ NA_real_),
+    toma_ING = case_when(
+      b_value ==1 ~ toma *100,
+      TRUE ~ NA_real_),
+  ) %>%
+    # Gather across quarters
+   # tidyr::spread(quarter_measurement, market_average_unaided) %>%
+  dplyr::ungroup() %>%
+  distinct() %>%
+  dplyr::select(b_value, quarter_measurement, labels_quarters, market_average_unaided, 
+                best_unaided, unaided_ING) %>%
+  gather(variable, value, -(b_value:labels_quarters)) %>%
+  dplyr::filter(b_value==1)
+  #unite(temp, quarter_measurement, variable) %>%
+  #spread(temp, value)
+  
+#awa$value[awa$variable==""]
+x <-unique(awa$labels_quarters)
+y1 <- awa$value[awa$variable=='market_average_unaided']
+y2 <- awa$value[awa$variable=='best_unaided']
+y3 <- awa$value[awa$variable=='unaided_ING']
+datatest <- data.frame(x, y1, y2, y3)
+xaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              ticklen = 5,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              range =c(0,100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+#datatest$x <- factor(datatest$x, levels = data[["x"]])
+
+p1 <- plot_ly(test, x = ~x, y = ~y1, type = 'bar', name = 'market average', marker = list(color = 'rgb(82,81,153)')) %>%
+  add_trace(y = ~y2, name = 'best', marker = list(color = "rgb 168, 168, 168")) %>%
+  add_trace(y = ~y3, name = 'ING', marker = list(color = 'rgb(255,098,000)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         #margin = list(b = 100),
+         barmode = 'group', title= "",
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+p1
+```
+ </div> <div class="row">  
+</div>
+
+### Desirability 
+ </div>
+  <div class="col-md-4" markdown="1">
+  
+   **Evolution over time**
+   
+```{r AUT desi over time, echo=F, eval=T, fig.width=5.6, fig.height=3.5}
+## over time desirability per brand
+desi_time <- test %>%
+  dplyr::select(label, country, quarter_measurement, desirability, labels_quarters) %>%
+  dplyr::filter(country==2) %>%
+  # There are some NA rows, get rid of them
+  tidyr::drop_na() %>%
+  # Gather across brands
+  tidyr::spread(label, desirability) 
+
+xaxis <- list(title = "",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              #range =c(20:90),
+              #dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "",
+              range =c(0,100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+             # autotick = TRUE,
+             # dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+             # tickwidth = 1,
+             # ticklen = 10,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_timep1 <-desi_time %>%
+  plot_ly(x = ~labels_quarters) %>%
+  add_lines(y = ~desi_time$ING, type='scatter', name='ING',
+            line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~desi_time$`BAWAG P S K  Bank` , type='scatter', name='BAWAG PSK Bank',
+            line = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~desi_time$Easybank, type='scatter', name='Easybank',
+            line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~desi_time$`Erste Bank und Sparkasse`, type='scatter', name='Erste Bank und Sparkasse',
+            line = list(color = 'rgb(208,217,60)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~desi_time$`Raiffeisen Sektor`, type='scatter', name='Raiffeisen Sektor',
+            line = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  layout(title = "",
+         xaxis = xaxis,
+         yaxis = yaxis,
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+desi_timep1
+```
+</div>
+  <div class="col-md-2" markdown="1">
+  
+   ** **
+   
+```{r emp4, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+
+```
+ </div> 
+
+
+  <div class="col-md-4" markdown="1">
+  
+  **Price perception vs Desirability**
+  
+```{r AUT Desirability vs price perception, eval=T, echo=F, fig.width=4, fig.height=3.5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==2) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(30,70),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(30,50),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = '',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+``` 
+  </div> <div class="row">  
+</div>
+
+  <div class="col-md-12" markdown="1">
+  <br>
+  
+* TEXT
+  
+ <div class="row">
+</div>
+
+### Reputation 
+ </div>
+  <div class="col-md-4" markdown="1">
+  
+  **Evoluation over time**
+
+```{r AUT pulse, echo=F, eval=T, fig.width=5.5, fig.height=3.5}
+rep_brand <- test %>%
+  dplyr::select(quarter_measurement, country, b_value, pulse, labels_quarters) %>%
+  dplyr::filter(quarter_measurement > 17 & country==2 & b_value <6) %>%
+  dplyr::mutate(
+    pulse = pulse
+  ) %>%
+  distinct() %>%
+  # Gather across brands
+  tidyr::spread(b_value, pulse) 
+
+xaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              ticklen = 5,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+yaxis <- list(title = "",
+              range =c(0,100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+margin <- list(autoexpand = F)
+
+rep_b<-rep_brand %>%
+  plot_ly(x = ~labels_quarters) %>%
+  add_lines(y = ~rep_brand$'1', type='scatter', name='ING',
+            line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~rep_brand$'2', type='scatter', name='Raiffeisen',
+            line = list(color = 'rgb(96,166,218)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~rep_brand$'3', type='scatter', name='Erste Bank und Sparkasse',
+            line = list(color = 'rgb(171,0,102)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~rep_brand$'4', type='scatter', name='Unicredit',
+            line = list(color = 'rgb(208,217,60)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~rep_brand$'5', type='scatter', name='Volksbankensektor',
+          line = list(color = 'rgb(52,150,81)', width = 4, mode = 'lines+markers')) %>%
+  layout(title = "",
+         xaxis = xaxis,
+         yaxis = yaxis, legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+rep_b
+```
+</div>
+  <div class="col-md-2" markdown="1">
+  
+   ** **
+   
+```{r emp3, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+
+```
+ 
+</div>
+
+<div class="col-md-4" markdown="1">  
+  
+  **Love**
+  
+```{r AUT love, echo=F, eval=T, fig.width=5.5, fig.height=3.5}
+love <- test %>%
+  dplyr::select(quarter_measurement, country, love_mean_ING, love_mean_Google, love_mean_ING_client, labels_quarters) %>%
+  dplyr::filter(quarter_measurement >17 & country==2) %>%
+  distinct()
+
+xaxis <- list(title = "",
+             # showline = TRUE,
+              #showgrid = TRUE,
+              #showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              #autotick = TRUE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              #ticklen = 3,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+yaxis <- list(title = "",
+              range =c(0,10),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 1,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+margin <- list(autoexpand = F)
+
+love$x <-c("2019 Q2", "2019 Q3", "2019 Q4", "2020 Q1")
+
+l<-love %>%
+  plot_ly(x = ~x) %>%
+  add_lines(y = ~love_mean_ING_client, type='scatter', name='love ING clients', 
+            line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~love_mean_Google, type='scatter', name='love Google',
+            line = list(color = 'rgb(82,81,153)', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y =~love_mean_ING, type='scatter', name='love ING',
+            line = list(color = 'rgb(52, 150, 81', width = 4, mode = 'lines+markers')) %>%
+  layout(title = "",
+         xaxis = xaxis,
+         yaxis = yaxis, legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+l
+```
+  </div> <div class="row">  
+</div>
+
+
+  <div class="col-md-12" markdown="1">
+  <br>
+  
+* TEXT
+  
+ <div class="row">
+</div>
+
+### Customer
+<div class="row">
+
+  <div class="col-md-4" markdown="1">
+  
+  **CX**
+  
+```{r AUT cx, eval=T, echo=F, fig.width=3.5, fig.height=3.5, warning=FALSE}
+easy <- test %>%
+  dplyr::select(easy_mean, meets_needs_mean, smart_mean, labels_countries, label, labels_quarters, quarter_measurement, country) %>%
+  dplyr::filter(quarter_measurement ==21 & country==2) %>%
+  dplyr::filter(!is.na(easy_mean))
+
+yaxis <- list(title = "CX",
+              titlefont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'),
+              range =c(40,70),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+xaxis <- list(title = "",
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+es <- easy %>%
+  plot_ly(x = ~"easy", y = ~easy_mean, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  add_trace(x = ~"smart", y = ~smart_mean, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  add_trace(x = ~"meets needs", y = ~meets_needs_mean, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = '', yaxis= yaxis, 
+         xaxis = xaxis,
+         showlegend = FALSE, 
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+es
+```
+  </div>
+  <div class="col-md-4" markdown="1">
+  
+  **Primairy customer**
+  
+```{r AUT customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
+customerthing <- test_customer_fig %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
+                "Avg number of product categories per active customer") %>%
+  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==1) %>%
+  dplyr::arrange(country)
+
+customerthing <- customerthing %>%
+  dplyr::mutate(
+    Diff_year = 1,  
+    Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
+    Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
+  )
+
+
+x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
+
+xaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              ticklen = 5,
+              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Primary customer *1000",
+              titlefont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'),
+              showline = TRUE,
+              showgrid = FALSE,
+              range =c(100.000:2000.000),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 50.000,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+              
+p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+              type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
+ #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'group', title= "",
+         legend =list(family = "ING me",
+                      size = 12,
+                      color = 'rgb(105, 105, 105)'))
+p1
+```
+  </div>
+  <div class="col-md-4" markdown="1">
+  
+  **Average # products**
+
+```{r AUT avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
+
+customerthing <- test_customer_fig %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
+                "Avg number of product categories per active customer") %>%
+  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==1) %>%
+  dplyr::distinct() %>%
+  dplyr::arrange(country)
+
+xaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              ticklen = 5,
+              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = TRUE,
+              range =c(1:2),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = TRUE,
+              #dtick = 0.01,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 5,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+              
+p2 <- plot_ly(customerthing, x = ~labels_quarters, y = ~customerthing$"Avg number of product categories per active customer", 
+              type = 'bar', name = 'average amount of products', marker = list(color = 'rgb(82,81,153)')) %>%
+ #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         #margin = list(b = 100),
+         barmode = 'group', title= "",
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+
+p2
+```
+  </div>
+</div>
+  <div class="row">
+
+
+  <div class="col-md-12" markdown="1">
+  <br>
+  
+*  TEXT
+  
+ <div class="row">
+</div>
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/BE.png)   Belgium
+
+### Desirability and price perception
+
+```{r Belgium Desirability vs price perception, eval=T, echo=F, fig.align='left', fig.width=6.5, fig.height=5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==3) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0:100),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              range =c(0:100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Q1 2020',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/cz.png)   Czech Republic
+
+### Desirability and price perception
+
+```{r Czech Desirability vs price perception, eval=T, echo=F, fig.align='left', fig.width=6.5, fig.height=5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==4) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0:100),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              range =c(10:100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Q1 2020',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/fr.png)   France
+
+### Desirability and price perception
+
+```{r France Desirability vs price perception, eval=T, echo=F, fig.align='left', fig.width=6.5, fig.height=5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==5) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0:100),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              range =c(0:100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Q1 2020',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/ge.png)   Germany
+
+### Desirability and price perception
+
+```{r Germany Desirability vs price perception, eval=T, echo=F, fig.align='left', fig.width=6.5, fig.height=5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==6) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0:100),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              range =c(0:100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Q1 2020',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/it.png)   Italy
+
+### Desirability and price perception
+
+```{r Italy Desirability vs price perception, eval=T, echo=F, fig.align='left', fig.width=6.5, fig.height=5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==7) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0:100),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              range =c(0:100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Q1 2020',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/lu.png)   Luxembourg
+
+### Desirability and price perception
+
+```{r Luxembourg Desirability vs price perception, eval=T, echo=F, fig.align='left', fig.width=6.5, fig.height=5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==8) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0:100),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              range =c(0:100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Q1 2020',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/nl.png)   The Netherlands 
+
+### Desirability and price perception
+
+```{r NL Desirability vs price perception, eval=T, echo=F, fig.align='left', fig.width=6.5, fig.height=5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==9) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0:100),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              range =c(0:100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Q1 2020',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/po.png)   Poland
+
+### Desirability and price perception
+
+```{r Poland Desirability vs price perception, eval=T, echo=F, fig.align='left', fig.width=6.5, fig.height=5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==10) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0:100),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              range =c(0:100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Q1 2020',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/ro.png)   Romania
+
+### Desirability and price perception
+
+```{r Romania Desirability vs price perception, eval=T, echo=F, fig.align='left', fig.width=6.5, fig.height=5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==11) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0:100),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              range =c(0:100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Q1 2020',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/sp.png)   Spain
+
+### Desirability and price perception
+
+```{r Spain Desirability vs price perception, eval=T, echo=F, fig.align='left', fig.width=6.5, fig.height=5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==12) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0:100),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              range =c(0:100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Q1 2020',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/tu.png)   Turkey
+
+### Desirability and price perception
+
+```{r Turkey Desirability vs price perception, eval=T, echo=F, fig.align='left', fig.width=6.5, fig.height=5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==13) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0:100),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              range =c(0:100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Q1 2020',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/ph.png)   The Philippines
+
+### Desirability and price perception
+
+```{r PH Desirability vs price perception, eval=T, echo=F, fig.align='left', fig.width=6.5, fig.height=5, warning=FALSE}
+desi_comb <- test %>%
+  dplyr::select(quarter_measurement, country, label, desirability, price_mean) %>%
+  dplyr::filter(quarter_measurement ==21 & country==14) %>%
+  dplyr::mutate(
+    desirability = desirability,
+    price_mean = price_mean
+  ) %>%
+  distinct()
+
+xaxis <- list(title = "Price perception",
+              textfont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0:100),
+              dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Desirability",
+              range =c(0:100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 10,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+desi_combi <- desi_comb %>%
+  plot_ly(x = ~price_mean, y = ~desirability, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = 'Q1 2020',
+         xaxis = xaxis,
+         yaxis = yaxis)
+desi_combi  
+```
