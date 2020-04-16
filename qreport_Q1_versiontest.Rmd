@@ -48,11 +48,11 @@ c <- c("Australia", "Austria", "Belgium", "Czech", "France", "Germany", "Italy",
 
 desi_p<- plot_ly(
   type = 'table',
-  columnwidth = c(70, 40, 40, 40, 40),
+  columnwidth = c(50, 30, 30, 30, 30),
   columnorder = c(0, 1, 2, 3, 4),
   header = list(
     values = c("country","Q3 2019", "Q4 2019", "Q1 2020", "CAGR"),
-    align = c("center", "center", "center", "center", "center"),
+    align = c("left", "right", "right", "right", "right"),
     line = list(width = 1, color = c("rgb 168, 168, 168")),
     fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
     font = list(family = "ING me", size = 14, color = "white")
@@ -63,7 +63,7 @@ desi_p<- plot_ly(
                    round(desi$desirability[desi$quarter_measurement==20], digits=2), 
                    round(desi$desirability[desi$quarter_measurement==21], digits=2),
                    round(desi_CAGR$cagr, digits=2)),
-    align = c("center", "center", "center", "center", "center"),
+    align = c("left", "right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -128,11 +128,11 @@ c <- c("Australia", "Austria", "Belgium", "Czech", "France", "Germany", "Italy",
 
 r <- plot_ly(
   type = 'table',
-  columnwidth = c(70, 40, 40, 40, 40),
+  columnwidth = c(50, 30, 30, 30, 30),
   columnorder = c(0, 1, 2, 3, 4),
   header = list(
     values = c("country","Q3 2019", "Q4 2019", "Q1 2020", "CAGR"),
-    align = c("center", "center", "center", "center", "center"),
+    align = c("left", "right", "right", "right", "right"),
     line = list(width = 1, color = c("rgb 168, 168, 168")),
     fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
     font = list(family = "ING me", size = 14, color = "white")
@@ -142,7 +142,7 @@ r <- plot_ly(
                    round(rep$pulse[rep$quarter_measurement==20], digits=2), 
                    round(rep$pulse[rep$quarter_measurement==21], digits=2),
                    round(rep_CAGR$cagr, digits=2)),
-    align = c("center", "center", "center", "center", "center"),
+    align = c("left", "right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -189,11 +189,11 @@ internal1 <- internal1 %>%
 
 internal_tab<- plot_ly(
   type = 'table',
-  columnwidth = c(70, 40, 40, 40, 40),
+  columnwidth = c(50, 30, 30, 30, 30),
   columnorder = c(0, 1, 2, 3, 4),
   header = list(
     values = c("country","Q2 2019", "Q3 2019", "Q4 2019", "CAGR"),
-    align = c("center", "center", "center", "center", "center"),
+    align = c("left", "right", "right", "right", "right"),
     line = list(width = 1, color = c("rgb 168, 168, 168")),
     fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
     font = list(family = "ING me", size = 14, color = "white")
@@ -204,7 +204,7 @@ internal_tab<- plot_ly(
                    round(internal1$`2019 Q3`, digits=2),
                    round(internal1$`2019 Q4`, digits=2),
                    round(internal1$cagr, digits=2)),
-    align = c("center", "center", "center", "center", "center"),
+    align = c("left", "right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -221,7 +221,7 @@ internal_tab
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/aus.png) Australia
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -421,7 +421,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability** 
 
   <div class="col-md-4" markdown="1">
   
@@ -555,7 +555,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation** 
 
   <div class="col-md-4" markdown="1">
   
@@ -699,7 +699,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
@@ -898,7 +898,7 @@ p2
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/aut.png)   Austria
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -1098,7 +1098,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability** 
 </div>
   <div class="col-md-4" markdown="1">
   
@@ -1230,7 +1230,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation**
 
   <div class="col-md-4" markdown="1">
   
@@ -1374,7 +1374,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
@@ -1572,7 +1572,7 @@ p2
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/BE.png)   Belgium
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -1772,7 +1772,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability** 
  </div>
   <div class="col-md-4" markdown="1">
   
@@ -1903,7 +1903,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation** 
 
   <div class="col-md-4" markdown="1">
   
@@ -2047,7 +2047,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
@@ -2244,7 +2244,7 @@ p2
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/cz.png)   Czech Republic
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -2444,7 +2444,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability** 
  </div>
   <div class="col-md-4" markdown="1">
   
@@ -2576,7 +2576,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation** 
 
   <div class="col-md-4" markdown="1">
   
@@ -2718,7 +2718,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
@@ -2809,7 +2809,7 @@ es
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/fr.png)   France
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -3009,7 +3009,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability**
  </div>
   <div class="col-md-4" markdown="1">
   
@@ -3141,7 +3141,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation** 
 
   <div class="col-md-4" markdown="1">
   
@@ -3284,7 +3284,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
@@ -3483,7 +3483,7 @@ p2
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/ge.png)   Germany
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -3683,7 +3683,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability** 
  </div>
   <div class="col-md-4" markdown="1">
   
@@ -3815,7 +3815,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation** 
 
   <div class="col-md-4" markdown="1">
   
@@ -3958,7 +3958,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
@@ -4158,7 +4158,7 @@ p2
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/it.png)   Italy
 
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -4358,7 +4358,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability** 
  </div>
   <div class="col-md-4" markdown="1">
   
@@ -4490,7 +4490,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation** 
 
   <div class="col-md-4" markdown="1">
   
@@ -4634,7 +4634,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
@@ -4833,7 +4833,7 @@ p2
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/lu.png)   Luxembourg
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -5033,7 +5033,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability** 
  </div>
   <div class="col-md-4" markdown="1">
   
@@ -5165,7 +5165,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation** 
 
   <div class="col-md-4" markdown="1">
   
@@ -5308,7 +5308,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
@@ -5507,7 +5507,7 @@ p2
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/nl.png)   The Netherlands 
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -5707,7 +5707,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability** 
  </div>
   <div class="col-md-4" markdown="1">
   
@@ -5839,7 +5839,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation** 
 
   <div class="col-md-4" markdown="1">
   
@@ -5980,7 +5980,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
@@ -6178,7 +6178,7 @@ p2
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/po.png)   Poland
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -6378,7 +6378,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability** 
  </div>
   <div class="col-md-4" markdown="1">
   
@@ -6510,7 +6510,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation** 
 
   <div class="col-md-4" markdown="1">
   
@@ -6653,7 +6653,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
@@ -6852,7 +6852,7 @@ p2
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/ro.png)   Romania
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -7052,7 +7052,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability** 
  </div>
   <div class="col-md-4" markdown="1">
   
@@ -7184,7 +7184,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation** 
 
   <div class="col-md-4" markdown="1">
   
@@ -7327,7 +7327,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
@@ -7526,7 +7526,7 @@ p2
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/sp.png)   Spain
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -7726,7 +7726,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability** 
  </div>
   <div class="col-md-4" markdown="1">
   
@@ -7858,7 +7858,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation** 
 
   <div class="col-md-4" markdown="1">
   
@@ -8001,7 +8001,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
@@ -8200,7 +8200,7 @@ p2
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/tu.png)   Turkey
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -8400,7 +8400,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability** 
  </div>
   <div class="col-md-4" markdown="1">
   
@@ -8532,7 +8532,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation** 
 
   <div class="col-md-4" markdown="1">
   
@@ -8675,7 +8675,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
@@ -8874,7 +8874,7 @@ p2
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/ph.png)   The Philippines
 
-### Brand funnel
+### **Brand funnel**
 <div class="row">
   <div class="col-md-4" markdown="1">
   
@@ -9074,7 +9074,7 @@ p1
  </div> <div class="row">  
 </div>
 
-### Desirability 
+### **Desirability** 
  </div>
   <div class="col-md-4" markdown="1">
   
@@ -9206,7 +9206,7 @@ desi_combi
   </div> <div class="row">
 </div>
 
-### Reputation 
+### **Reputation** 
 
   <div class="col-md-4" markdown="1">
   
@@ -9349,7 +9349,7 @@ l
  </div> <div class="row">
 </div>
 
-### Customer
+### **Customer**
 
   <div class="col-md-4" markdown="1">
   
