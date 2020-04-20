@@ -1989,39 +1989,18 @@ temp4$type <- NULL
 data <- full_join(data, temp4, by=c("b_value", "country", "quarter_measurement"))
 rm(temp4)
 
-### desirability
-temp4 <- temp %>%
-  dplyr::filter(!is.na(score)) %>%
-  dplyr::filter(score %in% c(0, 1)) %>% 
-  dplyr::mutate(
-    score_category = case_when(
-      score == 1 ~ "One",
-      score == 0 ~ "Zero",
-      TRUE ~ "No Score"
-    )
+## desirability
+desirability_overview <- result %>%
+  dplyr::select(country, quarter_measurement, b_value, desirability_value, Weight) %>%
+  dplyr::filter(!is.na(desirability_value)) %>%
+  dplyr::group_by(country, quarter_measurement, b_value) %>% 
+  dplyr::summarise(
+    desirability = mean(desirability_value * Weight, na.rm = T) *100
   ) %>%
-  dplyr::mutate(
-    score = score * Weight
-  ) %>%
-  dplyr::group_by(type, b_value, country, quarter_measurement) %>%
-  dplyr::summarize(
-    score_one = sum(Weight[score_category == "One"]),
-    score_zero = sum(Weight[score_category == "Zero"]),
-    score_total = sum(Weight)
-  ) %>%
-  dplyr::ungroup() %>% 
-  dplyr::mutate(
-   desirability= score_one / score_total
-  ) %>% 
-  dplyr::filter(type == "desirability_value")
+  dplyr::ungroup()
 
-temp4$score_zero <- NULL
-temp4$score_one <- NULL
-temp4$score_total <- NULL
-temp4$type <- NULL
-
-data <- full_join(data, temp4, by=c("b_value", "country", "quarter_measurement"))
-rm(temp4)
+data <- full_join(data, desirability_overview, by=c("country", "quarter_measurement", "b_value"))
+rm(desirability_overview) 
 
 ### Reptrak statements
 tempREP <- temp %>%
@@ -2112,11 +2091,11 @@ rm(love_overview)
 
 love_overview_client <- result %>%
   dplyr::select(country, quarter_measurement, b_value, client_value, price_perc_value, Weight, love_ING) %>%
-  dplyr::filter(b_value==1 & client_value==1 & !is.na(love_ING)) %>%
-  dplyr::filter(love_ING %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) %>% 
+  dplyr::filter(b_value==1 & client_value==1) %>%
+  #dplyr::filter(love_ING %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) %>% 
   dplyr::group_by(country, quarter_measurement) %>% 
   dplyr::summarise(
-    love_mean_ING_client = mean(love_ING * Weight, na.rm = T) 
+    love_mean_ING_client = mean(love_ING * Weight) 
   ) %>%
   dplyr::ungroup()
 
@@ -2165,7 +2144,7 @@ NPS_trial <- result %>%
   dplyr::group_by(country, quarter_measurement, b_value) %>%
   dplyr::mutate(
     nps_clients = case_when(
-      client_value == 1 ~ as.numeric(nps_value) * weight,
+      client_value == 1 ~ as.numeric(nps_value) * Weight,
       TRUE ~ NA_real_)
   ) %>%
   dplyr::mutate(nps_cat = case_when(
@@ -2277,8 +2256,8 @@ X20200209_Competitorlist$label <-str_replace_all(X20200209_Competitorlist$label,
 data <-left_join(data, X20200209_Competitorlist, by=c("country", "b_value"))
 rm(X20200209_Competitorlist)     
 
-data$labels_quarters <- as.yearqtr(unlist(data$labels_quarters), format='%Y Q%q')
+
 
 data <-write_csv(data, "data.csv")
-data$labels_quarters <- as.yearqtr(unlist(data$labels_quarters), format='%Y Q%q')
+
 
