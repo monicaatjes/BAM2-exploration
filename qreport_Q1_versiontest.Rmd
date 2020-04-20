@@ -35,7 +35,7 @@ desi_CAGR <- test %>%
   tidyr::spread(quarter_measurement, desirability) %>% 
   # Calculate CAGR
   dplyr::mutate(
-    cagr = (`21`/`19`)^(1/3) - 1
+    cagr = (`21`/`19`)^(1/2) - 1
   ) %>% 
   # Gather across quarters
   tidyr::gather(quarter_measurement, desirability, -country, -b_value, -cagr) %>% 
@@ -103,7 +103,6 @@ rep <- test %>%
       TRUE ~ NA_real_)
   ) %>%
   distinct()
-
 rep_CAGR <- test %>%
   dplyr::select(quarter_measurement, country, b_value, pulse) %>%
   dplyr::filter(quarter_measurement >17 & b_value==1) %>%
@@ -115,17 +114,15 @@ rep_CAGR <- test %>%
   tidyr::spread(quarter_measurement, pulse) %>% 
   # Calculate CAGR
   dplyr::mutate(
-    cagr = (`21`/`19`)^(1/3) - 1
+    cagr = (`21`/`19`)^(1/2) - 1
   ) %>% 
   # Gather across quarters
   tidyr::gather(quarter_measurement, pulse, -country, -b_value, -cagr) %>% 
   # Filter to per country per time
   dplyr::select(country, cagr) %>% 
   dplyr::distinct()
-
 c <- c("Australia", "Austria", "Belgium", "Czech", "France", "Germany", "Italy", "Luxembourg", 
        "Netherlands", "Poland", "Romania", "Spain", "Turkey", "The Philippines")
-
 r <- plot_ly(
   type = 'table',
   columnwidth = c(50, 30, 30, 30, 30),
@@ -162,45 +159,31 @@ r
   <div class="col-md-8" markdown="1">
 ```{r overview internal NPS, echo=F, eval=T, fig.align='left', fig.width=8, fig.height=4}
 ### INTERNAL NPS 
-internal <-read_excel("/Users/xo21bm/Documents/Lokaal/BAM2/exploration/data/20100124 Internal metrics .xlsx", range = "A26:I47")
-
-# throw away empty column
-internal <- internal[,-2]
-
-# without transpose
-internal$labels_countries <- internal$`Row Labels`
-internal$`Row Labels` <- NULL
-colnames(internal) <- as.yearqtr(colnames(internal[1:7]), format= 'Q%q_%Y') 
-names(internal)[8] <- "labels_countries" 
-
-internal <- internal %>%
-  dplyr::select(labels_countries, `2018 Q2`, `2018 Q3`, `2018 Q4`, `2019 Q1`, `2019 Q2`, `2019 Q3`, `2019 Q4`) %>%
-  dplyr::mutate(labels_countries = case_when(
-    labels_countries =="Spain & Portugal" ~ "Spain",
-    labels_countries =="Germany Region" ~ "Germany",
-    TRUE ~ labels_countries)
-  )
 
 internal1 <- internal %>%
-  dplyr::select(labels_countries, `2019 Q2`, `2019 Q3`, `2019 Q4`) %>%
-  dplyr::filter(!is.na(`2019 Q4` & `2019 Q3` & `2019 Q2`)) %>%
+  dplyr::select(labels_countries, `2019 Q3`, `2019 Q4`, `2020 Q1`) %>%
+  dplyr::filter(!is.na(`2019 Q4`) & 
+                  !labels_countries=="Americas" &
+                  !labels_countries=="European Network" & 
+                  !labels_countries=="Asia" &
+                  !labels_countries=="UK region") %>%
   dplyr::mutate(
     # Calculate CAGR
-        cagr = (`2019 Q4`/`2019 Q2`)^(1/3) - 1,
+        cagr = (`2020 Q1`/`2019 Q3`)^(1/2) - 1,
   )
   
 internal1 <- internal1 %>%
   dplyr::mutate(
-    '2019 Q2'= internal1$'2019 Q2' *100,
     '2019 Q3'= internal1$'2019 Q3' *100,
-    '2019 Q4'= internal1$'2019 Q4' *100)
+    '2019 Q4'= internal1$'2019 Q4' *100,
+    '2020 Q1'= internal1$'2020 Q1' *100)
 
 internal_tab<- plot_ly(
   type = 'table',
-  columnwidth = c(50, 30, 30, 30, 30),
+  columnwidth = c(70, 40, 40, 40, 40),
   columnorder = c(0, 1, 2, 3, 4),
   header = list(
-     values = c("<b>country<b>","<b>Q3 2019<b>", "<b>Q4 2019<b>", "<b>Q1 2020<b>", "<b>CAGR<b>"),
+    values = c("<b>country<b>","<b>Q3 2019<b>", "<b>Q4 2019<b>", "<b>Q1 2020<b>", "<b>CAGR<b>"),
     align = c("left", "right", "right", "right", "right"),
     line = list(width = 1, color = c("rgb 168, 168, 168")),
     fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
@@ -208,9 +191,9 @@ internal_tab<- plot_ly(
   ),
   cells = list(
     values = rbind(internal1$labels_countries,
-                   round(internal1$`2019 Q2`, digits=2),
                    round(internal1$`2019 Q3`, digits=2),
                    round(internal1$`2019 Q4`, digits=2),
+                   round(internal1$`2020 Q1`, digits=2),
                    round(internal1$cagr, digits=2)),
     align = c("left", "right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
@@ -305,14 +288,14 @@ funnel_plot
   
    **Delta best - ING**
    
-```{r tab, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+```{r tab, echo=FALSE, echo=F, eval=T, fig.align="left", fig.width=1.2, fig.height=3.5}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
-    values = c("delta best comp"),
-    align = c("center"),
+    values = c("delta best"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -322,7 +305,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+    align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -337,28 +320,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==1) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==1 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -368,7 +338,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -477,9 +447,9 @@ desi_timep1 <-desi_time %>%
   plot_ly(x = ~labels_quarters) %>%
   add_lines(y = ~desi_time$ING, type='scatter', name='ING',
             line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$ANZ , type='scatter', name='ANZ',
+  add_lines(y =~desi_time$ANZ, type='scatter', name='ANZ',
             line = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$'Commonwealth Bank', type='scatter', name='Commonwealth',
+  add_lines(y =~desi_time$`Commonwealth Bank`, type='scatter', name='Commonwealth',
             line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~desi_time$NAB, type='scatter', name='NAB',
             line = list(color = 'rgb(208,217,60)', type='scatter', width = 4, mode = 'lines+markers')) %>%
@@ -529,7 +499,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -558,9 +528,8 @@ desi_combi
   <div class="col-md-12" markdown="1">
   <br>
   
-  * Where other brand have shown a declining trend over time, ING has managed to show a positive development since Q4 2014.
   * Commonwealth is the most desired brand in the market, closely followed by ING. 
-  * It is an important advantage that ING is not considered as expensive. 
+  * ING is considered to be not expensive. 
   
   </div> <div class="row">
 </div>
@@ -774,9 +743,8 @@ es
   
 ```{r Australia customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==1) %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", `Primary bank customers`, "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==1 & quarter_measurement >16) %>%
   dplyr::arrange(country)
 
 customerthing <- customerthing %>%
@@ -785,9 +753,6 @@ customerthing <- customerthing %>%
     Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
     Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
   )
-
-
-x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -800,7 +765,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -824,7 +788,7 @@ yaxis <- list(title = "Primary customer *1000",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
               
-p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+p1 <- plot_ly(customerthing, x = ~customerthing$labels_quarters, y = ~customerthing$'Primary bank customers', 
               type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
  #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
@@ -844,11 +808,10 @@ p1
 ```{r Australia avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==1) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(country)
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==1 & quarter_measurement >16) %>%
+  dplyr::arrange(country) %>%
+  dplyr::distinct()
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -861,7 +824,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -982,14 +944,14 @@ funnel_plot
   
    **Delta best - ING**
    
-```{r tabAUT, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+```{r tabAUT, echo=FALSE, echo=F, eval=T, fig.width=1.2, fig.height=3, fig.align='left'}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
-    values = c("delta best comp"),
-    align = c("center"),
+    values = c("delta best"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -999,7 +961,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+     align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -1014,28 +976,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==2) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==2 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -1045,7 +994,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -1206,7 +1155,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -1322,7 +1271,8 @@ rep_b
   
 ```{r AUT love, echo=F, eval=T, fig.width=5.5, fig.height=3.5}
 love <- test %>%
-  dplyr::select(quarter_measurement, country, love_mean_ING, love_mean_Google, love_mean_ING_client, labels_quarters) %>%
+  dplyr::select(quarter_measurement, country, love_mean_ING, love_mean_Google,
+                love_mean_ING_client, labels_quarters) %>%
   dplyr::filter(quarter_measurement >17 & country==2) %>%
   distinct()
 
@@ -1449,9 +1399,8 @@ es
   
 ```{r AUT customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==2) %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", `Primary bank customers`, "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==2 & quarter_measurement >16) %>%
   dplyr::arrange(country)
 
 customerthing <- customerthing %>%
@@ -1460,9 +1409,6 @@ customerthing <- customerthing %>%
     Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
     Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
   )
-
-
-x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -1475,10 +1421,10 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
+
 yaxis <- list(title = "Primary customer *1000",
               titlefont = list(family = "ING me",
                               size = 12,
@@ -1499,7 +1445,7 @@ yaxis <- list(title = "Primary customer *1000",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
               
-p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+p1 <- plot_ly(customerthing, x = ~customerthing$labels_quarters, y = ~customerthing$'Primary bank customers', 
               type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
  #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
@@ -1518,11 +1464,10 @@ p1
 ```{r AUT avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==2) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(country)
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==2 & quarter_measurement >16) %>%
+  dplyr::arrange(country) %>%
+  dplyr::distinct()
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -1535,7 +1480,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -1656,14 +1600,14 @@ funnel_plot
   
    **Delta best - ING**
    
-```{r tabBEL, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+```{r tabBEL, echo=FALSE, echo=F, eval=T, fig.width=1.2, fig.height=3, fig.align='center'}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
-    values = c("delta best comp"),
-    align = c("center"),
+    values = c("delta best"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -1673,7 +1617,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+     align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -1688,28 +1632,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==3) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==3 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -1719,7 +1650,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -1879,7 +1810,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -2122,9 +2053,8 @@ es
   
 ```{r BEL customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==3) %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", `Primary bank customers`, "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==3 & quarter_measurement >16) %>%
   dplyr::arrange(country)
 
 customerthing <- customerthing %>%
@@ -2133,9 +2063,6 @@ customerthing <- customerthing %>%
     Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
     Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
   )
-
-
-x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -2148,7 +2075,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -2171,7 +2097,7 @@ yaxis <- list(title = "Primary customer *1000",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
               
-p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+p1 <- plot_ly(customerthing, x = ~customerthing$labels_quarters, y = ~customerthing$'Primary bank customers', 
               type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
  #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
@@ -2190,11 +2116,10 @@ p1
 ```{r BEL avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==3) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(country)
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==3 & quarter_measurement >16) %>%
+  dplyr::arrange(country) %>%
+  dplyr::distinct()
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -2207,7 +2132,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -2328,14 +2252,14 @@ funnel_plot
   
    **Delta best - ING**
    
-```{r tabCZ, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+```{r tabCZ, echo=FALSE, echo=F, eval=T, fig.width=1.2, fig.height=3, fig.align='center'}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
-    values = c("delta best comp"),
-    align = c("center"),
+    values = c("delta best"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -2345,7 +2269,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+    align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -2360,28 +2284,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==4) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==4 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -2391,7 +2302,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -2552,7 +2463,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -2899,8 +2810,8 @@ tab <- plot_ly(
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
-    values = c("delta best comp"),
-    align = c("center"),
+    values = c("delta best"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -2910,7 +2821,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+     align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -2925,28 +2836,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==5) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==5 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -2956,7 +2854,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -3117,7 +3015,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -3359,9 +3257,8 @@ es
   
 ```{r FR customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==5) %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", `Primary bank customers`, "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==5 & quarter_measurement >16) %>%
   dplyr::arrange(country)
 
 customerthing <- customerthing %>%
@@ -3370,9 +3267,6 @@ customerthing <- customerthing %>%
     Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
     Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
   )
-
-
-x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -3385,7 +3279,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -3409,7 +3302,7 @@ yaxis <- list(title = "Primary customer *1000",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
               
-p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+p1 <- plot_ly(customerthing, x = ~customerthing$labels_quarters, y = ~customerthing$'Primary bank customers', 
               type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
  #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
@@ -3429,11 +3322,10 @@ p1
 ```{r FR avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==5) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(country)
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==5 & quarter_measurement >16) %>%
+  dplyr::arrange(country) %>%
+  dplyr::distinct()
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -3446,7 +3338,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -3567,14 +3458,14 @@ funnel_plot
   
    **Delta best - ING**
    
-```{r tabGE, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+```{r tabGE, echo=FALSE, echo=F, eval=T, fig.width=1.2, fig.height=3, fig.align='center'}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
-    values = c("delta best comp"),
-    align = c("center"),
+    values = c("delta best"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -3584,7 +3475,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+     align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -3599,28 +3490,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==6) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==6 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -3630,7 +3508,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -3791,7 +3669,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -4033,9 +3911,8 @@ es
   
 ```{r GE customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==6) %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", `Primary bank customers`, "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==6 & quarter_measurement >16) %>%
   dplyr::arrange(country)
 
 customerthing <- customerthing %>%
@@ -4044,9 +3921,6 @@ customerthing <- customerthing %>%
     Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
     Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
   )
-
-
-x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -4059,7 +3933,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -4083,7 +3956,7 @@ yaxis <- list(title = "Primary customer *1000",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
               
-p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+p1 <- plot_ly(customerthing, x = ~customerthing$labels_quarters, y = ~customerthing$'Primary bank customers', 
               type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
  #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
@@ -4103,11 +3976,10 @@ p1
 ```{r GE avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==6) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(country)
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==6 & quarter_measurement >16) %>%
+  dplyr::arrange(country) %>%
+  dplyr::distinct()
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -4120,7 +3992,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -4242,14 +4113,14 @@ funnel_plot
   
    **Delta best - ING**
    
-```{r tabIT, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+```{r tabIT, echo=FALSE, echo=F, eval=T, fig.width=1.2, fig.height=3, fig.align='center'}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
     values = c("delta best comp"),
-    align = c("center"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -4259,7 +4130,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+     align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -4274,28 +4145,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==7) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==7 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -4305,7 +4163,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -4466,7 +4324,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -4709,9 +4567,8 @@ es
   
 ```{r IT customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==7) %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", `Primary bank customers`, "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==7 & quarter_measurement >16) %>%
   dplyr::arrange(country)
 
 customerthing <- customerthing %>%
@@ -4720,9 +4577,6 @@ customerthing <- customerthing %>%
     Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
     Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
   )
-
-
-x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -4735,7 +4589,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -4759,7 +4612,7 @@ yaxis <- list(title = "Primary customer *1000",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
               
-p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+p1 <- plot_ly(customerthing, x = ~customerthing$labels_quarters, y = ~customerthing$'Primary bank customers', 
               type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
  #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
@@ -4779,11 +4632,10 @@ p1
 ```{r IT avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==7) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(country)
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==7 & quarter_measurement >16) %>%
+  dplyr::arrange(country) %>%
+  dplyr::distinct()
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -4796,7 +4648,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -4917,14 +4768,14 @@ funnel_plot
   
    **Delta best - ING**
    
-```{r tabLUX, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+```{r tabLUX, echo=FALSE, echo=F, eval=T, fig.width=1.2, fig.height=3, fig.align='center'}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
     values = c("delta best comp"),
-    align = c("center"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -4934,7 +4785,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+    align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -4949,28 +4800,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==8) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==8 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -4980,7 +4818,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -5141,7 +4979,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -5383,9 +5221,8 @@ es
   
 ```{r LUX customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==8) %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", `Primary bank customers`, "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==8 & quarter_measurement >16) %>%
   dplyr::arrange(country)
 
 customerthing <- customerthing %>%
@@ -5394,9 +5231,6 @@ customerthing <- customerthing %>%
     Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
     Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
   )
-
-
-x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -5409,7 +5243,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -5433,7 +5266,7 @@ yaxis <- list(title = "Primary customer *1000",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
               
-p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+p1 <- plot_ly(customerthing, x = ~customerthing$labels_quarters, y = ~customerthing$'Primary bank customers', 
               type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
  #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
@@ -5453,11 +5286,10 @@ p1
 ```{r LUX avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==8) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(country)
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==8 & quarter_measurement >16) %>%
+  dplyr::arrange(country) %>%
+  dplyr::distinct()
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -5470,7 +5302,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -5591,14 +5422,14 @@ funnel_plot
   
    **Delta best - ING**
    
-```{r tabNL, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+```{r tabNL, echo=FALSE, echo=F, eval=T, fig.width=1.2, fig.height=3, fig.align='center'}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
     values = c("delta best comp"),
-    align = c("center"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -5608,7 +5439,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+    align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -5623,28 +5454,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==9) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==9 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -5654,7 +5472,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -5815,7 +5633,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -6055,8 +5873,8 @@ es
   
 ```{r NL customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==9) %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", `Primary bank customers`, "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==9 & quarter_measurement >16) %>%
   dplyr::arrange(country)
 
 customerthing <- customerthing %>%
@@ -6065,9 +5883,6 @@ customerthing <- customerthing %>%
     Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
     Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
   )
-
-
-x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -6104,7 +5919,7 @@ yaxis <- list(title = "Primary customer *1000",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
               
-p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+p1 <- plot_ly(customerthing, x = ~customerthing$labels_quarters, y = ~customerthing$'Primary bank customers', 
               type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
  #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
@@ -6124,11 +5939,10 @@ p1
 ```{r nl avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==9) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(country)
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==9 & quarter_measurement >16) %>%
+  dplyr::arrange(country) %>%
+  dplyr::distinct()
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -6141,7 +5955,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -6262,14 +6075,14 @@ funnel_plot
   
    **Delta best - ING**
    
-```{r tabPOL, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+```{r tabPOL, echo=FALSE, echo=F, eval=T, fig.width=1.2, fig.height=3, fig.align='center'}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
     values = c("delta best comp"),
-    align = c("center"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -6279,7 +6092,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+    align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -6294,28 +6107,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==10) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==10 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -6325,7 +6125,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -6336,8 +6136,8 @@ awa <- test %>%
   dplyr::filter(b_value==1)
   #unite(temp, quarter_measurement, variable) %>%
   #spread(temp, value)
-  
 #awa$value[awa$variable==""]
+
 x <-unique(awa$labels_quarters)
 y1 <- awa$value[awa$variable=='market_average_unaided']
 y2 <- awa$value[awa$variable=='best_unaided']
@@ -6486,7 +6286,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -6728,9 +6528,8 @@ es
   
 ```{r POL customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==10) %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", `Primary bank customers`, "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==10 & quarter_measurement >16) %>%
   dplyr::arrange(country)
 
 customerthing <- customerthing %>%
@@ -6739,9 +6538,6 @@ customerthing <- customerthing %>%
     Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
     Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
   )
-
-
-x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -6754,7 +6550,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -6778,7 +6573,7 @@ yaxis <- list(title = "Primary customer *1000",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
               
-p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+p1 <- plot_ly(customerthing, x = ~customerthing$labels_quarters, y = ~customerthing$'Primary bank customers', 
               type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
  #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
@@ -6798,11 +6593,10 @@ p1
 ```{r POL avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==10) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(country)
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==10 & quarter_measurement >16) %>%
+  dplyr::arrange(country) %>%
+  dplyr::distinct()
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -6815,7 +6609,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -6936,14 +6729,14 @@ funnel_plot
   
    **Delta best - ING**
    
-```{r tabROM, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+```{r tabROM, echo=FALSE, echo=F, eval=T, fig.width=1.2, fig.height=3, fig.align='center'}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
     values = c("delta best comp"),
-    align = c("center"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -6953,7 +6746,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+    align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -6968,28 +6761,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==11) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==11 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -6999,7 +6779,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -7160,7 +6940,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -7402,9 +7182,8 @@ es
   
 ```{r ROM customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==11) %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", `Primary bank customers`, "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==11 & quarter_measurement >16) %>%
   dplyr::arrange(country)
 
 customerthing <- customerthing %>%
@@ -7414,8 +7193,6 @@ customerthing <- customerthing %>%
     Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
   )
 
-
-x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -7428,7 +7205,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -7452,7 +7228,7 @@ yaxis <- list(title = "Primary customer *1000",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
               
-p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+p1 <- plot_ly(customerthing, x = ~customerthing$labels_quarters, y = ~customerthing$'Primary bank customers', 
               type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
  #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
@@ -7472,11 +7248,10 @@ p1
 ```{r ROM avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==11) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(country)
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==11 & quarter_measurement >16) %>%
+  dplyr::arrange(country) %>%
+  dplyr::distinct()
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -7610,14 +7385,14 @@ funnel_plot
   
    **Delta best - ING**
    
-```{r tabSP, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+```{r tabSP, echo=FALSE, echo=F, eval=T, fig.width=1.2, fig.height=3, fig.align='center'}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
-    values = c("delta best comp"),
-    align = c("center"),
+    values = c("delta best"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -7627,7 +7402,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+    align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -7642,28 +7417,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==12) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==12 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -7673,7 +7435,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -7834,7 +7596,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -8076,9 +7838,8 @@ es
   
 ```{r SPA customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==12) %>%
+  dplyr::select(labels_quarters, country, b_value, "Active customers", `Primary bank customers`, "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==13 & quarter_measurement >16) %>%
   dplyr::arrange(country)
 
 customerthing <- customerthing %>%
@@ -8087,9 +7848,6 @@ customerthing <- customerthing %>%
     Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
     Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
   )
-
-
-x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -8102,7 +7860,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -8126,7 +7883,7 @@ yaxis <- list(title = "Primary customer *1000",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
               
-p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+p1 <- plot_ly(customerthing, x = ~customerthing$labels_quarters, y = ~customerthing$'Primary bank customers', 
               type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
  #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
@@ -8146,11 +7903,10 @@ p1
 ```{r SPA avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==12) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(country)
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==12 & quarter_measurement >16) %>%
+  dplyr::arrange(country) %>%
+  dplyr::distinct()
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -8163,7 +7919,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -8284,14 +8039,14 @@ funnel_plot
   
    **Delta best - ING**
    
-```{r TURtab, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+```{r TURtab, echo=FALSE, echo=F, eval=T, fig.width=1.2, fig.height=3, fig.align='center'}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
     values = c("delta best comp"),
-    align = c("center"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -8301,7 +8056,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+    align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -8316,28 +8071,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==13) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==13 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -8347,7 +8089,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -8508,7 +8250,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -8820,11 +8562,10 @@ p1
 ```{r TUR avg products, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==13) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(country)
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==13 & quarter_measurement >16) %>%
+  dplyr::arrange(country) %>%
+  dplyr::distinct()
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -8837,7 +8578,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -8958,14 +8698,14 @@ funnel_plot
   
    **Delta best - ING**
    
-```{r PHtab, echo=FALSE, echo=F, eval=T, fig.width=1.5, fig.height=3, fig.align='center'}
+```{r PHtab, echo=FALSE, echo=F, eval=T, fig.width=1.2, fig.height=3, fig.align='center'}
 tab <- plot_ly(
   type = 'table',
   columnwidth = c(1),
   columnorder = c(0),
   header = list(
-    values = c("delta best comp"),
-    align = c("center"),
+    values = c("delta best"),
+    align = c("left"),
     line = list(width = 1, color = 'black'),
     fill = list(color = "rgb(255,098,000)"),
     font = list(family = "ING me", size = 14, color = "white")
@@ -8975,7 +8715,7 @@ tab <- plot_ly(
                    round(funnel_data_diff$diff_fami, digits=2),
                    round(funnel_data_diff$diff_cons, digits=2),
                    round(funnel_data_diff$diff_pref, digits=2)),
-    align = c("center", "center", "center", "center"),
+    align = c("right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
     font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
   ))
@@ -8990,28 +8730,15 @@ tab
 awa <- test %>%
   dplyr::select(b_value, country, labels_countries, labels_quarters,
                 quarter_measurement, unaided, toma, aided, main_competition, label) %>%
-  dplyr::filter(quarter_measurement > 18 & country==14) %>%
-  distinct() %>%
+  dplyr::filter(quarter_measurement > 18 & country==14 & main_competition==1) %>%
   dplyr::group_by(quarter_measurement) %>%
   dplyr::mutate(
-    market_average_unaided = case_when(
-      main_competition == 1 ~ mean(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_aided = case_when(
-      main_competition == 1 ~ mean(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    market_average_toma = case_when(
-      main_competition == 1 ~ mean(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_unaided = case_when(
-      main_competition == 1 ~ max(unaided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_aided = case_when(
-      main_competition == 1 ~ max(aided *100, na.rm =T), 
-      TRUE ~ NA_real_),
-    best_toma = case_when(
-      main_competition == 1 ~ max(toma *100, na.rm =T), 
-      TRUE ~ NA_real_),
+    market_average_unaided = mean(unaided *100, na.rm =T), 
+    market_average_aided = mean(aided *100, na.rm =T), 
+    market_average_toma = mean(toma *100, na.rm =T), 
+    best_unaided = max(unaided *100, na.rm =T), 
+    best_aided = max(aided *100, na.rm =T), 
+    best_toma = max(toma *100, na.rm =T), 
     unaided_ING = case_when(
       b_value ==1 ~ unaided *100,
       TRUE ~ NA_real_),
@@ -9021,7 +8748,7 @@ awa <- test %>%
     toma_ING = case_when(
       b_value ==1 ~ toma *100,
       TRUE ~ NA_real_),
-  ) %>%
+    ) %>%
     # Gather across quarters
    # tidyr::spread(quarter_measurement, market_average_unaided) %>%
   dplyr::ungroup() %>%
@@ -9032,6 +8759,7 @@ awa <- test %>%
   dplyr::filter(b_value==1)
   #unite(temp, quarter_measurement, variable) %>%
   #spread(temp, value)
+
   
 #awa$value[awa$variable==""]
 x <-unique(awa$labels_quarters)
@@ -9182,7 +8910,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,50),
+              range =c(0,70),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
