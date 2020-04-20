@@ -1,4 +1,21 @@
 ## Add Reptrak pulse scores
+# open data latest quarter (Q1 2020)
+reptrakq1 <-read_excel("/Users/xo21bm/Documents/Lokaal/BAM2/exploration/data/20200416 Reputation overview.xlsx", range = "B1:O15")
+# Transpose data except quarter column
+reptrakq1_ <- as.data.frame(t(reptrakq1[,-1]))
+
+# first row as column names
+colnames(reptrakq1_) = as.character(unlist(reptrakq1_[1,]))
+reptrakq1_ <- reptrakq1_[-1,]
+reptrakq1_$country <-rownames(reptrakq1_)
+reptrakq1_<- as_tibble(reptrakq1_)
+# add quarter column again
+reptrakq1_$quarter <-reptrakq1[c(1:12),1]
+reptrakq1_$quarter <- as.yearqtr(unlist(reptrakq1_$quarter), format='Q%q %Y')
+rm(reptrakq1)
+
+
+
 
 # open data latest quarter
 reptrak <-read_excel("/Users/xo21bm/Documents/Lokaal/BAM2/exploration/data/201200128 2019 Reputation overview.xlsx", range = "A1:N15")
@@ -67,6 +84,12 @@ rm(reptrakQ1_)
 rept1 <- rbind(reptrakQ1, reptrak_)
 rept2 <- rbind(reptrakQ3, reptrakQ2)
 rept3 <- rbind(rept1, rept2)
+
+## Q UPDATE HERE ######################################################
+rept4 <-rbind(rept3, reptrakq1_)
+rept3 <- rept4
+
+
 rept3$labels_quarters <- rept3$quarter
 rept3$labels_countries <- rept3$country
 rept3$quarter <- NULL
@@ -94,8 +117,10 @@ rm(rept1, rept2, reptrakQ1, reptrakQ2, reptrakQ3, reptrak_)
 
 # Combine in data 
 rept3$labels_quarters <-as.yearqtr(unlist(rept3$labels_quarters), format='%Y Q%q')
-data$labels_quarters <-as.yearqtr(unlist(data$labels_quarters), format= '%Y Q%q')
-data <- dplyr::left_join(data, rept3, by=c("labels_countries", "labels_quarters", "b_value"))
+
+############# Q update here
+test$labels_quarters <-as.yearqtr(unlist(test$labels_quarters), format= '%Y Q%q')
+test <- dplyr::left_join(test, rept3, by=c("labels_countries", "labels_quarters", "b_value"))
 
 
 
@@ -111,40 +136,113 @@ internal$`Row Labels` <- NULL
 colnames(internal) <- as.yearqtr(colnames(internal[1:7]), format= 'Q%q_%Y') 
 names(internal)[8] <- "labels_countries" 
 
-internal1 <- internal %>%
-  dplyr::select(labels_countries, `2019 Q2`, `2019 Q3`, `2019 Q4`) %>%
-  dplyr::filter(!is.na(`2019 Q4`)) %>%
-  dplyr::mutate(
-    # Calculate CAGR
-        cagr = (`2019 Q4`/`2019 Q2`)^(1/3) - 1,
+internal <- internal %>%
+  dplyr::select(labels_countries, `2019 Q1`, `2019 Q2`, 
+                `2019 Q3`, `2019 Q4`) %>%
+  dplyr::mutate(labels_countries = case_when(
+    labels_countries =="Spain & Portugal" ~ "Spain",
+    labels_countries =="Germany Region" ~ "Germany",
+    TRUE ~ labels_countries)
   )
-  
-internal1 <- internal1 %>%
-  dplyr::mutate(
-    '2019 Q2'= internal1$'2019 Q2' *100,
-    '2019 Q3'= internal1$'2019 Q3' *100,
-    '2019 Q4'= internal1$'2019 Q4' *100)
 
-internal_tab<- plot_ly(
-  type = 'table',
-  columnwidth = c(70, 40, 40, 40, 40),
-  columnorder = c(0, 1, 2, 3, 4),
-  header = list(
-    values = c("country","Q2 2019", "Q3 2019", "Q4 2019", "CAGR"),
-    align = c("center", "center", "center", "center", "center"),
-    line = list(width = 1, color = c("rgb 168, 168, 168")),
-    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
-    font = list(family = "ING me", size = 14, color = "white")
-  ),
-  cells = list(
-    values = rbind(internal1$labels_countries,
-                   round(internal1$`2019 Q2`, digits=2),
-                   round(internal1$`2019 Q3`, digits=2),
-                   round(internal1$`2019 Q4`, digits=2),
-                   round(internal1$cagr, digits=2)),
-    align = c("center", "center", "center", "center", "center"),
-    line = list(color = c("rgb 168, 168, 168"), width = 1),
-    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
-  ))
+# and for Q1 2020 NPS 
+p79004_AlignmentMonitor_2020Q1 <- read_csv("p79004_AlignmentMonitor_2020Q1_v2.csv")
+
+int <-p79004_AlignmentMonitor_2020Q1
+rm(p79004_AlignmentMonitor_2020Q1)
+str(int)
+as_tibble(int)
+
+int <- int %>%
+  dplyr::mutate(
+    labels_countries = case_when(
+      country == 1 ~ "Netherlands",
+      country == 2 ~ "Belgium",
+      country == 3 ~ "Luxembourg",
+      country == 4 ~ "France",
+      country == 5 ~ "Spain",
+      country == 6 ~ "Italy",
+      country == 7 ~ "Poland",
+      country == 8 ~ "Romania",
+      country == 9 ~ "Turkey",
+      country == 10 ~ "Germany",
+      country == 11 ~ "Austria",
+      country == 13 ~ "Australia",
+      country == 14 ~ "Singapore",
+      country == 15 ~ "United Kingdom",
+      country == 16 ~ "United States",
+      country == 17 ~ "Czech Rebulic",
+      country == 18 ~ "Russia",
+      country == 19 ~ "Philippines",
+      country == 20 ~ "Slovakia",
+      country == 21 ~ "other",
+      TRUE ~ "NA_real_")
+  )
+
+nps_overview <- int %>%
+  dplyr::select(labels_countries, weight, q1001) %>%
+  dplyr::group_by(labels_countries) %>%
+  dplyr::mutate(
+    nps_value = q1001
+  ) %>%
+  dplyr::mutate(nps_cat = case_when(
+    nps_value >=9.0 ~ "promotors",
+    nps_value <= 9.0 & nps_value >= 7.0 ~ "neutrals",
+    nps_value  <= 6.0 ~ "detractors",
+    TRUE ~ "NA_real_")) %>%
+  dplyr::filter(nps_cat %in% c("detractors", "neutrals", "promotors")) %>%
+  dplyr::group_by(labels_countries, nps_cat) %>%
+  dplyr::tally() %>%
+  dplyr::mutate(
+    percentage = n /sum(n)
+  ) %>% 
+  dplyr::ungroup()
+
+NPS_score <- nps_overview %>%
+  dplyr::select(labels_countries, percentage, nps_cat) %>%
+  tidyr::spread(nps_cat, percentage) %>%
+  dplyr::mutate(
+    nps_value = promotors - detractors
+  ) %>%
+  dplyr::filter(!labels_countries=="Austria") %>%
+  dplyr::filter(!labels_countries=="Czech Rebulic") %>%
+  dplyr::filter(!labels_countries=="Singapore") %>%
+  dplyr::filter(!labels_countries=="Turkey") %>%
+  dplyr::filter(!labels_countries=="Slovakia") %>%
+  dplyr::filter(!labels_countries=="France") %>%
+  dplyr::filter(!labels_countries=="other") %>%
+  dplyr::filter(!labels_countries=="Russia") %>%
+  dplyr::filter(!labels_countries=="Philippines") %>%
+  dplyr::filter(!labels_countries=="Luxembourg")
+
+NPS_score$"2020 Q1" <- NPS_score$nps_value
+NPS_score$detractors <- NULL
+NPS_score$neutrals <- NULL
+NPS_score$promotors <- NULL
+NPS_score$nps_value <- NULL
+
+internal <- left_join(internal, NPS_score, by="labels_countries")
+internal <- write_csv(internal, "internal.csv")
+
+
+#nps_plot <- NPS_score %>%
+#  plot_ly(x= ~ promotors,
+#          y= ~ labels_countries,
+#          marker = list(color = 'rgb(255,098,000)'),
+#          type="bar", name="promotors") %>%
+#  add_trace(x= ~ neutrals,
+#            y= ~ labels_countries,
+#            marker = list(color = 'rgb(82,81,153)'),
+#            type="bar", name="neutrals") %>%
+#  add_trace(x= ~ detractors,
+#            y= ~ labels_countries,
+#            marker = list(color = 'rgb(168, 168, 168)'),
+#            type="bar", name="detractors") %>%
+#  layout(xaxis = xaxis,
+#         yaxis = yaxis,
+#         barmode = "stack")
+#nps_plot
+
+
 
 
