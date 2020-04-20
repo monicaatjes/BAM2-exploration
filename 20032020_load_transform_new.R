@@ -5,11 +5,13 @@ source("add_questionnaire_responds_category.R")
 source("changed_messed_up_variable_names.R")
 ## Load and transform BAM data Q1
 
-# open dataset 
-raw_data1 <- read.csv("200318_ING_JAN_2020_CSV.sav.csv", header = T)
+
+
+raw_data2 <- raw_data2 %>%
+  dplyr::select(-contains("SPSS"))
 
 # Add in X1 which is a row count
-raw_data1 <- raw_data1 %>% 
+raw_data1 <- raw_data2 %>% 
   dplyr::mutate(
     X1 = 1:dplyr::n()
   )
@@ -168,7 +170,7 @@ temp4$score_zero <- NULL
 temp4$score_total <- NULL
 temp4$type <- NULL
 
-data1 <- full_join(data, temp4, by=c("b_value", "country", "quarter_measurement"))
+data1 <- full_join(data1, temp4, by=c("b_value", "country", "quarter_measurement"))
 rm(temp4)
 
 ### fami
@@ -202,7 +204,7 @@ temp4$score_zero <- NULL
 temp4$score_total <- NULL
 temp4$type <- NULL
 
-data1 <- full_join(data, temp4, by=c("b_value", "country", "quarter_measurement"))
+data1 <- full_join(data1, temp4, by=c("b_value", "country", "quarter_measurement"))
 rm(temp4)
 
 ### consideration
@@ -279,7 +281,7 @@ desirability_overview <- result %>%
   dplyr::filter(!is.na(desirability_value)) %>%
   dplyr::group_by(country, quarter_measurement, b_value) %>% 
   dplyr::summarise(
-    desirability_mean = mean(desirability_value * weight, na.rm = T) 
+    desirability = mean(desirability_value * weight, na.rm = T) 
   ) %>%
   dplyr::ungroup()
 
@@ -1074,8 +1076,8 @@ rm(tempREP11)
 
 ### Love overview 
 love_overview <- result %>%
-  dplyr::filter(!is.na(Love_ING)) %>%
-  dplyr::filter(Love_ING %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) %>% 
+ dplyr::filter(!is.na(Love_ING)) %>%
+ dplyr::filter(Love_ING %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) %>% 
   dplyr::group_by(country, quarter_measurement) %>% 
   dplyr::summarise(
     love_mean_ING = mean(Love_ING * weight, na.rm = T) 
@@ -1087,11 +1089,11 @@ rm(love_overview)
 
 love_overview_client <- result %>%
   dplyr::select(country, quarter_measurement, b_value, client_value, weight, Love_ING) %>%
-  dplyr::filter(b_value==1 & client_value==1 & !is.na(Love_ING)) %>%
-  dplyr::filter(Love_ING %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) %>% 
+  dplyr::filter(b_value==1 & client_value==1) %>%
+  #dplyr::filter(Love_ING %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) %>% 
   dplyr::group_by(country, quarter_measurement) %>% 
   dplyr::summarise(
-    love_mean_ING_client = mean(Love_ING * weight, na.rm = T) 
+    love_mean_ING_client = mean(Love_ING * weight) 
   ) %>%
   dplyr::ungroup()
 
@@ -1123,38 +1125,108 @@ data1 <- full_join(data1, price_perc, by=c("country", "quarter_measurement", "b_
 rm(price_perc) 
 
 ## NPS
-NPS_trial <- result %>%
-  dplyr::filter(!is.na(nps_value)) %>%
-  dplyr::group_by(country, quarter_measurement, b_value) %>%
-  dplyr::mutate(
-    nps_clients = case_when(
-      client_value == 1 ~ as.numeric(nps_value) * weight,
-      TRUE ~ NA_real_)
-  ) %>%
-  dplyr::mutate(nps_cat = case_when(
-    nps_clients >=9.0 ~ "promotors",
-    nps_clients <= 9.0 & nps_clients >= 7.0 ~ "neutrals",
-    nps_clients  <= 6.0 ~ "detractors",
-    TRUE ~ "NA_real_")) %>%
-  dplyr::filter(nps_cat %in% c("detractors", "neutrals", "promotors")) %>%
-  dplyr::group_by(country, b_value, quarter_measurement, nps_cat) %>%
-  dplyr::tally() %>%
-  dplyr::mutate(
-    percentage = n /sum(n)
-  ) %>% 
-  dplyr::ungroup()
+#NPS_trial <- result %>%
+#  dplyr::filter(!is.na(nps_value)) %>%
+#  dplyr::group_by(country, quarter_measurement, b_value, client_value) %>%
+#  dplyr::mutate(
+#    nps_clients = case_when(
+#      client_value == 1 ~ as.numeric(nps_value) * weight,
+#      TRUE ~ NA_real_)
+#  ) %>%
+#  dplyr::mutate(nps_cat = case_when(
+#    nps_clients >=9.0 ~ "promotors",
+#    nps_clients <= 9.0 & nps_clients >= 7.0 ~ "neutrals",
+#    nps_clients  <= 6.0 ~ "detractors",
+#    TRUE ~ "NA_real_")) %>%
+#  dplyr::filter(nps_cat %in% c("detractors", "neutrals", "promotors")) %>%
+#  dplyr::group_by(country, b_value, quarter_measurement, nps_cat) %>%
+#  dplyr::tally() %>%
+#  dplyr::mutate(
+#    percentage = n /sum(n)
+#  ) %>% 
+#  dplyr::ungroup()
 
-NPS_score <- NPS_trial %>%
-  select(-n) %>%
-  tidyr::spread(nps_cat, percentage) %>%
+#NPS_score <- NPS_trial %>%
+#  select(-n) %>%
+#  tidyr::spread(nps_cat, percentage) %>%
+#  dplyr::mutate(
+#    nps_score = promotors - detractors
+#  )
+
+#data1 <- left_join(NPS_score, data1, by=c("country", "b_value", "quarter_measurement"))
+
+#rm(NPS_trial, NPS_score)
+
+### Labels
+labels_countries <- data1 %>%
+  dplyr::select(country) %>%
+  dplyr::distinct() %>% 
   dplyr::mutate(
-    nps_score = promotors - detractors
+    labels_countries = case_when(
+      country == 1 ~ "Australia",
+      country == 2 ~ "Austria",
+      country == 3 ~ "Belgium",
+      country == 4 ~ "Czech Republic",
+      country == 5 ~ "France",
+      country == 6 ~ "Germany",
+      country == 7 ~ "Italy",
+      country == 8 ~ "Luxembourg",
+      country == 9 ~ "The Netherlands",
+      country == 10 ~ "Poland",
+      country == 11 ~ "Romania",
+      country == 12 ~ "Spain",
+      country == 13 ~ "Turkey",
+      country == 14 ~ "The Philippines",
+      TRUE ~ "NA_real_")
   )
+data1 <- left_join(data1, labels_countries, by=c("country"))
 
-data1 <- left_join(NPS_score, data1, by=c("country", "b_value", "quarter_measurement"))
+labels_quarters <-data1 %>%
+  dplyr::select(quarter_measurement) %>%
+  dplyr::distinct() %>% 
+  dplyr::mutate(
+    labels_quarters = case_when(
+      quarter_measurement == 21 ~ "2020 Q1",
+      TRUE ~ "NA_real_"))
 
-rm(NPS_trial, NPS_score)
+data1 <- left_join(data1, labels_quarters, by=c("quarter_measurement"))
+
+### dummy for main competition
+main_competition <- data1 %>% 
+  dplyr::mutate(
+    main_competition = dplyr::case_when(
+      country == 1 & b_value < 6 ~ 1,
+      country == 2 & b_value < 7 ~ 1,
+      country == 3 & b_value < 5 ~ 1,
+      country == 4 & b_value < 6 ~ 1,
+      country == 5 & b_value < 8 ~ 1,
+      country == 6 & b_value < 6 ~ 1,
+      country == 7 & (b_value < 8 | b_value == 10) ~ 1,
+      country == 8 & b_value < 7 ~ 1,
+      country == 9 & b_value < 5 ~ 1,
+      country == 10 & b_value < 7 ~ 1,
+      country == 11 & b_value < 6 ~ 1,
+      country == 12 & b_value < 5 ~ 1,
+      country == 13 & b_value < 7 ~ 1,
+      country == 14 & b_value < 8 ~ 1,
+      TRUE ~ 0
+    )
+  )
+data1 <- main_competition
+rm(main_competition)
+
+## Add brand names
+X20200209_Competitorlist <- read.csv("20200209_Competitorlist.csv", sep=";") 
+
+X20200209_Competitorlist$label <-str_replace_all(X20200209_Competitorlist$label, "[^[:alnum:]]", " ")
+data1 <-left_join(data1, X20200209_Competitorlist, by=c("country", "b_value"))
+rm(X20200209_Competitorlist)     
+
+data1 <-write_csv(data1, "data1.csv")
+#resulthis <- write_csv(result, "resulthis.csv")
 
 ## Connect with current dataset
 
-
+test <- dplyr::bind_rows(data1, data)
+test$labels_quarters <- as.yearqtr(unlist(test$labels_quarters), format='%Y Q%q')
+test <-write_csv(test, "test.csv")
