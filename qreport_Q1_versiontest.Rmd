@@ -73,7 +73,7 @@ desi_p
   <div class="col-md-4" markdown="1">
   <br>
   
-  TEXT
+* Add explanation what changed for desirability KPI
   </div>
 </div>
 
@@ -210,6 +210,7 @@ internal_tab
   
   * Please notice that scores of countries with a small amount of colleagues show some fluctuation.
 * HR embedded the NPS question in existing surveys (OHI, WPC, pulse) which all have a different context. This might have some impact on the data. 
+* Q1 2020 contains scores from the Brand & Communication monitor. Countries with a small base size >50 are not reported. 
   </div>
 </div>
 
@@ -452,7 +453,7 @@ desi_timep1 <-desi_time %>%
             line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~desi_time$ANZ, type='scatter', name='ANZ',
             line = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$`Commonwealth Bank`, type='scatter', name='Commonwealth',
+  add_lines(y =~desi_time$Commonwealth, type='scatter', name='Commonwealth',
             line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~desi_time$NAB, type='scatter', name='NAB',
             line = list(color = 'rgb(208,217,60)', type='scatter', width = 4, mode = 'lines+markers')) %>%
@@ -591,7 +592,7 @@ rep_b<-rep_brand %>%
             line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~rep_brand$'2', type='scatter', name='ANZ',
             line = list(color = 'rgb(96,166,218)', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~rep_brand$'3', type='scatter', name='Commonwealth Bank',
+  add_lines(y =~rep_brand$'3', type='scatter', name='Commonwealth',
             line = list(color = 'rgb(171,0,102)', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~rep_brand$'4', type='scatter', name='NAB',
             line = list(color = 'rgb(208,217,60)', width = 4, mode = 'lines+markers')) %>%
@@ -865,7 +866,7 @@ p2
   <br>
 
 * Australia showed a positive trend in their amount of primary customers. 
-* Australia has shown a positive development in their average amount of products since Q3 2018.
+* Ubank is perceived as easiest of all banks in the market. 
   
   <div class="row">
 </div></div>
@@ -1106,13 +1107,13 @@ desi_timep1 <-desi_time %>%
   plot_ly(x = ~labels_quarters) %>%
   add_lines(y = ~desi_time$ING, type='scatter', name='ING',
             line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$`BAWAG P S K  Bank` , type='scatter', name='BAWAG PSK Bank',
+  add_lines(y =~desi_time$BAWAG , type='scatter', name='BAWAG',
             line = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~desi_time$Easybank, type='scatter', name='Easybank',
             line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$`Erste Bank und Sparkasse`, type='scatter', name='Erste Bank und Sparkasse',
+  add_lines(y =~desi_time$`Erste Bank`, type='scatter', name='Erste Bank ',
             line = list(color = 'rgb(208,217,60)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$`Raiffeisen Sektor`, type='scatter', name='Raiffeisen Sektor',
+  add_lines(y =~desi_time$Raiffeisen, type='scatter', name='Raiffeisen',
             line = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   layout(title = "",
          xaxis = xaxis,
@@ -1246,7 +1247,7 @@ rep_b<-rep_brand %>%
             line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~rep_brand$'2', type='scatter', name='Raiffeisen',
             line = list(color = 'rgb(96,166,218)', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~rep_brand$'3', type='scatter', name='Erste Bank und Sparkasse',
+  add_lines(y =~rep_brand$'3', type='scatter', name='Erste Bank',
             line = list(color = 'rgb(171,0,102)', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~rep_brand$'4', type='scatter', name='Unicredit',
             line = list(color = 'rgb(208,217,60)', width = 4, mode = 'lines+markers')) %>%
@@ -1332,7 +1333,7 @@ l
   <div class="col-md-12" markdown="1">
   <br>
   
-* TEXT
+* To provide an overview of the scores compared to the competitors, pulse from the Brand Affinity Monitor is reported (the Reptrak data contains a limited amount of competitors). 
   
  </div> <div class="row">
 </div>
@@ -1522,7 +1523,6 @@ p2
   <div class="col-md-12" markdown="1">
   <br>
   
-*  TEXT
   
   <div class="row">
 </div></div>
@@ -1725,10 +1725,12 @@ p1
 ```{r BEL desi over time, echo=F, eval=T, fig.width=5.6, fig.height=3.5}
 ## over time desirability per brand
 desi_time <- test %>%
+  dplyr::select(label, country, quarter_measurement, desirability, labels_quarters, b_value) %>%
+  dplyr::filter(country==3 & b_value<=7) %>%
   dplyr::select(label, country, quarter_measurement, desirability, labels_quarters) %>%
-  dplyr::filter(country==3) %>%
   # There are some NA rows, get rid of them
   tidyr::drop_na() %>%
+  dplyr::distinct() %>%
   # Gather across brands
   tidyr::spread(label, desirability) 
 
@@ -1764,7 +1766,7 @@ desi_timep1 <-desi_time %>%
             line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~desi_time$`Belfius Banque` , type='scatter', name='Belfius Banque',
             line = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$`BNP Paribas Fortis`, type='scatter', name='BNP Paribas',
+  add_lines(y =~desi_time$BNP, type='scatter', name='BNP Paribas',
             line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~desi_time$KBC, type='scatter', name='KBC',
             line = list(color = 'rgb(208,217,60)', type='scatter', width = 4, mode = 'lines+markers')) %>%
@@ -1842,7 +1844,6 @@ desi_combi
   <div class="col-md-12" markdown="1">
   <br>
   
-* TEXT
   
   </div> <div class="row">
 </div>
@@ -1986,7 +1987,7 @@ l
   <div class="col-md-12" markdown="1">
   <br>
   
-* TEXT
+* To provide an overview of the scores compared to the competitors, pulse from the Brand Affinity Monitor is reported (the Reptrak data contains a limited amount of competitors). 
   
  </div> <div class="row">
 </div>
@@ -2174,7 +2175,6 @@ p2
   <div class="col-md-12" markdown="1">
   <br>
   
-*  TEXT
   
   <div class="row">
 </div></div>
@@ -2377,8 +2377,9 @@ p1
 ```{r CZ desi over time, echo=F, eval=T, fig.width=5.6, fig.height=3.5}
 ## over time desirability per brand
 desi_time <- test %>%
+  dplyr::select(label, country, quarter_measurement, desirability, labels_quarters, b_value) %>%
+  dplyr::filter(country==4 & b_value<=7) %>%
   dplyr::select(label, country, quarter_measurement, desirability, labels_quarters) %>%
-  dplyr::filter(country==4) %>%
   # There are some NA rows, get rid of them
   tidyr::drop_na() %>%
   # Gather across brands
@@ -2414,11 +2415,11 @@ desi_timep1 <-desi_time %>%
   plot_ly(x = ~labels_quarters) %>%
   add_lines(y = ~desi_time$ING, type='scatter', name='ING',
             line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$`Cesk  spoitelna` , type='scatter', name='Cesk  spoitelna',
+  add_lines(y =~desi_time$`Cesk  spoitelna` , type='scatter', name='Cesk',
             line = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~desi_time$SOB, type='scatter', name='SOB',
             line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$`Komern  banka`, type='scatter', name='Komern  banka',
+  add_lines(y =~desi_time$`Komern  banka`, type='scatter', name='Komern',
             line = list(color = 'rgb(208,217,60)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~desi_time$`Air Bank`, type='scatter', name='Air Bank',
             line = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'lines+markers')) %>%
@@ -2495,7 +2496,7 @@ desi_combi
   <div class="col-md-12" markdown="1">
   <br>
   
-  * 
+  * ING operates in a competitive market regarding CX. 
   
   </div> <div class="row">
 </div>
@@ -2637,7 +2638,6 @@ l
   <div class="col-md-12" markdown="1">
   <br>
   
-* 
   
  </div> <div class="row">
 </div>
@@ -2726,7 +2726,7 @@ es
   <div class="col-md-12" markdown="1">
   <br>
   
-*  TEXT
+*  No customer data available
   
   <div class="row">
 </div></div>
@@ -3190,7 +3190,7 @@ l
   <div class="col-md-12" markdown="1">
   <br>
   
-* 
+
   
  </div> <div class="row">
 </div>
@@ -3380,7 +3380,6 @@ p2
   <div class="col-md-12" markdown="1">
   <br>
   
-*  TEXT
   
   <div class="row">
 </div></div>
@@ -3701,7 +3700,7 @@ desi_combi
   <div class="col-md-12" markdown="1">
   <br>
   
-  * 
+  * ING outperforms the market on both dimesions, the most desirable brand of the market and considered to be least expensive. 
   
   </div> <div class="row">
 </div>
@@ -3844,7 +3843,7 @@ l
   <div class="col-md-12" markdown="1">
   <br>
   
-* 
+* To provide an overview of the scores compared to the competitors, pulse from the Brand Affinity Monitor is reported (the Reptrak data contains a limited amount of competitors). 
   
  </div> <div class="row">
 </div>
@@ -4034,7 +4033,7 @@ p2
   <div class="col-md-12" markdown="1">
   <br>
   
-*  TEXT
+*  ING outperforms the market regarding CX, expecially when it comes to offering smart solutions. 
   
   <div class="row">
 </div></div>
@@ -4281,7 +4280,7 @@ desi_timep1 <-desi_time %>%
             line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~desi_time$`Intesa Sanpaolo`, type='scatter', name='Intesa Sanpaolo',
             line = list(color = 'rgb(208,217,60)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$`Monte dei Paschi di Siena`, type='scatter', name='Monte dei Paschi di Siena',
+  add_lines(y =~desi_time$`Monte dei P diS`, type='scatter', name='Monte dei Paschi di Siena',
             line = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   layout(title = "",
          xaxis = xaxis,
@@ -4356,7 +4355,6 @@ desi_combi
   <div class="col-md-12" markdown="1">
   <br>
   
-  * 
   
   </div> <div class="row">
 </div>
@@ -4500,7 +4498,6 @@ l
   <div class="col-md-12" markdown="1">
   <br>
   
-* 
   
  </div> <div class="row">
 </div>
@@ -4690,7 +4687,7 @@ p2
   <div class="col-md-12" markdown="1">
   <br>
   
-*  TEXT
+*  ING has to deal with a strong market. Banks show similar results regarding CX. 
   
   <div class="row">
 </div></div>
@@ -4930,7 +4927,7 @@ desi_timep1 <-desi_time %>%
   plot_ly(x = ~labels_quarters) %>%
   add_lines(y = ~desi_time$ING, type='scatter', name='ING',
             line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$`Banque et Caisse d Epargne de l Etat` , type='scatter', name='`Banque et Caisse d Epargne de l Etat`',
+  add_lines(y =~desi_time$`Banque et Caisse` , type='scatter', name='`Banque et Caisse',
             line = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~desi_time$`BGL BNP Paribas`, type='scatter', name='BGL BNP Paribas',
             line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
@@ -5011,7 +5008,7 @@ desi_combi
   <div class="col-md-12" markdown="1">
   <br>
   
-  * 
+
   
   </div> <div class="row">
 </div>
@@ -5068,11 +5065,11 @@ rep_b<-rep_brand %>%
   plot_ly(x = ~labels_quarters) %>%
   add_lines(y = ~rep_brand$'1', type='scatter', name='ING',
             line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~rep_brand$'2', type='scatter', name='Banque et Caisse d’Epargne de l’Etat',
+  add_lines(y =~rep_brand$'2', type='scatter', name='Banque et Caisse',
             line = list(color = 'rgb(96,166,218)', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~rep_brand$'3', type='scatter', name='BGL BNP Paribas',
             line = list(color = 'rgb(171,0,102)', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~rep_brand$'4', type='scatter', name='Banque International a Luxembourg',
+  add_lines(y =~rep_brand$'4', type='scatter', name='Banque International',
             line = list(color = 'rgb(208,217,60)', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~rep_brand$'5', type='scatter', name='Raiffeisen',
           line = list(color = 'rgb(52,150,81)', width = 4, mode = 'lines+markers')) %>%
@@ -5154,7 +5151,6 @@ l
   <div class="col-md-12" markdown="1">
   <br>
   
-* 
   
  </div> <div class="row">
 </div>
@@ -5344,7 +5340,7 @@ p2
   <div class="col-md-12" markdown="1">
   <br>
   
-*  TEXT
+*  The new banks (N26 ann Revolut) clearly outperform regarding CX principles. 
   
   <div class="row">
 </div></div>
@@ -5665,7 +5661,7 @@ desi_combi
   <div class="col-md-12" markdown="1">
   <br>
   
-  * 
+  * Rabobank is outperforming regarding desirability, closely followed by ING. 
   
   </div> <div class="row">
 </div>
@@ -5806,7 +5802,7 @@ l
   <div class="col-md-12" markdown="1">
   <br>
   
-* 
+* To provide an overview of the scores compared to the competitors, pulse from the Brand Affinity Monitor is reported (the Reptrak data contains a limited amount of competitors). 
   
  </div> <div class="row">
 </div>
@@ -5997,7 +5993,7 @@ p2
   <div class="col-md-12" markdown="1">
   <br>
   
-*  TEXT
+*  The comeptition is strong regarding CX principles. Rabobank and ING are competing for the leading position. 
   
   <div class="row">
 </div></div>
@@ -6200,8 +6196,9 @@ p1
 ```{r POL desi over time, echo=F, eval=T, fig.width=5.6, fig.height=3.5}
 ## over time desirability per brand
 desi_time <- test %>%
+  dplyr::select(label, country, quarter_measurement, desirability, labels_quarters, b_value) %>%
+  dplyr::filter(country==10 & b_value <=7 ) %>%
   dplyr::select(label, country, quarter_measurement, desirability, labels_quarters) %>%
-  dplyr::filter(country==10) %>%
   # There are some NA rows, get rid of them
   tidyr::drop_na() %>%
   # Gather across brands
@@ -6318,7 +6315,7 @@ desi_combi
   <div class="col-md-12" markdown="1">
   <br>
   
-  * 
+ 
   
   </div> <div class="row">
 </div>
@@ -6379,9 +6376,9 @@ rep_b<-rep_brand %>%
             line = list(color = 'rgb(96,166,218)', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~rep_brand$'3', type='scatter', name='mBank',
             line = list(color = 'rgb(171,0,102)', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~rep_brand$'4', type='scatter', name='Pekao S.A',
+  add_lines(y =~rep_brand$'4', type='scatter', name='Pekao',
             line = list(color = 'rgb(208,217,60)', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~rep_brand$'5', type='scatter', name='PKO BP',
+  add_lines(y =~rep_brand$'5', type='scatter', name='PKO',
           line = list(color = 'rgb(52,150,81)', width = 4, mode = 'lines+markers')) %>%
   layout(title = "",
          xaxis = xaxis,
@@ -6461,7 +6458,7 @@ l
   <div class="col-md-12" markdown="1">
   <br>
   
-* 
+
   
  </div> <div class="row">
 </div>
@@ -6651,7 +6648,7 @@ p2
   <div class="col-md-12" markdown="1">
   <br>
   
-*  TEXT
+*  PKO and mBank outperform the market regarding CX, but scores are close. 
   
   <div class="row">
 </div></div>
@@ -6854,8 +6851,9 @@ p1
 ```{r ROM desi over time, echo=F, eval=T, fig.width=5.6, fig.height=3.5}
 ## over time desirability per brand
 desi_time <- test %>%
+  dplyr::select(label, country, quarter_measurement, desirability, labels_quarters, b_value) %>%
+  dplyr::filter(country==11 & b_value <=7) %>%
   dplyr::select(label, country, quarter_measurement, desirability, labels_quarters) %>%
-  dplyr::filter(country==11) %>%
   # There are some NA rows, get rid of them
   tidyr::drop_na() %>%
   # Gather across brands
@@ -6895,7 +6893,7 @@ desi_timep1 <-desi_time %>%
             line = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~desi_time$BRD, type='scatter', name='BRD',
             line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$`Raiffeisen Bank`, type='scatter', name='Raiffeisen Bank',
+  add_lines(y =~desi_time$`Raiffeisen`, type='scatter', name='Raiffeisen',
             line = list(color = 'rgb(208,217,60)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~desi_time$`Banca Transilvania`, type='scatter', name='Banca Transilvania',
             line = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'lines+markers')) %>%
@@ -6972,7 +6970,7 @@ desi_combi
   <div class="col-md-12" markdown="1">
   <br>
   
-  * 
+* ING and Banca Transilvania share the top position regarding desirability and price perception. 
   
   </div> <div class="row">
 </div>
@@ -7115,7 +7113,6 @@ l
   <div class="col-md-12" markdown="1">
   <br>
   
-* 
   
  </div> <div class="row">
 </div>
@@ -7136,7 +7133,7 @@ yaxis <- list(title = "CX",
               titlefont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'),
-              range =c(40,70),
+              range =c(40,75),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -7307,7 +7304,7 @@ p2
   <div class="col-md-12" markdown="1">
   <br>
   
-*  TEXT
+*  Banca Transilvania outperforms ING regarding CX principles. 
   
   <div class="row">
 </div></div>
@@ -7628,7 +7625,7 @@ desi_combi
   <div class="col-md-12" markdown="1">
   <br>
   
-  * 
+  * ING outperforms the market on both dimensions, most desired and not seen as expensive. 
   
   </div> <div class="row">
 </div>
@@ -7842,7 +7839,7 @@ es
 ```{r SPA customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 customerthing <- test_customer_fig %>%
   dplyr::select(labels_quarters, country, b_value, "Active customers", `Primary bank customers`, "Avg number of product categories per active customer", quarter_measurement) %>%
-  dplyr::filter(b_value ==1 & country ==13 & quarter_measurement >16) %>%
+  dplyr::filter(b_value ==1 & country ==12 & quarter_measurement >16) %>%
   dplyr::arrange(country)
 
 customerthing <- customerthing %>%
@@ -7872,7 +7869,7 @@ yaxis <- list(title = "Primary customer *1000",
                               color = 'rgb(105, 105, 105)'),
               showline = TRUE,
               showgrid = FALSE,
-              range =c(100.000,1000.000),
+              range =c(100.000,2000.000),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -7961,7 +7958,7 @@ p2
   <div class="col-md-12" markdown="1">
   <br>
   
-*  TEXT
+*  ING is considered as easiest bank to work with after N26 and Revolut. 
   
   <div class="row">
 </div></div>
@@ -8199,15 +8196,15 @@ yaxis <- list(title = "",
 
 desi_timep1 <-desi_time %>%
   plot_ly(x = ~labels_quarters) %>%
-  add_lines(y = ~desi_time$ING, type='scatter', name='ING',
+  add_lines(y = ~desi_time$`ING`, type='scatter', name='ING',
             line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   add_lines(y =~desi_time$Akbank, type='scatter', name='Akbank',
             line = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$`Garanti Bankas`, type='scatter', name='Garanti Bankasi',
+  add_lines(y =~desi_time$`Garanti`, type='scatter', name='Garanti',
             line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$ISBankas, type='scatter', name='IsBankasi',
+  add_lines(y =~desi_time$`ISBankas`, type='scatter', name='IsBankasi',
             line = list(color = 'rgb(208,217,60)', type='scatter', width = 4, mode = 'lines+markers')) %>%
-  add_lines(y =~desi_time$`Yap  Kredi Bankas`, type='scatter', name='Yap  Kredi Bankasi',
+  add_lines(y =~desi_time$`Yap`, type='scatter', name='Yap  Kredi',
             line = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   layout(title = "",
          xaxis = xaxis,
@@ -8282,7 +8279,7 @@ desi_combi
   <div class="col-md-12" markdown="1">
   <br>
   
-  * 
+ 
   
   </div> <div class="row">
 </div>
@@ -8425,7 +8422,7 @@ l
   <div class="col-md-12" markdown="1">
   <br>
   
-* 
+
   
  </div> <div class="row">
 </div>
@@ -8495,10 +8492,10 @@ es
   
 ```{r TUR customer, eval=T, echo=F, error=F, fig.height=3.5, fig.width=4, message=FALSE}
 customerthing <- test_customer_fig %>%
-  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", 
-                "Avg number of product categories per active customer") %>%
-  dplyr::filter(b_value ==1 & labels_quarters %in% c("2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4") & country ==13) %>%
-  dplyr::arrange(country)
+  dplyr::select(labels_quarters, country, b_value, "Active customers", "Primary bank customers", "Avg number of product categories per active customer", quarter_measurement) %>%
+  dplyr::filter(b_value ==1 & country ==13 & quarter_measurement >16) %>%
+  dplyr::arrange(country) %>%
+  dplyr::distinct()
 
 customerthing <- customerthing %>%
   dplyr::mutate(
@@ -8506,9 +8503,6 @@ customerthing <- customerthing %>%
     Diff_growth = customerthing$'Primary bank customers' - lag(customerthing$'Primary bank customers'), 
     Rate_percent = (Diff_growth / Diff_year)/ customerthing$'Primary bank customers' * 100
   )
-
-
-x<- c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019")
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -8521,7 +8515,6 @@ xaxis <- list(title = "",
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
               ticklen = 5,
-              categoryarray = c("Q3_2018", "Q4_2018", "Q1_2019", "Q2_2019", "Q3_2019", "Q4_2019"),
               tickfont = list(family = "ING me",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
@@ -8545,7 +8538,7 @@ yaxis <- list(title = "Primary customer *1000",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
               
-p1 <- plot_ly(customerthing, x = ~x, y = ~customerthing$'Primary bank customers', 
+p1 <- plot_ly(customerthing, x = ~customerthing$labels_quarters, y = ~customerthing$'Primary bank customers', 
               type = 'bar', name = 'Primary customers', marker = list(color = 'rgb(82,81,153)')) %>%
  #add_lines(y = ~Rate_percent, name = 'growth', marker = list(color = "rgb 168, 168, 168")) %>%
   layout(xaxis = xaxis,
@@ -8620,7 +8613,7 @@ p2
   <div class="col-md-12" markdown="1">
   <br>
   
-*  TEXT
+*  IsBankasi is clearly outperforming the market regarding CX. 
   
   <div class="row">
 </div></div>
@@ -8913,7 +8906,7 @@ xaxis <- list(title = "Price perception",
                               color = 'rgb(105, 105, 105)'))
 yaxis <- list(title = "Desirability",
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
-              range =c(0,70),
+              range =c(0,75),
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
@@ -8942,7 +8935,7 @@ desi_combi
   <div class="col-md-12" markdown="1">
   <br>
   
-  * 
+  * BDO is the most desired brand in the marktet, where ING is not (yet) standing out on either desirability or price perception. 
   
   </div> <div class="row">
 </div>
@@ -9089,7 +9082,7 @@ l
   <div class="col-md-12" markdown="1">
   <br>
   
-* 
+* The market has shown a decline in its reputation, where ING has shown steady results.
   
  </div> <div class="row">
 </div>
@@ -9178,7 +9171,7 @@ es
   <div class="col-md-12" markdown="1">
   <br>
   
-*  TEXT
+*  No data available
   
   <div class="row">
 </div></div>
