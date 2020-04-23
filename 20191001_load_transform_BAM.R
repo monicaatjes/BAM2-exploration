@@ -1,3 +1,33 @@
+
+# Add in X1 which is a row count
+raw_data <- raw_data %>% 
+  dplyr::mutate(
+    X1 = 1:n()
+  )
+
+ID_char <- c("X1", "quarter_measurement", "country", "age", "gender", "income", "Weight", "weight_nps", "love_ING", "love_Google")
+
+# and for Q1 onwards
+ID_char_Q1 <- c("X1", "quarter_measurement", "country", "age", "age_groups", "id",
+                "gender", "income", "Weight", "weight_nps", "Love_ING", "love_Google")
+
+
+base_data <- raw_data %>% 
+  select(ID_char)
+
+# Wanted categories
+categories <- c("unaided", "relationship", "aided", "fami", "opinion", "consideration", "preference", "nps",
+                "image1", "image2", "image3", "image4", "image5", "image6", "image7", "image13", "image16", 
+                "image19", "image20", "reptrak1", "reptrak2", "reptrak3", "reptrak4", "trust4", "proxi", "desirability", "price_perc", "client", "main_bank", "empower_1", "empower_2", "empower_3", "empower_4", "love_respected", "love_meaningful", 
+                "love_irresistible", "love_irreplaceable", "consideration_p1", "consideration_p2", "consideration_p3", "consideration_p4", "preference_p1", "preference_p2", 
+                "preference_p3", "preference_p4", "relationship_p1", "relationship_p2", "relationship_p3", "relationship_p4", "consideration_p1", "consideration_p2", "consideration_p3", 
+                "consideration_p4", "product_awareness_p1", "product_awareness_p2", "product_awareness_p3", 
+                "product_awareness_p4", "banktype", "product_usage_p1", "product_usage_p2", "product_usage_p3", "product_usage_p4",
+                "product_usage_p5", "product_usage_p6", "product_usage_p7", "product_usage_p8", "product_usage_p9", "ad_awareness", "message_recall")
+
+# Confirm that categories has distinct arguments
+categories <- unique(categories)
+
 ### exploration
 source("add_questionnaire_responds_category.R")
 source("changed_messed_up_variable_names.R")
@@ -2079,7 +2109,6 @@ data<- data %>%
 ### Love overview 
 love_overview <- result %>%
   dplyr::filter(!is.na(love_ING)) %>%
-  dplyr::filter(love_ING %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) %>% 
   dplyr::group_by(country, quarter_measurement) %>% 
   dplyr::summarise(
     love_mean_ING = mean(love_ING * Weight, na.rm = T) 
@@ -2090,12 +2119,11 @@ data <- full_join(data, love_overview, by=c("country", "quarter_measurement"))
 rm(love_overview) 
 
 love_overview_client <- result %>%
-  dplyr::select(country, quarter_measurement, b_value, client_value, price_perc_value, Weight, love_ING) %>%
+  dplyr::select(country, quarter_measurement, b_value, client_value, love_ING, Weight) %>%
   dplyr::filter(b_value==1 & client_value==1) %>%
-  #dplyr::filter(love_ING %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) %>% 
   dplyr::group_by(country, quarter_measurement) %>% 
   dplyr::summarise(
-    love_mean_ING_client = mean(love_ING * Weight) 
+    love_mean_ING_client = mean(love_ING * Weight) /mean(Weight),
   ) %>%
   dplyr::ungroup()
 
@@ -2256,8 +2284,7 @@ X20200209_Competitorlist$label <-str_replace_all(X20200209_Competitorlist$label,
 data <-left_join(data, X20200209_Competitorlist, by=c("country", "b_value"))
 rm(X20200209_Competitorlist)     
 
-
-
 data <-write_csv(data, "data.csv")
+
 
 
