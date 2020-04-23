@@ -1090,10 +1090,9 @@ rm(love_overview)
 love_overview_client <- result %>%
   dplyr::select(country, quarter_measurement, b_value, client_value, weight, Love_ING) %>%
   dplyr::filter(b_value==1 & client_value==1) %>%
-  #dplyr::filter(Love_ING %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) %>% 
   dplyr::group_by(country, quarter_measurement) %>% 
   dplyr::summarise(
-    love_mean_ING_client = mean(Love_ING * weight) 
+    love_mean_ING_client = mean(Love_ING * weight) /mean(weight),
   ) %>%
   dplyr::ungroup()
 
@@ -1230,3 +1229,8 @@ data1 <-write_csv(data1, "data1.csv")
 test <- dplyr::bind_rows(data1, data)
 test$labels_quarters <- as.yearqtr(unlist(test$labels_quarters), format='%Y Q%q')
 test <-write_csv(test, "test.csv")
+
+
+
+
+
