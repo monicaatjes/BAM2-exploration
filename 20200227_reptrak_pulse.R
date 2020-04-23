@@ -125,25 +125,44 @@ test <- dplyr::left_join(test, rept3, by=c("labels_countries", "labels_quarters"
 
 
 ### INTERNAL NPS 
-internal <-read_excel("/Users/xo21bm/Documents/Lokaal/BAM2/exploration/data/20100124 Internal metrics .xlsx", range = "A26:I47")
+#internal <-read_excel("/Users/xo21bm/Documents/Lokaal/BAM2/exploration/data/20100124 Internal metrics .xlsx", range = "A28:P4")
 
 # throw away empty column
-internal <- internal[,-2]
+#internal <- internal[,-2]
 
 # without transpose
-internal$labels_countries <- internal$`Row Labels`
-internal$`Row Labels` <- NULL
-colnames(internal) <- as.yearqtr(colnames(internal[1:7]), format= 'Q%q_%Y') 
-names(internal)[8] <- "labels_countries" 
+#internal$labels_countries <- internal$`Row Labels`
+#internal$`Row Labels` <- NULL
+#colnames(internal) <- as.yearqtr(colnames(internal[1:7]), format= 'Q%q_%Y') 
+#names(internal)[8] <- "labels_countries" 
+
+#internal <- internal %>%
+#  dplyr::select(labels_countries, `2019 Q1`, `2019 Q2`, 
+#                `2019 Q3`, `2019 Q4`) %>%
+#  dplyr::mutate(labels_countries = case_when(
+#    labels_countries =="Spain & Portugal" ~ "Spain",
+#    labels_countries =="Germany Region" ~ "Germany",
+#    TRUE ~ labels_countries)
+#  )
+
+internal <-read_excel("/Users/xo21bm/Documents/Lokaal/BAM2/exploration/data/20100124 Internal metrics .xlsx", range = "A28:P46")
+internal <- internal[,-c(2:10)]
+internal <- internal[,-c(3,5,6,7)]
+
+internal$labels_countries <- internal$Asia
+colnames(internal) <-c("labels_countries", "2019 Q3", "2019 Q4", "T")
+
+colnames(internal[2:3]) <- as.yearqtr(colnames(internal[2:3]), format= '%Y Q%q') 
 
 internal <- internal %>%
-  dplyr::select(labels_countries, `2019 Q1`, `2019 Q2`, 
-                `2019 Q3`, `2019 Q4`) %>%
+  dplyr::select(labels_countries, `2019 Q3`, `2019 Q4`) %>%
   dplyr::mutate(labels_countries = case_when(
     labels_countries =="Spain & Portugal" ~ "Spain",
     labels_countries =="Germany Region" ~ "Germany",
-    TRUE ~ labels_countries)
-  )
+    TRUE ~ labels_countries) 
+  ) %>%
+  dplyr::filter(!is.na('2019 Q3'))
+
 
 # and for Q1 2020 NPS 
 p79004_AlignmentMonitor_2020Q1 <- read_csv("p79004_AlignmentMonitor_2020Q1_v2.csv")
