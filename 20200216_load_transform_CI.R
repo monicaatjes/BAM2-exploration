@@ -170,7 +170,7 @@ customer$country <- NULL
 customer$b_value <- 1
 
 #data$labels_quarters <- as.yearqtr(unlist(data$labels_quarters), format='%Y Q%q')
-#customer$labels_quarters <- as.yearqtr(unlist(customer$labels_quarters), format='%Y Q%q')
+customer$labels_quarters <- as.yearqtr(unlist(customer$labels_quarters), format='%Y Q%q')
 test_customer_fig <- left_join(test, customer, by=c("labels_countries", "labels_quarters", "b_value"))  
 
 test_customer_fig <- test_customer_fig %>%
