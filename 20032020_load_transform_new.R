@@ -5,8 +5,7 @@ source("add_questionnaire_responds_category.R")
 source("changed_messed_up_variable_names.R")
 ## Load and transform BAM data Q1
 
-
-
+# Throw away columns specifically for ML
 raw_data2 <- raw_data2 %>%
   dplyr::select(-contains("SPSS"))
 
@@ -136,6 +135,7 @@ temp3$score_two <- NULL
 temp3$score_nine_nine <- NULL
 temp3$type <- NULL
 
+# Connect the first two transformed varibles together and create file data1 that contains all variables for Q1 2020
 data1 <- full_join(temp4, temp3, by=c("b_value", "country", "quarter_measurement"))
 rm(temp4)
 
@@ -1123,38 +1123,29 @@ price_perc <- result %>%
 data1 <- full_join(data1, price_perc, by=c("country", "quarter_measurement", "b_value"))
 rm(price_perc) 
 
-## NPS
-#NPS_trial <- result %>%
-#  dplyr::filter(!is.na(nps_value)) %>%
-#  dplyr::group_by(country, quarter_measurement, b_value, client_value) %>%
-#  dplyr::mutate(
-#    nps_clients = case_when(
-#      client_value == 1 ~ as.numeric(nps_value) * weight,
-#      TRUE ~ NA_real_)
-#  ) %>%
-#  dplyr::mutate(nps_cat = case_when(
-#    nps_clients >=9.0 ~ "promotors",
-#    nps_clients <= 9.0 & nps_clients >= 7.0 ~ "neutrals",
-#    nps_clients  <= 6.0 ~ "detractors",
-#    TRUE ~ "NA_real_")) %>%
-#  dplyr::filter(nps_cat %in% c("detractors", "neutrals", "promotors")) %>%
-#  dplyr::group_by(country, b_value, quarter_measurement, nps_cat) %>%
-#  dplyr::tally() %>%
-#  dplyr::mutate(
-#    percentage = n /sum(n)
-#  ) %>% 
-#  dplyr::ungroup()
+### NPS
+NPS_trial <- result %>%
+  dplyr::select(weight, country, quarter_measurement, b_value, nps_value, client_value) %>%
+  dplyr::filter(!is.na(nps_value) & client_value==1) %>% 
+  dplyr::mutate(nps_cat = case_when(
+    nps_value >= 9 ~ "promotors",
+    nps_value < 9 & nps_value > 6 ~ "neutrals",
+    nps_value  <= 6 ~ "detractors",
+    TRUE ~ "NA_real_")) %>%
+  dplyr::group_by(country, quarter_measurement, b_value, nps_cat) %>%
+  dplyr::tally(wt=weight) %>%
+  dplyr::mutate(
+    percentage = n /sum(n) *100
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(country, quarter_measurement, b_value, nps_cat, percentage) %>%
+  tidyr::spread(nps_cat, percentage) %>%
+  dplyr::mutate(
+    NPS_non_rolling =round(promotors, digits =2)- round(detractors, digits =2)
+  ) 
 
-#NPS_score <- NPS_trial %>%
-#  select(-n) %>%
-#  tidyr::spread(nps_cat, percentage) %>%
-#  dplyr::mutate(
-#    nps_score = promotors - detractors
-#  )
-
-#data1 <- left_join(NPS_score, data1, by=c("country", "b_value", "quarter_measurement"))
-
-#rm(NPS_trial, NPS_score)
+data1 <- full_join(data1, NPS_trial, by=c("country", "quarter_measurement", "b_value"))
+rm(NPS_trial) 
 
 ### Labels
 labels_countries <- data1 %>%
@@ -1180,12 +1171,16 @@ labels_countries <- data1 %>%
   )
 data1 <- left_join(data1, labels_countries, by=c("country"))
 
+# Important to add the new labels
 labels_quarters <-data1 %>%
   dplyr::select(quarter_measurement) %>%
   dplyr::distinct() %>% 
   dplyr::mutate(
     labels_quarters = case_when(
       quarter_measurement == 21 ~ "2020 Q1",
+      quarter_measurement == 22 ~ "2020 Q2",
+      quarter_measurement == 23 ~ "2020 Q3",
+      quarter_measurement == 24 ~ "2020 Q4",
       TRUE ~ "NA_real_"))
 
 data1 <- left_join(data1, labels_quarters, by=c("quarter_measurement"))
@@ -1224,13 +1219,13 @@ rm(X20200209_Competitorlist)
 data1 <-write_csv(data1, "data1.csv")
 #resulthis <- write_csv(result, "resulthis.csv")
 
-## Connect with current dataset
+## Connect with "data" (history data Q4 2014- Q4 2019)
 
+## First the data set which is leading. Otherwise columns will be dropped
 test <- dplyr::bind_rows(data1, data)
 test$labels_quarters <- as.yearqtr(unlist(test$labels_quarters), format='%Y Q%q')
 test <-write_csv(test, "test.csv")
 
-
-
+  
 
 
