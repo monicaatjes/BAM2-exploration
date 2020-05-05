@@ -1,3 +1,11 @@
+# BEFORE RUNNING CHANGE WORKING DIRECTORY TO SOURCE FILE LOCATION
+# Dependencies
+library(tidyverse)
+source("add_questionnaire_responds_category.R")
+source("changed_messed_up_variable_names.R")
+## Load and transform BAM data Q1
+
+
 
 # Add in X1 which is a row count
 raw_data <- raw_data %>% 
@@ -27,10 +35,6 @@ categories <- c("unaided", "relationship", "aided", "fami", "opinion", "consider
 
 # Confirm that categories has distinct arguments
 categories <- unique(categories)
-
-### exploration
-source("add_questionnaire_responds_category.R")
-source("changed_messed_up_variable_names.R")
 
 ### apply function to change names ###
 raw_data <- changed_messed_up_variable_names(raw_data, cat = "product_usage")
@@ -133,6 +137,7 @@ temp3$score_two <- NULL
 temp3$score_nine_nine <- NULL
 temp3$type <- NULL
 
+# Connect the first two transformed varibles together and create file "data", that contains all the questions from Q4 2014- Q4 2019
 data <- full_join(temp3, temp4, by=c("b_value", "country", "quarter_measurement"))
 rm(temp3, temp4)
 
@@ -2166,38 +2171,29 @@ proximity_overview <- result %>%
 data <- full_join(data, proximity_overview, by=c("country", "quarter_measurement", "b_value"))
 rm(proximity_overview) 
 
-## NPS
+### NPS
 NPS_trial <- result %>%
-  dplyr::filter(!is.na(nps_value)) %>%
-  dplyr::group_by(country, quarter_measurement, b_value) %>%
-  dplyr::mutate(
-    nps_clients = case_when(
-      client_value == 1 ~ as.numeric(nps_value) * Weight,
-      TRUE ~ NA_real_)
-  ) %>%
+  dplyr::select(Weight, country, quarter_measurement, b_value, nps_value, client_value) %>%
+  dplyr::filter(!is.na(nps_value) & client_value==1) %>% 
   dplyr::mutate(nps_cat = case_when(
-    nps_clients >=9.0 ~ "promotors",
-    nps_clients <= 9.0 & nps_clients >= 7.0 ~ "neutrals",
-    nps_clients  <= 6.0 ~ "detractors",
+    nps_value >= 9 ~ "promotors",
+    nps_value < 9 & nps_value > 6 ~ "neutrals",
+    nps_value  <= 6 ~ "detractors",
     TRUE ~ "NA_real_")) %>%
-  dplyr::filter(nps_cat %in% c("detractors", "neutrals", "promotors")) %>%
-  dplyr::group_by(country, b_value, quarter_measurement, nps_cat) %>%
-  dplyr::tally() %>%
+  dplyr::group_by(country, quarter_measurement, b_value, nps_cat) %>%
+  dplyr::tally(wt=Weight) %>%
   dplyr::mutate(
-    percentage = n /sum(n)
-  ) %>% 
-  dplyr::ungroup()
-
-NPS_score <- NPS_trial %>%
-  select(-n) %>%
+    percentage = n /sum(n) *100
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(country, quarter_measurement, b_value, nps_cat, percentage) %>%
   tidyr::spread(nps_cat, percentage) %>%
   dplyr::mutate(
-    nps_score = promotors - detractors
-  )
+    NPS_non_rolling =round(promotors, digits =2)- round(detractors, digits =2)
+  ) 
 
-data <- left_join(NPS_score, data, by=c("country", "b_value", "quarter_measurement"))
-
-rm(NPS_trial, NPS_score)
+data <- full_join(data, NPS_trial, by=c("country", "quarter_measurement", "b_value"))
+rm(NPS_trial) 
   
 ### Labels
 labels_countries <- data %>%
@@ -2284,6 +2280,7 @@ X20200209_Competitorlist$label <-str_replace_all(X20200209_Competitorlist$label,
 data <-left_join(data, X20200209_Competitorlist, by=c("country", "b_value"))
 rm(X20200209_Competitorlist)     
 
+## Write to csv
 data <-write_csv(data, "data.csv")
 
 
