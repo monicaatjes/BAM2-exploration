@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This dashboard shows reputation scores in line with what The Reputation Institure used to report for ING. Altough the same methodology is applied, it is not possible to reproduce the (pulse) scores exactly because of unknown cultural correction. The aim is to provide insights in ING's reputation, within the context of the (other) brand metrics. 
 
+<br>
 
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/aus.png) Australia
@@ -21,6 +22,10 @@ This dashboard shows reputation scores in line with what The Reputation Institur
   
 <div class="row">
   <div class="col-md-6" markdown="1">
+  
+  
+   **Drivers ING vs competition**
+   
 ```{r quickAUS, echo=FALSE, echo=F, eval=T, fig.width=6.3, fig.align='left', fig.height=3}
 quickfact <- test %>%
   dplyr::select(label, country, quarter_measurement, labels_quarters, pulse, rep_trak1, rep_trak2, rep_trak3, rep_trak4,
@@ -76,7 +81,7 @@ p
 
    **Pulse over time**
  
-```{r pulse AUS, echo=FALSE, echo=F, eval=T, fig.width=4.8, fig.height=3.5, fig.align='left'}
+```{r pulse AUS, echo=FALSE, echo=F, eval=T, fig.width=5.2, fig.height=3.5, fig.align='left'}
 quickfact <- test %>%
   dplyr::select(label, country, quarter_measurement, labels_quarters, pulse, rep_trak1, rep_trak2, rep_trak3, rep_trak4,
                 rep_trak5, rep_trak6, rep_trak7, rep_trak8, rep_trak9, rep_trak10, rep_trak11, b_value) %>%
@@ -148,8 +153,11 @@ p1
 </div>
 
 ### **Clients and non clients**
+
 <div class="row">
   <div class="col-md-6" markdown="1">
+
+   **Drivers ING clients vs non clients**
 ```{r split1AUS, echo=FALSE, echo=F, eval=T, fig.width=6.3, fig.align='left', fig.height=3}
 split <- data1 %>%
   dplyr::select(label, country, quarter_measurement, labels_quarters, rep_trak1, rep_trak2, rep_trak3, rep_trak4, pulse, 
@@ -257,9 +265,9 @@ p
  </div>
   <div class="col-md-6" markdown="1">
 
-   **Pulse over time**
+   **ING clients vs non clients**
  
-```{r split AUS, echo=FALSE, echo=F, eval=T, fig.width=4.8, fig.height=3.5, fig.align='left'}
+```{r split AUS, echo=FALSE, echo=F, eval=T, fig.width=5.2, fig.height=3.5, fig.align='left'}
 
 xaxis <- list(title = "",
               showline = TRUE,
@@ -267,7 +275,7 @@ xaxis <- list(title = "",
               showticklabels = TRUE,
               linecolor = 'rgb(204, 204, 204)',
               linewidth = 2,
-              autotick = FALSE,
+              autotick = TRUE,
               ticks = 'inside',
               tickcolor = 'rgb(204, 204, 204)',
               tickwidth = 2,
@@ -295,19 +303,164 @@ yaxis <- list(title = "",
                               size = 12,
                               color = 'rgb(105, 105, 105)'))
 
-p1 <- plot_ly(x = split$drivers[split$drivers=="pulse"]) %>%
-  add_lines(y = ~split$clients[split$drivers=="pulse"], name = 'clients', type='scatter', mode = 'lines+markers',
-            line = list(color = 'rgb(255,098,000)', type='bar', width = 4, mode = 'lines')) %>%
-  add_lines(y = ~split$general_pop[split$drivers=="pulse"], name = 'general pop', type='scatter', mode = 'lines+markers', 
-            line = list(color = 'rgb(96,166,218)', type='bar', width = 4, mode = 'lines')) %>%
-  add_lines(y = ~split$non_clients[split$drivers=="pulse"], name = 'non clients', type='scatter', mode = 'lines+markers',
-            line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines')) %>%
+
+p1 <- plot_ly(x = split$drivers, y=~split$clients, 
+               name ='clients', type='bar', marker = list(color = 'rgb(255,098,000)', width = 4)) %>%
+  add_trace(y = ~split$general_pop, 
+            name = 'general pop', marker = list(color = 'rgb(96,166,218)', width = 4)) %>%
+  add_trace(y = ~split$non_clients, 
+            name = 'non clients', marker = list(color = 'rgb(171,0,102)', width = 4)) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'group', title= "",
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+p1
+
+```
+ </div> <div class="row">  
+</div>
+
+
+### **Reputation and other brand metrics**
+
+<div class="row">
+  <div class="col-md-6" markdown="1">
+
+   **Trust, Love, Pulse**
+```{r trendbrandAUS, echo=FALSE, echo=F, eval=T, fig.width=5.2, fig.align='left', fig.height=3.5 }
+trendbrand <- test %>%
+  dplyr::select(b_value, label, quarter_measurement, country, labels_quarters, labels_countries, trust4, desirability,
+                easy_mean, meets_needs_mean, smart_mean, digital_experience, pulse, love_mean_ING, price_mean) %>%
+  dplyr::filter(country==1 & quarter_measurement>17 & b_value==1) %>%
+  dplyr::mutate(
+    trust = trust4 *100,
+    love = love_mean_ING * 10
+  )
+
+p1 <- plot_ly(x = trendbrand$labels_quarters) %>%
+  add_lines(y = ~trendbrand$pulse, name = 'pulse', type='scatter', 
+            line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  #add_lines(y = ~trendbrand$desirability, name = 'desirability', type='scatter', 
+  #          line = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y = ~trendbrand$trust, name = 'trust', type='scatter', 
+            line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y = ~trendbrand$love, name = 'love', type='scatter', 
+            line = list(color = 'rgb(208,217,60)', type='scatter', width = 4, mode = 'lines+markers')) %>%
   layout(xaxis = xaxis,
          yaxis = yaxis,
          barmode = 'group', title= "",
          legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
 
 p1
+
+
 ```
+
+ </div>
+  <div class="col-md-6" markdown="1">
+
+   **Pulse and Trust**
+ 
+```{r trendbrand2AUS, echo=FALSE, echo=F, eval=T, fig.width=5.2, fig.height=3.5, fig.align='left', warning=F}
+
+trendbrand <- test %>%
+  dplyr::select(b_value, label, quarter_measurement, country, labels_quarters, labels_countries, trust4, desirability,
+                easy_mean, meets_needs_mean, smart_mean, digital_experience, pulse, love_mean_ING, price_mean) %>%
+  dplyr::filter(country==1 & quarter_measurement==21 & b_value <6) %>%
+  dplyr::mutate(
+    trust = trust4 *100,
+    love = love_mean_ING * 10
+  )
+
+trendbrandp <- trendbrand %>%
+  plot_ly(x = ~trust, y = ~pulse, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = '',
+         xaxis = xaxis,
+         yaxis = yaxis)
+trendbrandp
+
+
+```
+
+ </div> <div class="row">  
+</div>
+
+### **Relations with pulse **
+  
+<div class="row">
+  <div class="col-md-6" markdown="1">
+  
+  
+   **Correlations**
+   
+```{r CORAUS, echo=FALSE, echo=F, eval=T, fig.width=6.3, fig.align='left', fig.height=3}
+
+trial <- result %>%
+  dplyr::select(country, quarter_measurement, weight, b_value, Love_ING, desirability_value, price_perception_value,
+                easy_value, smart_value, meets_needs_value, reptrak1_value, reptrak2_value, reptrak3_value, reptrak4_value,
+                reptrak5_value, reptrak6_value, reptrak7_value, reptrak8_value, reptrak9_value, reptrak10_value,
+                reptrak11_value) %>%
+  dplyr::filter(quarter_measurement == max(quarter_measurement)) %>%
+  dplyr::filter(country==1 & b_value<6 & !is.na(reptrak1_value) & !is.na(reptrak11_value) & !is.na(desirability_value)) %>%
+  dplyr::mutate(
+   reptrak1 = (reptrak1_value * weight)/7 *100,
+   reptrak2 = (reptrak2_value * weight)/7 *100,
+   reptrak3 = (reptrak3_value * weight)/7 *100,
+   reptrak4 = (reptrak4_value * weight)/7 *100,
+   reptrak5 = (reptrak5_value * weight)/7 *100,
+   reptrak6 = (reptrak6_value * weight)/7 *100,
+   reptrak7 = (reptrak7_value * weight)/7 *100,
+   reptrak8 = (reptrak8_value * weight)/7 *100,
+   reptrak9 = (reptrak9_value * weight)/7 *100,
+   reptrak10 = (reptrak10_value * weight)/7 *100,
+   reptrak11 = (reptrak11_value * weight)/7 *100
+  ) %>%
+  dplyr::select(reptrak1, reptrak2, reptrak3, reptrak4, reptrak5, reptrak6, reptrak7, reptrak8, reptrak9,
+                reptrak10, reptrak11, Love_ING, desirability_value, price_perception_value, easy_value, smart_value,
+                meets_needs_value) %>%
+  dplyr::mutate(
+    pulse = reptrak1 + reptrak2 + reptrak3 + reptrak4
+  ) %>%
+   dplyr::select(pulse, reptrak5, reptrak6, reptrak7, reptrak8, reptrak9, reptrak10, reptrak11, Love_ING, 
+                 desirability_value, price_perception_value, easy_value, smart_value, meets_needs_value)
+
+trialcor <- trial %>%
+  correlate() %>% 
+  fashion() %>%
+  dplyr::select(rowname, pulse) 
+  trialcor$drivers <-trialcor$rowname
+  trialcor$rowname <- NULL
+
+p2 <- plot_ly(
+  type = 'table',
+  columnwidth = c(50, 45),
+  columnorder = c(0, 1),
+  header = list(
+    values = c("<b>Drivers<b>", "<b>correlation pulse<b>"),
+    align = c("left", "right"),
+    line = list(width = 1, color = c("rgb 168, 168, 168")),
+    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)")),
+    font = list(family = "ING me", size = 14, color = "white")
+  ),
+  cells = list(
+    values = rbind(trialcor$drivers, trialcor$pulse),
+    align = c("left", "right"),
+    line = list(color = c("rgb 168, 168, 168"), width = 1),
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
+  ))
+p2
+
+```
+ </div>
+  <div class="col-md-6" markdown="1">
+
+   **Pulse over time**
+ 
+```{r pulse AUS, echo=FALSE, echo=F, eval=T, fig.width=5.2, fig.height=3.5, fig.align='left'}
+
+```
+
  </div> <div class="row">  
 </div>
