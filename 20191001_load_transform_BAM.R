@@ -2111,6 +2111,140 @@ data<- data %>%
     pulse = (rep_trak1 + rep_trak2 + rep_trak3 + rep_trak4) /4
   )
 
+## Reptrak for clients & non clients
+### Reptrak statements
+tempREP110 <- result %>%
+  dplyr::select(Weight, country, quarter_measurement, b_value, reptrak1_value, client_value) %>%
+  dplyr::filter(!is.na(reptrak1_value) & client_value==1) %>%
+  dplyr::filter(reptrak1_value %in% c(1, 2, 3, 4, 5, 6, 7)) %>% 
+  dplyr::mutate(
+    reptrak1_client = reptrak1_value * Weight
+  ) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    reptrak1_client =(mean(reptrak1_client)/7 *100)/ mean(Weight)
+  )
+
+data <- full_join(data, tempREP110, by=c("b_value", "country", "quarter_measurement"))
+rm(tempREP110)
+
+tempREP22 <- result %>%
+  dplyr::select(Weight, country, quarter_measurement, b_value, reptrak2_value, client_value) %>%
+  dplyr::filter(!is.na(reptrak2_value) & client_value==1) %>%
+  dplyr::filter(reptrak2_value %in% c(1, 2, 3, 4, 5, 6, 7)) %>% 
+  dplyr::mutate(
+    reptrak2_client = reptrak2_value * Weight
+  ) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    reptrak2_client =(mean(reptrak2_client)/7 *100) / mean(Weight)
+  )
+
+data <- full_join(data, tempREP22, by=c("b_value", "country", "quarter_measurement"))
+rm(tempREP22)
+
+tempREP23 <- result %>%
+  dplyr::select(Weight, country, quarter_measurement, b_value, reptrak3_value, client_value) %>%
+  dplyr::filter(!is.na(reptrak3_value) & client_value==1) %>%
+  dplyr::filter(reptrak3_value %in% c(1, 2, 3, 4, 5, 6, 7)) %>% 
+  dplyr::mutate(
+    reptrak3_client = reptrak3_value * Weight
+  ) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    reptrak3_client =(mean(reptrak3_client)/7 *100) / mean(Weight)
+  )
+
+data <- full_join(data, tempREP23, by=c("b_value", "country", "quarter_measurement"))
+rm(tempREP23)
+
+tempREP24 <- result %>%
+  dplyr::select(Weight, country, quarter_measurement, b_value, reptrak4_value, client_value) %>%
+  dplyr::filter(!is.na(reptrak4_value) & client_value==1) %>%
+  dplyr::filter(reptrak4_value %in% c(1, 2, 3, 4, 5, 6, 7)) %>% 
+  dplyr::mutate(
+    reptrak4_client = reptrak4_value * Weight
+  ) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    reptrak4_client =(mean(reptrak4_client)/7 *100) / mean(Weight)
+  )
+
+data <- full_join(data, tempREP24, by=c("b_value", "country", "quarter_measurement"))
+rm(tempREP24)
+
+data<- data %>%
+  dplyr::mutate(
+    pulse_clients = (reptrak1_client + reptrak2_client + reptrak3_client + reptrak4_client) /4
+  )
+
+### NON CLIENTS REPTRAK
+### Reptrak statements
+tempREP110 <- result %>%
+  dplyr::select(Weight, country, quarter_measurement, b_value, reptrak1_value, client_value) %>%
+  dplyr::filter(!is.na(reptrak1_value) & client_value==0) %>%
+  dplyr::filter(reptrak1_value %in% c(1, 2, 3, 4, 5, 6, 7)) %>% 
+  dplyr::mutate(
+    reptrak1_non_client = reptrak1_value * Weight
+  ) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    reptrak1_non_client =(mean(reptrak1_non_client)/7 *100)/ mean(Weight)
+  )
+
+data <- full_join(data, tempREP110, by=c("b_value", "country", "quarter_measurement"))
+rm(tempREP110)
+
+tempREP22 <- result %>%
+  dplyr::select(Weight, country, quarter_measurement, b_value, reptrak2_value, client_value) %>%
+  dplyr::filter(!is.na(reptrak2_value) & client_value==0) %>%
+  dplyr::filter(reptrak2_value %in% c(1, 2, 3, 4, 5, 6, 7)) %>% 
+  dplyr::mutate(
+    reptrak2_non_client = reptrak2_value * Weight
+  ) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    reptrak2_non_client =(mean(reptrak2_non_client)/7 *100) / mean(Weight)
+  )
+
+data <- full_join(data, tempREP22, by=c("b_value", "country", "quarter_measurement"))
+rm(tempREP22)
+
+tempREP23 <- result %>%
+  dplyr::select(Weight, country, quarter_measurement, b_value, reptrak3_value, client_value) %>%
+  dplyr::filter(!is.na(reptrak3_value) & client_value==0) %>%
+  dplyr::filter(reptrak3_value %in% c(1, 2, 3, 4, 5, 6, 7)) %>% 
+  dplyr::mutate(
+    reptrak3_non_client = reptrak3_value * Weight
+  ) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    reptrak3_non_client =(mean(reptrak3_non_client)/7 *100) / mean(Weight)
+  )
+
+data <- full_join(data, tempREP23, by=c("b_value", "country", "quarter_measurement"))
+rm(tempREP23)
+
+tempREP24 <- result %>%
+  dplyr::select(Weight, country, quarter_measurement, b_value, reptrak4_value, client_value) %>%
+  dplyr::filter(!is.na(reptrak4_value) & client_value==0) %>%
+  dplyr::filter(reptrak4_value %in% c(1, 2, 3, 4, 5, 6, 7)) %>% 
+  dplyr::mutate(
+    reptrak4_non_client = reptrak4_value * Weight
+  ) %>%
+  dplyr::group_by(b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    reptrak4_non_client =(mean(reptrak4_non_client)/7 *100) / mean(Weight)
+  )
+
+data <- full_join(data, tempREP24, by=c("b_value", "country", "quarter_measurement"))
+rm(tempREP24)
+
+data<- data %>%
+  dplyr::mutate(
+    pulse_non_clients = (reptrak1_non_client + reptrak2_non_client + reptrak3_non_client + reptrak4_non_client) /4
+  )
+
 ### Love overview 
 love_overview <- result %>%
   dplyr::filter(!is.na(love_ING)) %>%
@@ -2170,6 +2304,8 @@ proximity_overview <- result %>%
 
 data <- full_join(data, proximity_overview, by=c("country", "quarter_measurement", "b_value"))
 rm(proximity_overview) 
+
+
 
 ### NPS
 NPS_trial <- result %>%
