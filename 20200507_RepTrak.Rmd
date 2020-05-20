@@ -7,13 +7,118 @@ output: ingmarkdowntemplates::ing_html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# to run: open data1, test & result of new data BAM
 ```
 
-## Reputation
+## Summary
 
 This dashboard shows reputation scores in line with what The Reputation Institure used to report for ING. Altough the same methodology is applied, it is not possible to reproduce the (pulse) scores exactly because of unknown cultural correction. The aim is to provide insights in ING's reputation, within the context of the (other) brand metrics. 
 
 <br>
+
+<div class="row">
+  <div class="col-md-6" markdown="1">
+
+  **Overview countries**
+  
+```{r overview pulse , echo=F, eval=T, fig.align='left', fig.width=5.5, fig.height=4, message=F, warning=FALSE}
+
+rep <- test %>%
+  dplyr::select(quarter_measurement, country, b_value, pulse, `RepTrak® Pulse`) %>%
+  dplyr::filter(quarter_measurement > 16 & b_value==1) %>%
+  dplyr::mutate(pulse = case_when(
+    country ==14 & quarter_measurement==19 ~ pulse /1.603,
+    TRUE ~ pulse
+  )) 
+
+c <- c("Australia", "Austria", "Belgium", "Czech", "France", "Germany", "Italy", "Luxembourg", 
+       "Netherlands", "Poland", "Romania", "Spain", "Turkey", "The Philippines")
+r <- plot_ly(
+  type = 'table',
+  columnwidth = c(40, 20, 20, 20),
+  columnorder = c(0, 1, 2, 3),
+  header = list(
+     values = c("<b>country<b>","<b>Q3 2019<b>", "<b>Q4 2019<b>", "<b>Q1 2020<b>"),
+    align = c("left", "right", "right", "right", "right"),
+    line = list(width = 1, color = c("rgb 168, 168, 168")),
+    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
+    font = list(family = "ING me", size = 14, color = "white")
+  ),
+  cells = list(
+    values = rbind(c, round(rep$pulse[rep$quarter_measurement==19], digits=2),
+                   round(rep$pulse[rep$quarter_measurement==20], digits=2), 
+                   round(rep$pulse[rep$quarter_measurement==21], digits=2)),
+    align = c("left", "right", "right", "right", "right"),
+    line = list(color = c("rgb 168, 168, 168"), width = 1),
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
+  ))
+r
+
+```
+</div>
+  <div class="col-md-6" markdown="1">
+  
+  **ING vs delta market average**
+  
+```{r overview ma, echo=F, eval=T, fig.align='left', fig.width=5.5, fig.height=4, message=F, warning=FALSE}
+
+quickfact <- test %>%
+  dplyr::select(label, country, labels_countries, quarter_measurement, labels_quarters, pulse, b_value, main_competition) %>%
+  dplyr::filter(quarter_measurement ==21 & main_competition ==1) %>%
+   dplyr::group_by(quarter_measurement, country) %>%
+  dplyr::mutate(
+    #pulse = round(pulse, digits=2),
+    MA_pulse = mean(round(pulse, digits=2)),
+    best_pulse = max(round(pulse, digits=2)),
+    ING_pulse = case_when(
+      b_value ==1 ~ round(pulse, digits=2),
+      TRUE ~ NA_real_),
+  ) %>%
+  dplyr::ungroup()
+
+quickfact <- quickfact %>%
+  dplyr::mutate(
+    gap = ING_pulse - MA_pulse
+  )
+
+xaxis <- list(title = "delta ING - MA", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              #range =c(20,80),
+              #dtick = 10,
+              showline = TRUE,
+              showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "pulse ING",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(50,100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+gapplot <- quickfact %>%
+  plot_ly(x = ~gap, y = ~ING_pulse, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~labels_countries, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(title = '',
+         xaxis = xaxis,
+         yaxis = yaxis)
+gapplot
+
+```
+ </div>
+</div>
 
 
 ##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/aus.png) Australia
@@ -538,7 +643,7 @@ figAUS
   
    **Model results  with pulse ING**
    
-```{r MODAUS, echo=FALSE, echo=F, eval=T, fig.width=5.5, fig.align='left', fig.height=4, warning=F, message=F}
+```{r MODAUS, echo=FALSE, echo=F, eval=T, fig.width=5.5, fig.align='left', fig.height=3, warning=F, message=F}
 trial <- result %>%
   dplyr::select(country, quarter_measurement, weight, b_value, Love_ING, desirability_value, price_perception_value,
                 easy_value, smart_value, meets_needs_value, reptrak1_value, reptrak2_value, reptrak3_value, reptrak4_value,
@@ -583,7 +688,17 @@ test.data <- trial[-training.samples, ]
 model1 <- lm(pulse ~ products + innovation + workplace + governance + citizenship + leadership + performance, 
              data = train.data)
 sum <- summary(model1)
+sum <- sum$coefficients
 
+colnames(sum) <- c("estimate", "std. error", "t value", "p")
+sum <- as.tibble(sum)
+sum$drivers <- c("intercept", "products", "innovation", "workplace", "governance", "citizenship", "leadership", "performance")
+
+sum <- sum %>%
+  dplyr::mutate(highl = ifelse(
+    p <= 0.05, "rgb(204, 204, 204)",
+    "white"
+  ))
 
 # Make predictions
 predictions <- model1 %>% 
@@ -595,9 +710,14 @@ model_performance <- data.frame(
   R2 = R2(predictions, test.data$pulse)
 )
 
-
 # running multi collinearity checks, above >8 remove from model
 mult <- car::vif(model1)
+#mult
+#   products  innovation   workplace  governance citizenship  leadership performance 
+#   8.279496    5.504705    6.318372    7.522369    5.099801    7.331810    7.813686 
+
+# VIF score >4 indicates multi collinearity. The way to deal is leave out these factors. As all are too high,
+# lets start with the highest. When the model is rebuilt, it hardly impacts the high model performance. A model without products, performance and governance performs as well. 
 
 # other option to check multu collinearity
 #imcdiag(x= trial[,9:21], y=trial$pulse)
@@ -616,30 +736,26 @@ p2 <- plot_ly(
     font = list(family = "ING me", size = 14, color = "white")
   ),
   cells = list(
-    values = rbind(driv, round(sum$coefficients[,1], digits = 4), round(sum$coefficients[,2], digits=4),
-                   round(sum$coefficients[,3], digits=4), round(sum$coefficients[,4], digits=4)),
+    values = rbind(driv, round(sum$estimate, digits = 4), round(sum$`std. error`, digits=4),
+                   round(sum$`t value`, digits=4), round(sum$p, digits=4)),
     align = c("left", "right", "right", "right", "right"),
     line = list(color = c("rgb 168, 168, 168"), width = 1),
-    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105")),
+    fill = list(color = list(sum$highl))
   ))
 p2
-
-
-
-
-fit <- lm(pulse ~ products , 
-             data = train.data)
-
-
-
-
 ```
  </div>
   <div class="col-md-6" markdown="1">
 
    **Plot model**
+   
  
-```{r PL AUS, echo=FALSE, echo=F, eval=T, fig.width=5.0, fig.height=3.5, fig.align='left', warning=F}
+```{r PL AUS, echo=FALSE, echo=F, eval=T, fig.width=5.0, fig.height=3, fig.align='left', warning=F}
+
+fit <- lm(pulse ~ products , 
+             data = train.data)
+
 xaxis <- list(title = "", 
               titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
               #range =c(0,155),
@@ -674,6 +790,741 @@ plot <- train.data %>%
          legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
 plot
 ```
+  </div>  <div class="row">
+</div> 
+  
+
+  <div class="col-md-12" markdown="1">
+  <br>
+
+### **Model results**
+
+
+**Methodology and analysis** 
+  
+  In order to find what to prioritize to improve ING's reputation (pulse) a linear regression analysis is performed. 
+  In the first step, correlations with pulse are checked. The table shows very strong correlation scores between the seven  
+  drivers and pulse. The density plot provides an overview of the majority of the ING scores. The top of the plot shows the
+  mean. 
+  <br>
+
+**Model performance and results**
+
+  The high correlation between the different drivers (to be tested) might be a problem to interpret the results. A VIF score >4
+  indicates multi collinearity.
+  <br>
+
+  products	      8.279.496 <br>
+  innovation	    5.504.705 <br>
+  workplace       6.318.372 <br>
+  governance	    7.522.369 <br>
+  citizenship	    5.099.801 <br>
+  leadership	    7.331.810 <br>
+  performance	    7.813.686 <br>
+
+  The way to deal is leave out these factors. As all are too high, lets start with the highest. When the model is rebuilt, it
+  hardly impacts the high model performance. A model without products, performance and governance performs as well. 
+  
+  As the RI uses all (potential) drivers in the model, this full model is reported. Rsquared is 0.94. This means that 94% of
+  the variance of pulse can be explained based on the model. This is also visible in the plot, where the actual pulse score is
+  very close to the predicted score. 
+
+  The model results show that ING should focus on: products, workplace, governance, citizenship and performance to improve the
+  reputation score. 
+
+
+ 
+ </div> <div class="row">
+</div></div></div></div></div>
+
+
+##  ![](/Users/xo21bm/Documents/Lokaal/BAM2/exploration/notebooks/aut.png) Austria
+
+### **Overview**
+<div class="row">
+  <div class="col-md-6" markdown="1">
+  
+  
+   **Drivers ING vs competition**
+
+```{r quickAUT, echo=FALSE, echo=F, eval=T, fig.width=5.8, fig.align='left', fig.height=4.0}
+quickfact <- test %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, pulse, rep_trak1, rep_trak2, rep_trak3, rep_trak4,
+                rep_trak5, rep_trak6, rep_trak7, rep_trak8, rep_trak9, rep_trak10, rep_trak11, b_value) %>%
+  dplyr::filter(country==2 & quarter_measurement==21 & b_value<6) %>%
+  dplyr::mutate(
+    pulse = round(pulse, digits=2),
+    products  = round(rep_trak5, digits=2),
+    innovation = round(rep_trak6, digits=2),
+    workplace = round(rep_trak7, digits=2),
+    governance = round(rep_trak8, digits=2),
+    citizenship = round(rep_trak9, digits=2),
+    leadership = round(rep_trak10, digits=2),
+    performance = round(rep_trak11, digits=2),
+  )
+
+quickfact <- quickfact[,-c(6:16)]
+
+# transform quickfact to create the plot
+quickfactt <- as.data.frame(t(quickfact))
+row.names(quickfactt) <- NULL
+colnames(quickfactt) = as.character(unlist(quickfactt[1,]))
+quickfactt <- quickfactt[-c(1:6),]
+
+quickfactt$ING <- as.numeric(as.character(quickfactt$ING))
+quickfactt$Raiffeisen <- as.numeric(as.character(quickfactt$Raiffeisen))
+quickfactt$`Erste Bank` <- as.numeric(as.character(quickfactt$`Erste Bank`))
+quickfactt$UniCredit <- as.numeric(as.character(quickfactt$UniCredit))
+quickfactt$Volksbankensektor <- as.numeric(as.character(quickfactt$Volksbankensektor))
+
+quickfactt$Drivers <- c("Products", "Innovation", "Workplace", "Governance", "Citizenship", "Leadership", "Performance")
+
+xaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              #ticklen = 5,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+yaxis <- list(title = "",
+              titlefont = list(family = "ING me",
+                               size = 12,
+                               color = 'rgb(105, 105, 105)'),
+              showline = TRUE,
+              showgrid = FALSE,
+              range =c(0,100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = TRUE,
+              #dtick = 50.000,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+
+p1 <- plot_ly(x = quickfactt$Drivers, y=~quickfactt$ING, 
+               name ='ING', type='bar', marker = list(color = 'rgb(255,098,000)', width = 4)) %>%
+  add_trace(y = ~quickfactt$Raiffeisen , 
+            name = 'Raiffeisen', marker = list(color = 'rgb(96,166,218)', width = 4)) %>%
+  add_trace(y = ~quickfactt$`Erste Bank`, 
+            name = 'Erste Bank', marker = list(color = 'rgb(171,0,102)', width = 4)) %>%
+  add_trace(y = ~quickfactt$UniCredit, 
+            name = 'UniCredit', marker = list(color = 'rgb(208,217,60)', width = 4)) %>%
+  add_trace(y = ~quickfactt$Volksbankensektor, 
+            name = 'Volksbankensektor', marker = list(color = 'rgb(52,150,81)', width = 4)) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'group', title= "",
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+p1
+
+
+#quickfactt <- as.data.frame(t(quickfact))
+#row.names(quickfactt) <- NULL
+#colnames(quickfactt) = as.character(unlist(quickfactt[1,]))
+#quickfactt <- quickfactt[-c(1:9, 17),]
+
+#quickfactt$ING <- as.numeric(as.character(quickfactt$ING))
+#quickfactt$ANZ <- as.numeric(as.character(quickfactt$ANZ))
+#quickfactt$Commonwealth <- as.numeric(as.character(quickfactt$Commonwealth))
+#quickfactt$NAB <- as.numeric(as.character(quickfactt$NAB))
+#quickfactt$Westpac <- as.numeric(as.character(quickfactt$Westpac))
+
+#quickfactt$Drivers <- c("Products", "Innovation", "Workplace", "Governance", "Citizenship", "Leadership", "Performance")
+
+#p <- plot_ly(
+#  type = 'table',
+#  columnwidth = c(50, 45, 45, 45, 45, 45),
+#  columnorder = c(0, 1, 2, 3, 4, 5),
+#  header = list(
+#    values = c("<b>Drivers<b>", "<b>ING<b>", "<b>ANZ<b>", "<b>NAB<b>","<b>Commonwealth<b>", "<b>Westpac<b>"),
+#    align = c("left", "right", "right", "right", "right", "right"),
+#    line = list(width = 1, color = c("rgb 168, 168, 168")),
+#    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)",
+#                          "rgb(255,098,000)")),
+#    font = list(family = "ING me", size = 12, color = "white")
+#  ),
+#  cells = list(
+#    values = rbind(quickfactt$Drivers, quickfactt$ING, quickfactt$ANZ, quickfactt$NAB, 
+#                   quickfactt$Commonwealth, quickfactt$Westpac),
+#    align = c("left", "right", "right", "right", "right", "right"),
+#    line = list(color = c("rgb 168, 168, 168"), width = 1),
+#    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
+#  ))
+```
+
+
+ </div>
+  <div class="col-md-6" markdown="1">
+
+   **Pulse over time**
+ 
+```{r pulse AUT, echo=FALSE, echo=F, eval=T, fig.width=5.5, fig.height=4, fig.align='left'}
+quickfact <- test %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, pulse, rep_trak1, rep_trak2, rep_trak3, rep_trak4,
+                rep_trak5, rep_trak6, rep_trak7, rep_trak8, rep_trak9, rep_trak10, rep_trak11, b_value) %>%
+  dplyr::filter(country==2 & quarter_measurement>16 & b_value<6) %>%
+  dplyr::mutate(
+    pulse = round(pulse, digits=2),
+    products  = round(rep_trak5, digits=2),
+    innovation = round(rep_trak6, digits=2),
+    workplace = round(rep_trak7, digits=2),
+    governance = round(rep_trak8, digits=2),
+    citizenship = round(rep_trak9, digits=2),
+    leadership = round(rep_trak10, digits=2),
+    performance = round(rep_trak11, digits=2),
+  )
+xaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = FALSE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              #ticklen = 5,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "",
+              titlefont = list(family = "ING me",
+                               size = 12,
+                               color = 'rgb(105, 105, 105)'),
+              showline = TRUE,
+              showgrid = FALSE,
+              range =c(0,100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = TRUE,
+              #dtick = 50.000,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+p1 <- plot_ly(x = unique(quickfact$labels_quarters)) %>%
+  add_lines(y = ~quickfact$pulse[quickfact$label=="ING"], name = 'ING', type='scatter', 
+            line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y = ~quickfact$pulse[quickfact$label=="Raiffeisen"], name = 'Raiffeisen', type='scatter', 
+            line = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y = ~quickfact$pulse[quickfact$label=="Erste Bank"], name = 'Erste Bank', type='scatter', 
+            line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y = ~quickfact$pulse[quickfact$label=="UniCredit"], name = 'UniCredit', type='scatter', 
+            line = list(color = 'rgb(208,217,60)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y = ~quickfact$pulse[quickfact$label=="Volksbankensektor"], name = 'Volksbankensektor', type='scatter', 
+            line = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'group', title= "",
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+
+p1
+
+```
+
+ </div> <div class="row">  
+</div>
+
+### **Clients and non clients**
+
+<div class="row">
+  <div class="col-md-6" markdown="1">
+
+   **Drivers **
+```{r split1AUT, echo=FALSE, echo=F, eval=T, fig.width=5.8, fig.align='left', fig.height=4}
+split <- data1 %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, rep_trak1, rep_trak2, rep_trak3, rep_trak4, pulse, 
+  rep_trak5, rep_trak6, rep_trak7, rep_trak8, rep_trak9, rep_trak10, rep_trak11, reptrak1_client, reptrak2_client,
+  reptrak3_client, reptrak4_client, pulse_clients, reptrak5_client, reptrak6_client, reptrak7_client, reptrak8_client, 
+  reptrak9_client, reptrak10_client, reptrak11_client, reptrak1_non_client, reptrak2_non_client, reptrak3_non_client,
+  reptrak4_non_client, pulse_non_clients, reptrak5_non_client, reptrak6_non_client, reptrak7_non_client, reptrak8_non_client,
+  reptrak9_non_client, reptrak10_non_client, reptrak11_non_client, b_value) %>%
+  dplyr::filter(country==2 & quarter_measurement==21 & b_value==1) %>%
+  dplyr::mutate(
+    pulse = round(pulse, digits=2),
+    rep_trak1 = round(rep_trak1, digits=2),
+    rep_trak2 = round(rep_trak2, digits=2),
+    rep_trak3 = round(rep_trak3, digits=2),
+    rep_trak4 = round(rep_trak4, digits=2),
+    rep_trak5 = round(rep_trak5, digits=2),
+    rep_trak6 = round(rep_trak6, digits=2),
+    rep_trak7 = round(rep_trak7, digits=2),
+    rep_trak8 = round(rep_trak8, digits=2),
+    rep_trak9 = round(rep_trak9, digits=2),
+    rep_trak10 = round(rep_trak10, digits=2),
+    rep_trak11 = round(rep_trak11, digits=2),
+    pulse_clients = round(pulse_clients, digits=2),
+    reptrak1_client = round(reptrak1_client, digits=2),
+    reptrak2_client = round(reptrak2_client, digits=2),
+    reptrak3_client = round(reptrak3_client, digits=2),
+    reptrak4_client = round(reptrak4_client, digits=2),
+    reptrak5_client = round(reptrak5_client, digits=2),
+    reptrak6_client = round(reptrak6_client, digits=2),
+    reptrak7_client = round(reptrak7_client, digits=2),
+    reptrak8_client = round(reptrak8_client, digits=2),
+    reptrak9_client = round(reptrak9_client, digits=2),
+    reptrak10_client = round(reptrak10_client, digits=2),
+    reptrak11_client = round(reptrak11_client, digits=2),
+    pulse_non_clients = round(pulse_non_clients, digits=2),
+    reptrak1_non_client = round(reptrak1_non_client, digits=2),
+    reptrak2_non_client = round(reptrak2_non_client, digits=2),
+    reptrak3_non_client = round(reptrak3_non_client, digits=2),
+    reptrak4_non_client = round(reptrak4_non_client, digits=2),
+    reptrak5_non_client = round(reptrak5_non_client, digits=2),
+    reptrak6_non_client = round(reptrak6_non_client, digits=2),
+    reptrak7_non_client = round(reptrak7_non_client, digits=2),
+    reptrak8_non_client = round(reptrak8_non_client, digits=2),
+    reptrak9_non_client = round(reptrak9_non_client, digits=2),
+    reptrak10_non_client = round(reptrak10_non_client, digits=2),
+    reptrak11_non_client = round(reptrak11_non_client, digits=2)
+  )
+
+splitINGdrivers <- split %>%
+  dplyr::select(pulse, rep_trak5, rep_trak6, rep_trak7, rep_trak8, rep_trak9, rep_trak10, rep_trak11) 
+
+splitINGdrivers <- as.data.frame(t(splitINGdrivers))
+row.names(splitINGdrivers) <- NULL
+splitINGdrivers$drivers <-c("Pulse", "Products", "Innovation", "Workplace", "Governance", "Citizenship", "Leadership", "Performance")
+splitINGdrivers$general_pop <- as.numeric(as.character(splitINGdrivers$V1))
+
+splitINGdrivers2 <- split %>%
+  dplyr::select(pulse_clients, reptrak5_client,reptrak6_client, reptrak7_client, reptrak8_client, reptrak9_client,
+                reptrak10_client, reptrak11_client) 
+
+splitINGdrivers2 <- as.data.frame(t(splitINGdrivers2))
+row.names(splitINGdrivers2) <- NULL
+splitINGdrivers2$drivers <-c("Pulse", "Products", "Innovation", "Workplace", "Governance", "Citizenship", "Leadership", "Performance")
+splitINGdrivers2$clients <- as.numeric(as.character(splitINGdrivers2$V1))
+
+splitINGdrivers3 <- split %>%
+  dplyr::select(pulse_non_clients, reptrak5_non_client, reptrak6_non_client, reptrak7_non_client, reptrak8_non_client,
+                reptrak9_non_client, reptrak10_non_client, reptrak11_non_client) 
+
+splitINGdrivers3 <- as.data.frame(t(splitINGdrivers3))
+row.names(splitINGdrivers3) <- NULL
+splitINGdrivers3$drivers <-c("Pulse", "Products", "Innovation", "Workplace", "Governance", "Citizenship", "Leadership", "Performance")
+splitINGdrivers3$non_clients <- as.numeric(as.character(splitINGdrivers3$V1))
+
+split <- cbind(splitINGdrivers, splitINGdrivers2, splitINGdrivers3)
+split$V1 <- NULL
+split$V1 <- NULL
+split$V1 <- NULL
+split$drivers <- NULL
+split$drivers <- NULL
+
+split <- split %>%
+  dplyr::select(drivers, general_pop, clients, non_clients)
+
+split <- split[-1,]
+
+#p <- plot_ly(
+#  type = 'table',
+#  columnwidth = c(50, 45, 45, 45),
+#  columnorder = c(0, 1, 2, 3),
+#  header = list(
+#    values = c("<b>Drivers<b>", "<b>general pop<b>", "<b>clients<b>", "<b>non clients<b>"),
+#    align = c("left", "right", "right", "right", "right"),
+#    line = list(width = 1, color = c("rgb 168, 168, 168")),
+#    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)")),
+#    font = list(family = "ING me", size = 14, color = "white")
+#  ),
+#  cells = list(
+#    values = rbind(split$drivers, split$general_pop, split$clients, split$non_clients),
+#   align = c("left", "right", "right", "right"),
+#    line = list(color = c("rgb 168, 168, 168"), width = 1),
+#    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
+#  ))
+#p
+xaxis <- list(title = "",
+              showline = TRUE,
+              showgrid = FALSE,
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = TRUE,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 2,
+              #ticklen = 5,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "",
+              titlefont = list(family = "ING me",
+                               size = 12,
+                               color = 'rgb(105, 105, 105)'),
+              showline = TRUE,
+              showgrid = FALSE,
+              range =c(0,100),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = TRUE,
+              #dtick = 50.000,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+
+p1 <- plot_ly(x = split$drivers, y=~split$clients, 
+               name ='clients', type='bar', marker = list(color = 'rgb(255,098,000)', width = 4)) %>%
+  add_trace(y = ~split$general_pop, 
+            name = 'general pop', marker = list(color = 'rgb(96,166,218)', width = 4)) %>%
+  add_trace(y = ~split$non_clients, 
+            name = 'non clients', marker = list(color = 'rgb(171,0,102)', width = 4)) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'group', title= "",
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+p1
+```
+
+ </div>
+  <div class="col-md-6" markdown="1">
+
+   **Pulse over time**
+ 
+```{r split AUT, echo=FALSE, echo=F, eval=T, fig.width=5.2, fig.height=3.5, fig.align='left'}
+
+split <- test %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, pulse, 
+  pulse_clients, pulse_non_clients, b_value) %>%
+  dplyr::filter(country==2 & quarter_measurement>16 & b_value==1) %>%
+  dplyr::mutate(
+    pulse = round(pulse, digits=2),
+    pulse_clients = round(pulse_clients, digits=2),
+    pulse_non_clients = round(pulse_non_clients, digits=2),
+  )
+
+p1 <- plot_ly(x = ~split$labels_quarters) %>%
+  add_lines(y = ~split$pulse, name = 'population', type='scatter', 
+            line = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y = ~split$pulse_clients, name = 'clients', type='scatter', 
+            line = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  add_lines(y = ~split$pulse_non_clients, name = 'non clients', type='scatter', 
+            line = list(color = 'rgb(171,0,102)', type='scatter', width = 4, mode = 'lines+markers')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'group', title= "",
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+
+p1
+
+
+
+```
+ </div> <div class="row">  
+</div>
+
+### **Relations with pulse **
+  
+<div class="row">
+  <div class="col-md-6" markdown="1">
+  
+  
+   **Correlations with pulse ING**
+   
+```{r CORAUT, echo=FALSE, echo=F, eval=T, fig.width=5.5, fig.align='left', fig.height=4, warning=F, message=F}
+
+trial <- result %>%
+  dplyr::select(country, quarter_measurement, weight, b_value, Love_ING, desirability_value, price_perception_value,
+                easy_value, smart_value, meets_needs_value, reptrak1_value, reptrak2_value, reptrak3_value, reptrak4_value,
+                reptrak5_value, reptrak6_value, reptrak7_value, reptrak8_value, reptrak9_value, reptrak10_value,
+                reptrak11_value) %>%
+  dplyr::filter(quarter_measurement == max(quarter_measurement)) %>%
+  dplyr::filter(country==2 & b_value==1 & !is.na(reptrak1_value)) %>%
+  dplyr::mutate(
+   reptrak1 = (reptrak1_value * weight)/7 *100,
+   reptrak2 = (reptrak2_value * weight)/7 *100,
+   reptrak3 = (reptrak3_value * weight)/7 *100,
+   reptrak4 = (reptrak4_value * weight)/7 *100,
+   products = (reptrak5_value * weight)/7 *100,
+   innovation = (reptrak6_value * weight)/7 *100,
+   workplace = (reptrak7_value * weight)/7 *100,
+   governance = (reptrak8_value * weight)/7 *100,
+   citizenship = (reptrak9_value * weight)/7 *100,
+   leadership = (reptrak10_value * weight)/7 *100,
+   performance = (reptrak11_value * weight)/7 *100
+  ) %>%
+  dplyr::select(country, quarter_measurement, weight, b_value, reptrak1, reptrak2, reptrak3, reptrak4, products, innovation,
+                workplace, governance, citizenship, leadership, performance, Love_ING, desirability_value,
+                price_perception_value, easy_value, smart_value, meets_needs_value) %>%
+  dplyr::mutate(
+    pulse = (reptrak1 + reptrak2 + reptrak3 + reptrak4)/4
+  )
+
+trial1 <- trial %>%
+  dplyr::select(pulse, products, innovation,
+                workplace, governance, citizenship, leadership, performance, Love_ING, desirability_value,
+                price_perception_value, easy_value, smart_value, meets_needs_value)
+
+trialcor <- trial1 %>%
+  correlate() %>% 
+  fashion() %>%
+  dplyr::select(rowname, pulse) 
+  trialcor$drivers <-trialcor$rowname
+  trialcor$rowname <- NULL
+  trialcor <- trialcor[-1,]
+
+p2 <- plot_ly(
+  type = 'table',
+  columnwidth = c(50, 45),
+  columnorder = c(0, 1),
+  header = list(
+    values = c("<b>Drivers<b>", "<b>correlation pulse<b>"),
+    align = c("left", "right"),
+    line = list(width = 1, color = c("rgb 168, 168, 168")),
+    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)")),
+    font = list(family = "ING me", size = 14, color = "white")
+  ),
+  cells = list(
+    values = rbind(trialcor$drivers, trialcor$pulse),
+    align = c("left", "right"),
+    line = list(color = c("rgb 168, 168, 168"), width = 1),
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105"))
+  ))
+p2
+
+```
+ </div>
+  <div class="col-md-6" markdown="1">
+
+   **Density plot pulse ING**
+ 
+```{r den AUT, echo=FALSE, echo=F, eval=T, fig.width=5.2, fig.height=3.5, fig.align='left', warning=F}
+
+den_AUS <-density(trial$pulse[trial$b_value==1], na.rm=T)
+xaxis <- list(title = "pulse", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              range =c(0,155),
+              #dtick = 10,
+              #showline = TRUE,
+              #showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "Density",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              #range =c(0,150),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = TRUE,
+              #dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+figAUS <- plot_ly(
+  x = ~den_AUS$x, y = ~den_AUS$y, type = 'scatter', mode = 'lines', fill = 'tozeroy',
+  color ='rgb(255,098,000)') %>% layout(xaxis = xaxis,                                                                                yaxis = yaxis)
+figAUS
+
+```
+
+ </div> <div class="row">  
+</div>
+
+
+### **Reputation model and conclusions **
+  
+<div class="row">
+  <div class="col-md-6" markdown="1">
+  
+  
+   **Model results  with pulse ING**
+   
+```{r MODAUT, echo=FALSE, echo=F, eval=T, fig.width=5.5, fig.align='left', fig.height=3, warning=F, message=F}
+trial <- result %>%
+  dplyr::select(country, quarter_measurement, weight, b_value, Love_ING, desirability_value, price_perception_value,
+                easy_value, smart_value, meets_needs_value, reptrak1_value, reptrak2_value, reptrak3_value, reptrak4_value,
+                reptrak5_value, reptrak6_value, reptrak7_value, reptrak8_value, reptrak9_value, reptrak10_value,
+                reptrak11_value) %>%
+  dplyr::filter(quarter_measurement == max(quarter_measurement)) %>%
+  dplyr::filter(country==2 & b_value==1 & !is.na(reptrak1_value)) %>%
+  dplyr::mutate(
+   reptrak1 = (reptrak1_value * weight)/7 *100,
+   reptrak2 = (reptrak2_value * weight)/7 *100,
+   reptrak3 = (reptrak3_value * weight)/7 *100,
+   reptrak4 = (reptrak4_value * weight)/7 *100,
+   products = (reptrak5_value * weight)/7 *100,
+   innovation = (reptrak6_value * weight)/7 *100,
+   workplace = (reptrak7_value * weight)/7 *100,
+   governance = (reptrak8_value * weight)/7 *100,
+   citizenship = (reptrak9_value * weight)/7 *100,
+   leadership = (reptrak10_value * weight)/7 *100,
+   performance = (reptrak11_value * weight)/7 *100
+  ) %>%
+  dplyr::select(country, quarter_measurement, weight, b_value, reptrak1, reptrak2, reptrak3, reptrak4, products, innovation,
+                workplace, governance, citizenship, leadership, performance, Love_ING, desirability_value,
+                price_perception_value, easy_value, smart_value, meets_needs_value) %>%
+  dplyr::mutate(
+    pulse = (reptrak1 + reptrak2 + reptrak3 + reptrak4)/4
+  )
+
+trial <- trial %>%
+  dplyr::filter(!is.na(pulse), !is.na(products), !is.na(innovation), !is.na(workplace), !is.na(governance), !is.na(citizenship),
+                !is.na(leadership), !is.na(performance))
+  
+# Model prep-> split the dataset 
+set.seed(123)
+training.samples <- trial$pulse %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train.data  <- trial[training.samples, ]
+test.data <- trial[-training.samples, ]
+
+#table(is.na(train.data$pulse))
+
+# Build the model
+model1 <- lm(pulse ~ products + innovation + workplace + governance + citizenship + leadership + performance, 
+             data = train.data)
+sum <- summary(model1)
+sum <- sum$coefficients
+
+colnames(sum) <- c("estimate", "std. error", "t value", "p")
+sum <- as.tibble(sum)
+sum$drivers <- c("intercept", "products", "innovation", "workplace", "governance", "citizenship", "leadership", "performance")
+
+sum <- sum %>%
+  dplyr::mutate(highl = ifelse(
+    p <= 0.05, "rgb(204, 204, 204)",
+    "white"
+  ))
+
+# Make predictions
+predictions <- model1 %>% 
+  predict.lm(test.data) 
+
+# Model performance
+model_performance <- data.frame(
+  RMSE = RMSE(predictions, test.data$pulse),
+  R2 = R2(predictions, test.data$pulse)
+)
+
+# running multi collinearity checks, above >8 remove from model
+mult <- car::vif(model1)
+#mult
+#   products  innovation   workplace  governance citizenship  leadership performance 
+#   8.279496    5.504705    6.318372    7.522369    5.099801    7.331810    7.813686 
+
+# VIF score >4 indicates multi collinearity. The way to deal is leave out these factors. As all are too high,
+# lets start with the highest. When the model is rebuilt, it hardly impacts the high model performance. A model without products, performance and governance performs as well. 
+
+# other option to check multu collinearity
+#imcdiag(x= trial[,9:21], y=trial$pulse)
+
+driv <-c("intercept", "products", "innovation", "workplace", "governance", "citizenship", "leadership", "performance")
+
+p2 <- plot_ly(
+  type = 'table',
+  columnwidth = c(50, 45, 45, 45, 45),
+  columnorder = c(0, 1, 2, 3, 4),
+  header = list(
+    values = c("<b>Drivers<b>", "<b>Estimate<b>", "<b>Std Error<b>", "<b>t value<b>", "<b>P<b>"),
+    align = c("left", "right", "right", "right", "right"),
+    line = list(width = 1, color = c("rgb 168, 168, 168")),
+    fill = list(color = c("rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)", "rgb(255,098,000)" )),
+    font = list(family = "ING me", size = 14, color = "white")
+  ),
+  cells = list(
+    values = rbind(driv, round(sum$estimate, digits = 4), round(sum$`std. error`, digits=4),
+                   round(sum$`t value`, digits=4), round(sum$p, digits=4)),
+    align = c("left", "right", "right", "right", "right"),
+    line = list(color = c("rgb 168, 168, 168"), width = 1),
+    font = list(family = "ING me", size = 12, color = c("rgb 105, 105, 105")),
+    fill = list(color = list(sum$highl))
+  ))
+p2
+```
+ </div>
+  <div class="col-md-6" markdown="1">
+
+   **Plot model**
+ 
+```{r PL AUT, echo=FALSE, echo=F, eval=T, fig.width=5.0, fig.height=3, fig.align='left', warning=F}
+
+fit <- lm(pulse ~ products , 
+             data = train.data)
+
+xaxis <- list(title = "", 
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              #range =c(0,155),
+              #dtick = 10,
+              #showline = TRUE,
+              #showgrid = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+yaxis <- list(title = "pulse",
+              titlefont = list(color = 'rgb(105, 105, 105)', size = 12, family = "ING me"),
+              #range =c(0,150),
+              showticklabels = TRUE,
+              linecolor = 'rgb(204, 204, 204)',
+              linewidth = 2,
+              autotick = TRUE,
+              #dtick = 5,
+              ticks = 'inside',
+              tickcolor = 'rgb(204, 204, 204)',
+              tickwidth = 1,
+              #ticklen = 1,
+              tickfont = list(family = "ING me",
+                              size = 12,
+                              color = 'rgb(105, 105, 105)'))
+plot <- train.data %>% 
+  plot_ly(x = ~products) %>% 
+  add_markers(y = ~pulse, type = 'scatter', mode = 'lines', color ='rgb(255,098,000)', name= 'actual pulse') %>% 
+  add_lines(x = ~products, y = fitted(fit), name= 'predicted') %>% 
+  layout(xaxis = xaxis, yaxis = yaxis,
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+plot
+```
+
+ </div> <div class="row">  
+</div>
+
+### **Model results**
+
+<div class="row">
+  <div class="col-md-12" markdown="1">
+
+**Methodology and analysis** 
+  
+  In order to find what to prioritize to improve ING's reputation (pulse) a linear regression analysis is performed. 
+In the first step, correlations with pulse are checked. The table shows very strong correlation scores between the seven drivers and pulse. The density plot provides an overview of the majority of the ING scores. The top of the plot shows the mean. 
+<br>
+
+**Model performance and results**
+
+
 
  </div> <div class="row">  
 </div>
