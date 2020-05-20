@@ -16,19 +16,19 @@ raw_data1 <- raw_data2 %>%
   )
 
 ID_char1 <- c("X1", "quarter_measurement", "country", "age", "age_groups", "gender", 
-              "weight", "Love_ING", "Love_Google", "freedom_segment")
+              "weight", "Love_ING", "Love_Google", "freedom_segment")#, #"corona_statement_1", "corona_statement_2")
 
 base_data1 <- raw_data1 %>% 
   dplyr::select(ID_char1)
 
 # Wanted categories
-categories <- c("unaided", "aided", "fami", "consideration", "preference", "relationship", "desirability",
+categories <- c("unaided", "toma", "aided", "fami", "consideration", "preference", "relationship", "desirability",
                 "price_perception", "easy", "smart", "meets_needs", "nps", "reptrak1", "reptrak2", "reptrak3", 
                 "reptrak4", "reptrak5", "reptrak6", "reptrak7", "reptrak8", "reptrak9", "reptrak10", "reptrak11",  
                 "trust4", "image20", "freedom_statement", "digital_experience", "app_usage", "client", 
                 "ad_awareness", "main_bank", "product_usage_p1", "product_usage_p2", "product_usage_p3", 
                 "product_usage_p4", "product_usage_p5", "product_usage_p6", "product_usage_p7", 
-                "product_usage_p8", "product_usage_p9")
+                "product_usage_p8", "product_usage_p9", "freedom_statement_3") #, "interest", "interest_action", "corona_support")
                 
               
 # Confirm that categories has distinct arguments
@@ -46,7 +46,7 @@ for (x in categories) {
     result <- raw_data1 %>%
       dplyr::select(X1, quarter_measurement, country, 
                     age, age_groups, gender, weight, Love_ING, 
-                    freedom_segment, Love_Google) %>%
+                    freedom_segment, Love_Google) %>% #, corona_statement_1, corona_statement_2) %>%
       add_questionaire_responds_category(raw_data1, x) 
   }
   else{
@@ -123,8 +123,7 @@ temp3 <- temp %>%
   ) %>%
   dplyr::ungroup() %>% 
   dplyr::mutate(
-    unaided = (score_one + score_two) / score_total,
-    toma = score_one / score_total
+    unaided = (score_one + score_two) / score_total
   ) %>% 
   dplyr::filter(type == "unaided_value")
 
@@ -138,6 +137,44 @@ temp3$type <- NULL
 # Connect the first two transformed varibles together and create file data1 that contains all variables for Q1 2020
 data1 <- full_join(temp4, temp3, by=c("b_value", "country", "quarter_measurement"))
 rm(temp4)
+
+### toma 
+temp33 <- temp %>%
+  dplyr::filter(!is.na(score)) %>%
+  dplyr::filter(score %in% c(0, 1, 2)) %>% 
+  dplyr::mutate(
+    score_category = case_when(
+      score == 1 ~ "One",
+      score == 2 ~ "Two",
+      score == 0 ~ "null",
+      TRUE ~ "No Score"
+    )
+  ) %>%
+  dplyr::mutate(
+    score = score * weight
+  ) %>%
+  dplyr::group_by(type, b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    score_one = sum(weight[score_category == "One"]),
+    score_two = sum(weight[score_category == "Two"]),
+    score_nine_nine = sum(weight[score_category == "null"]),
+    score_total = sum(weight)
+  ) %>%
+  dplyr::ungroup() %>% 
+  dplyr::mutate(
+    toma = score_one / score_total
+  ) %>% 
+  dplyr::filter(type == "toma_value")
+
+temp33$score_one <- NULL
+temp33$score_zero <- NULL
+temp33$score_total <- NULL
+temp33$score_two <- NULL
+temp33$score_nine_nine <- NULL
+temp33$type <- NULL
+
+data1 <- full_join(data1, temp33, by=c("b_value", "country", "quarter_measurement"))
+rm(temp33)
 
 ### relationship
 temp4 <- temp %>%
@@ -1492,6 +1529,277 @@ NPS_trial <- result %>%
 
 data1 <- full_join(data1, NPS_trial, by=c("country", "quarter_measurement", "b_value"))
 rm(NPS_trial) 
+
+### Corona additional questions
+covid_1 <- temp %>% 
+ # dplyr::select(weight, country, quarter_measurement, b_value, corona_statement_1) %>%
+  dplyr::filter(!is.na(score)) %>%
+  dplyr::filter(score %in% c(1, 2, 3, 4, 5)) %>% 
+  dplyr::mutate(
+    score_category = case_when(
+      score == 1 ~ "One",
+      score == 2 ~ "Two",
+      score == 3 ~ "Three",
+      score == 4 ~ "Four",
+      score == 5 ~ "Five",
+      TRUE ~ "No Score"
+    )
+  ) %>%
+  dplyr::mutate(
+    score = score * weight
+  ) %>%
+  dplyr::group_by(type, b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    score_one = sum(weight[score_category == "One"]),
+    score_two = sum(weight[score_category == "Two"]),
+    score_three = sum(weight[score_category == "Three"]),
+    score_four = sum(weight[score_category == "Four"]),
+    score_five = sum(weight[score_category == "Five"]),
+    score_total = sum(weight) 
+  ) %>%
+  dplyr::ungroup() %>% 
+  dplyr::mutate(
+    covid_time_finances= (score_one + score_two) / score_total,
+    covid_no_time_finances = (score_three + score_four + score_five) / score_total,
+ ) %>% 
+  dplyr::filter(type == "corona_statement_1")
+
+
+covid_1$score_one <- NULL
+covid_1$score_two <- NULL
+covid_1$score_four <- NULL
+covid_1$score_three <- NULL
+covid_1$score_five <- NULL
+covid_1$score_total <- NULL
+covid_1$type <- NULL
+
+data1 <- full_join(data1, covid_1, by=c("b_value", "country", "quarter_measurement"))
+rm(covid_1)
+  
+covid_2 <- temp %>% 
+  # dplyr::select(weight, country, quarter_measurement, b_value, corona_statement_1) %>%
+  dplyr::filter(!is.na(score)) %>%
+  dplyr::filter(score %in% c(1, 2, 3, 4, 5, 6, 7)) %>% 
+  dplyr::mutate(
+    score_category = case_when(
+      score == 1 ~ "One",
+      score == 2 ~ "Two",
+      score == 3 ~ "Three",
+      score == 4 ~ "Four",
+      score == 5 ~ "Five",
+      score == 6 ~ "Six",
+      score == 7 ~ "Seven",
+      TRUE ~ "No Score"
+    )
+  ) %>%
+  dplyr::mutate(
+    score = score * weight
+  ) %>%
+  dplyr::group_by(type, b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    score_one = sum(weight[score_category == "One"]),
+    score_two = sum(weight[score_category == "Two"]),
+    score_three = sum(weight[score_category == "Three"]),
+    score_four = sum(weight[score_category == "Four"]),
+    score_five = sum(weight[score_category == "Five"]),
+    score_six = sum(weight[score_category == "Six"]),
+    score_seven = sum(weight[score_category == "Seven"]),
+    score_total = sum(weight) 
+  ) %>%
+  dplyr::ungroup() %>% 
+  dplyr::mutate(
+    covid_income_drop= score_one / score_total,
+    covid_online = score_two / score_total,
+    covid_invest = score_three / score_total,
+    covid_business_impact = score_four / score_total,
+    covid_more_time = score_five / score_total,
+    covid_bills = score_six / score_total,
+    covid_open = score_seven / score_total
+  ) %>% 
+  dplyr::filter(type == "corona_statement_2")
+
+covid_2$score_one <- NULL
+covid_2$score_two <- NULL
+covid_2$score_four <- NULL
+covid_2$score_three <- NULL
+covid_2$score_five <- NULL
+covid_2$score_six <- NULL
+covid_2$score_seven <- NULL
+covid_2$score_total <- NULL
+covid_2$type <- NULL
+
+data1 <- full_join(data1, covid_2, by=c("b_value", "country", "quarter_measurement"))
+rm(covid_2)  
+
+corona_support <- temp %>% 
+  dplyr::filter(!is.na(score)) %>%
+  dplyr::filter(score %in% c(1, 2, 3, 4, 5)) %>% 
+  dplyr::mutate(
+    score_category = case_when(
+      score == 1 ~ "One",
+      score == 2 ~ "Two",
+      score == 3 ~ "Three",
+      score == 4 ~ "Four",
+      score == 5 ~ "Five",
+      TRUE ~ "No Score"
+    )
+  ) %>%
+  dplyr::mutate(
+    score = score * weight
+  ) %>%
+  dplyr::group_by(type, b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    score_one = sum(weight[score_category == "One"]),
+    score_two = sum(weight[score_category == "Two"]),
+    score_three = sum(weight[score_category == "Three"]),
+    score_four = sum(weight[score_category == "Four"]),
+    score_five = sum(weight[score_category == "Five"]),
+    score_total = sum(weight) 
+  ) %>%
+  dplyr::ungroup() %>% 
+  dplyr::mutate(
+    corona_support = (score_four + score_five) / score_total
+  ) %>% 
+  dplyr::filter(type == "corona_support_value")
+
+corona_support$score_one <- NULL
+corona_support$score_two <- NULL
+corona_support$score_four <- NULL
+corona_support$score_three <- NULL
+corona_support$score_five <- NULL
+corona_support$score_total <- NULL
+corona_support$type <- NULL
+
+data1 <- full_join(data1, corona_support, by=c("b_value", "country", "quarter_measurement"))
+rm(corona_support)  
+
+### Interest
+interest <- temp %>% 
+  dplyr::filter(!is.na(score)) %>%
+  dplyr::filter(score %in% c(1, 2, 3)) %>% 
+  dplyr::mutate(
+    score_category = case_when(
+      score == 1 ~ "One",
+      score == 2 ~ "Two",
+      score == 3 ~ "Three",
+      TRUE ~ "No Score"
+    )
+  ) %>%
+  dplyr::mutate(
+    score = score * weight
+  ) %>%
+  dplyr::group_by(type, b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    score_one = sum(weight[score_category == "One"]),
+    score_two = sum(weight[score_category == "Two"]),
+    score_three = sum(weight[score_category == "Three"]),
+    score_total = sum(weight) 
+  ) %>%
+  dplyr::ungroup() %>% 
+  dplyr::mutate(
+    interest_known = score_one / score_total,
+    interest_notsure = score_two / score_total,
+    interest_notaware = score_three / score_total,
+  ) %>% 
+  dplyr::filter(type == "interest_value")
+
+interest$score_one <- NULL
+interest$score_two <- NULL
+interest$score_three <- NULL
+interest$score_total <- NULL
+interest$type <- NULL
+
+data1 <- full_join(data1, interest, by=c("b_value", "country", "quarter_measurement"))
+rm(interest)  
+
+interest_action <- temp %>% 
+  dplyr::filter(!is.na(score)) %>%
+  dplyr::filter(score %in% c(1, 2, 3, 4, 5)) %>% 
+  dplyr::mutate(
+    score_category = case_when(
+      score == 1 ~ "One",
+      score == 2 ~ "Two",
+      score == 3 ~ "Three",
+      score == 4 ~ "Four",
+      score == 5 ~ "Five",
+      TRUE ~ "No Score"
+    )
+  ) %>%
+  dplyr::mutate(
+    score = score * weight
+  ) %>%
+  dplyr::group_by(type, b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    score_one = sum(weight[score_category == "One"]),
+    score_two = sum(weight[score_category == "Two"]),
+    score_three = sum(weight[score_category == "Three"]),
+    score_four = sum(weight[score_category == "Four"]),
+    score_five = sum(weight[score_category == "Five"]),
+    score_total = sum(weight) 
+  ) %>%
+  dplyr::ungroup() %>% 
+  dplyr::mutate(
+    interest_action = (score_one + score_two) / score_total
+  ) %>% 
+  dplyr::filter(type == "corona_support_value")
+
+interest_action$score_one <- NULL
+interest_action$score_two <- NULL
+interest_action$score_four <- NULL
+interest_action$score_three <- NULL
+interest_action$score_five <- NULL
+interest_action$score_total <- NULL
+interest_action$type <- NULL
+
+data1 <- full_join(data1, interest_action, by=c("b_value", "country", "quarter_measurement"))
+rm(interest_action)  
+
+### app usage
+
+app <- temp %>% 
+  dplyr::filter(!is.na(score)) %>%
+  dplyr::filter(score %in% c(1, 2, 3, 4, 5)) %>% 
+  dplyr::mutate(
+    score_category = case_when(
+      score == 1 ~ "One",
+      score == 2 ~ "Two",
+      score == 3 ~ "Three",
+      score == 4 ~ "Four",
+      score == 5 ~ "Five",
+      TRUE ~ "No Score"
+    )
+  ) %>%
+  dplyr::mutate(
+    score = score * weight
+  ) %>%
+  dplyr::group_by(type, b_value, country, quarter_measurement) %>%
+  dplyr::summarize(
+    score_one = sum(weight[score_category == "One"]),
+    score_two = sum(weight[score_category == "Two"]),
+    score_three = sum(weight[score_category == "Three"]),
+    score_four = sum(weight[score_category == "Four"]),
+    score_five = sum(weight[score_category == "Five"]),
+    score_total = sum(weight) 
+  ) %>%
+  dplyr::ungroup() %>% 
+  dplyr::mutate(
+    app_use = (score_one + score_two) / score_total,
+    app_not_use = (score_five + score_four + score_three) / score_total
+  ) %>% 
+  dplyr::filter(type == "app_usage_value")
+
+app$score_one <- NULL
+app$score_two <- NULL
+app$score_four <- NULL
+app$score_three <- NULL
+app$score_five <- NULL
+app$score_total <- NULL
+app$type <- NULL
+
+data1 <- full_join(data1, app, by=c("b_value", "country", "quarter_measurement"))
+rm(app)  
+
+
 
 ### Labels
 labels_countries <- data1 %>%
