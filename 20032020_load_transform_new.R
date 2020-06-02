@@ -1799,6 +1799,58 @@ app$type <- NULL
 data1 <- full_join(data1, app, by=c("b_value", "country", "quarter_measurement"))
 rm(app)  
 
+## split for app users
+App_usage <- result %>%
+  dplyr::select(weight, country, quarter_measurement, b_value, nps_value, client_value, app_usage_value, main_bank_value) %>%
+  #dplyr::filter(country ==9 | country ==3) %>%
+  dplyr::filter(!is.na(nps_value) & client_value==1 & !is.na(app_usage_value)) %>%
+  dplyr::mutate(app_usage = case_when(
+    app_usage_value==1 ~ "Yes, at least five times",
+    app_usage_value==2 ~ "Yes, but not very often, fewer than five times",
+    app_usage_value==3 ~ "No, but I do have the app on my smartphone",
+    app_usage_value==4 ~ "No, and I don’t have the app on my smartphone either",
+    app_usage_value==5 ~ "No, I don’t have a smartphone",
+    TRUE ~ "NA_real_"
+  )) %>%
+  dplyr::group_by(country, quarter_measurement, b_value, app_usage) %>%
+  dplyr::tally(wt=weight) %>%
+  dplyr::mutate(
+    percentage = n /sum(n) *100
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(country, quarter_measurement, b_value, app_usage, percentage) %>%
+  dplyr::distinct() %>%
+  #tibble::rowid_to_column() %>%
+  tidyr::spread(app_usage, percentage) 
+
+data1 <- full_join(data1, App_usage, by=c("b_value", "country", "quarter_measurement"))
+
+App_usage <- result %>%
+  dplyr::select(weight, country, quarter_measurement, b_value, nps_value, client_value, app_usage_value, main_bank_value) %>%
+  #dplyr::filter(country ==9) %>%
+  dplyr::filter(!is.na(nps_value) & client_value==1 & !is.na(app_usage_value)) %>%
+  dplyr::filter(main_bank_value==1) %>%
+  dplyr::mutate(app_usage = case_when(
+    app_usage_value==1 ~ "MB_Yes, at least five times",
+    app_usage_value==2 ~ "MB_Yes, but not very often, fewer than five times",
+    app_usage_value==3 ~ "MB_No, but I do have the app on my smartphone",
+    app_usage_value==4 ~ "MB_No, and I don’t have the app on my smartphone either",
+    app_usage_value==5 ~ "MB_No, I don’t have a smartphone",
+    TRUE ~ "NA_real_"
+  )) %>%
+  dplyr::group_by(country, quarter_measurement, b_value, app_usage) %>%
+  dplyr::tally(wt=weight) %>%
+  dplyr::mutate(
+    percentage = n /sum(n) *100
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(country, quarter_measurement, b_value, app_usage, percentage) %>%
+  dplyr::distinct() %>%
+  #tibble::rowid_to_column() %>%
+  tidyr::spread(app_usage, percentage) 
+
+# to add Q figures to data set, split for clients
+data1 <- full_join(data1, App_usage, by=c("b_value", "country", "quarter_measurement"))
 
 
 ### Labels
