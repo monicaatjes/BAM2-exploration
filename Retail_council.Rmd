@@ -1,0 +1,831 @@
+---
+title: "Retail council"
+author: "Moniek"
+date: "6/4/2020"
+output: ingmarkdowntemplates::ing_html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# open data1, covid
+```
+
+### **CX principles**
+
+<div class="row">
+  <div class="col-md-6" markdown="1">
+
+  **Easy general population**
+
+```{r easy_gen_pop , echo=F, eval=T, fig.align='left', fig.width=5.8, fig.height=4, message=F, warning=FALSE}
+CX <- data1 %>%
+  dplyr::select(quarter_measurement, country, b_value, label, labels_countries, easy_mean, meets_needs_mean, smart_mean,
+                easy_client, meets_needs_client, smart_client) %>%
+  dplyr::filter(quarter_measurement== max(quarter_measurement)) %>%
+  dplyr::filter(!is.na(easy_mean)) %>%
+  dplyr::filter(!is.na(easy_client)) %>%
+  dplyr::filter(!is.na(meets_needs_mean)) %>%
+  dplyr::filter(!is.na(meets_needs_client)) %>%
+  dplyr::filter(!is.na(smart_mean)) %>%
+  dplyr::filter(!is.na(smart_client)) %>%
+  dplyr::group_by(labels_countries) %>%
+  dplyr::mutate(
+    min_easy_genpop = min(easy_mean),
+    max_easy_genpop = max(easy_mean),
+    easy_ING_genpop = case_when(
+      b_value ==1 ~ easy_mean,
+      TRUE ~ NA_real_
+    ),
+    min_meets_needs_genpop = min(meets_needs_mean),
+    max_meets_needs_genpop = max(meets_needs_mean),
+    meets_needs_ING_genpop = case_when(
+      b_value ==1 ~ meets_needs_mean,
+      TRUE ~ NA_real_
+    ),
+    min_smart_genpop = min(smart_mean),
+    max_smart_genpop = max(smart_mean),
+    smart_ING_genpop = case_when(
+      b_value ==1 ~ smart_mean,
+      TRUE ~ NA_real_
+    ),
+    min_easy_client = min(easy_client),
+    max_easy_client = max(easy_client),
+    easy_ING_client = case_when(
+      b_value ==1 ~ easy_client,
+      TRUE ~ NA_real_
+    ),
+    min_meets_needs_client = min(meets_needs_client),
+    max_meets_needs_client = max(meets_needs_client),
+    meets_needs_ING_client = case_when(
+      b_value ==1 ~ meets_needs_client,
+      TRUE ~ NA_real_
+    ),
+    min_smart_client = min(smart_client),
+    max_smart_client = max(smart_client),
+    smart_ING_client = case_when(
+      b_value ==1 ~ smart_client,
+      TRUE ~ NA_real_
+    ),
+  )
+
+
+easy_gen_pop <- CX %>%
+  plot_ly(x = ~labels_countries, y= CX$min_easy_genpop, type = 'scatter', mode= 'markers',
+          name = 'min', marker = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'markers')) %>%
+  add_trace(y = ~CX$max_easy_genpop, type = 'scatter', mode= 'markers',
+            name = 'max', marker = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'markers')) %>%
+  add_trace(y= ~CX$easy_ING_genpop, type = 'scatter', mode= 'markers',
+            name = 'ING', marker = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'markers')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+
+easy_gen_pop
+```
+</div>
+  <div class="col-md-6" markdown="1">
+  
+  **Easy clients**
+
+```{r easy_client , echo=F, eval=T, fig.align='left', fig.width=5.8, fig.height=4, message=F, warning=FALSE}
+easy_client <- CX %>%
+  plot_ly(x = ~labels_countries, y= CX$min_easy_client, type = 'scatter', mode= 'markers',
+          name = 'min', marker = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'markers')) %>%
+  add_trace(y = ~CX$max_easy_client, type = 'scatter', mode= 'markers',
+            name = 'max', marker = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'markers')) %>%
+  add_trace(y= ~CX$easy_ING_client, type = 'scatter', mode= 'markers',
+            name = 'ING', marker = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'markers')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+
+easy_client
+```
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-md-6" markdown="1">
+
+  **Meets my needs general population**
+
+```{r meeds_needs_gen_pop , echo=F, eval=T, fig.align='left', fig.width=5.8, fig.height=4, message=F, warning=FALSE}
+meeds_needs_gen_pop <- CX %>%
+  plot_ly(x = ~labels_countries, y= CX$min_meets_needs_genpop, type = 'scatter', mode= 'markers',
+          name = 'min', marker = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'markers')) %>%
+  add_trace(y = ~CX$max_meets_needs_genpop, type = 'scatter', mode= 'markers',
+            name = 'max', marker = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'markers')) %>%
+  add_trace(y= ~CX$meets_needs_ING_genpop, type = 'scatter', mode= 'markers',
+            name = 'ING', marker = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'markers')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+
+meeds_needs_gen_pop
+```
+</div>
+  <div class="col-md-6" markdown="1">
+  
+  **Meets my needs clients**
+
+```{r meets_needs_client , echo=F, eval=T, fig.align='left', fig.width=5.8, fig.height=4, message=F, warning=FALSE}
+meets_my_needs_client <- CX %>%
+  plot_ly(x = ~labels_countries, y= CX$min_meets_needs_client, type = 'scatter', mode= 'markers',
+          name = 'min', marker = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'markers')) %>%
+  add_trace(y = ~CX$max_meets_needs_client, type = 'scatter', mode= 'markers',
+            name = 'max', marker = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'markers')) %>%
+  add_trace(y= ~CX$meets_needs_ING_client, type = 'scatter', mode= 'markers',
+            name = 'ING', marker = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'markers')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+
+meets_my_needs_client
+```
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6" markdown="1">
+
+  **Smart general population**
+
+```{r smart_gen_pop , echo=F, eval=T, fig.align='left', fig.width=5.8, fig.height=4, message=F, warning=FALSE}
+smart_gen_pop <- CX %>%
+  plot_ly(x = ~labels_countries, y= CX$min_smart_genpop, type = 'scatter', mode= 'markers',
+          name = 'min', marker = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'markers')) %>%
+  add_trace(y = ~CX$max_smart_genpop, type = 'scatter', mode= 'markers',
+            name = 'max', marker = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'markers')) %>%
+  add_trace(y= ~CX$smart_ING_genpop, type = 'scatter', mode= 'markers',
+            name = 'ING', marker = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'markers')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+
+smart_gen_pop
+```
+</div>
+  <div class="col-md-6" markdown="1">
+  
+  **Smart clients**
+
+```{r smart_client , echo=F, eval=T, fig.align='left', fig.width=5.8, fig.height=4, message=F, warning=FALSE}
+smart_client <- CX %>%
+  plot_ly(x = ~labels_countries, y= CX$min_smart_client, type = 'scatter', mode= 'markers',
+          name = 'min', marker = list(color = 'rgb(52,150,81)', type='scatter', width = 4, mode = 'markers')) %>%
+  add_trace(y = ~CX$max_smart_client, type = 'scatter', mode= 'markers',
+            name = 'max', marker = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'markers')) %>%
+  add_trace(y= ~CX$smart_ING_client, type = 'scatter', mode= 'markers',
+            name = 'ING', marker = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'markers')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+
+smart_client
+```
+  </div>
+</div>
+
+### **Covid-19**
+
+<div class="row">
+  <div class="col-md-6" markdown="1">
+
+  **Impact time spend managing finances**
+
+```{r impact time spend , echo=F, eval=T, fig.align='left', fig.width=5.8, fig.height=4, message=F, warning=FALSE}
+covid <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, covid_time_finances,
+                covid_no_time_finances, covid_income_drop, covid_online, covid_invest, covid_business_impact, covid_more_time, 
+                covid_bills, covid_open, corona_support, ING_clients_no_impact, ING_clients_impact) %>%
+  dplyr::filter(!is.na(corona_support)) 
+
+covid1 <- covid %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, covid_time_finances,
+                covid_no_time_finances, covid_income_drop, covid_online, covid_invest, covid_business_impact, covid_more_time, 
+                covid_bills, covid_open, corona_support) %>%
+  dplyr::filter(!is.na(corona_support)) %>%
+  dplyr::filter(b_value==1) 
+
+time_spent_finance <- covid1 %>%
+  plot_ly(x = ~labels_countries, y = ~covid_time_finances, type = 'bar', name = 'more often', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~covid_no_time_finances, name = "no impact ", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+time_spent_finance
+```
+
+</div>
+  <div class="col-md-6" markdown="1">
+  
+  **Impact according ING clients**
+  
+```{r impact time spend clients ING , echo=F, eval=T, fig.align='left', fig.width=5.8, fig.height=4, message=F, warning=FALSE}
+covid <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, covid_time_finances,
+                covid_no_time_finances, covid_income_drop, covid_online, covid_invest, covid_business_impact, covid_more_time, 
+                covid_bills, covid_open, corona_support, ING_clients_no_impact, ING_clients_impact) %>%
+  dplyr::filter(!is.na(corona_support)) 
+
+covid1 <- covid %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, covid_time_finances,
+                covid_no_time_finances, covid_income_drop, covid_online, covid_invest, covid_business_impact, covid_more_time, 
+                covid_bills, covid_open, corona_support) %>%
+  dplyr::filter(!is.na(corona_support)) %>%
+  dplyr::filter(b_value==1) 
+
+time_spent_finance <- covid %>%
+  plot_ly(x = ~labels_countries, y = ~ING_clients_impact, type = 'bar', name = 'more often', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~ING_clients_no_impact, name = "no impact ", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+time_spent_finance
+```
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6" markdown="1">
+  
+  **What keeps them more busy**
+  
+```{r time spend on general pop, echo=F, eval=T, fig.align='left', fig.width=5.8, fig.height=4, message=F, warning=FALSE}
+
+covid <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, covid_time_finances,
+                covid_no_time_finances, covid_income_drop, covid_online, covid_invest, covid_business_impact, covid_more_time, 
+                covid_bills, covid_open, corona_support, ING_clients_no_impact, ING_clients_impact) %>%
+  dplyr::filter(!is.na(corona_support)) 
+covid1 <- covid %>%
+  dplyr::filter(b_value==1)
+
+busy_what <- plot_ly(covid1, x = ~labels_countries, y = ~covid_income_drop, type = 'bar', name = 'income drop', 
+                 marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~covid_online, name = "online banking", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~covid_business_impact, name = "impact business", 
+            marker = list(color = 'rgb(96,166,218)')) %>%
+  add_trace(y = ~covid_more_time, name = "time for finances", 
+            marker = list(color = 'rgb(171,0,102)')) %>%
+  add_trace(y = ~covid_invest, name = "investing", 
+            marker = list(color = 'rgb(208,217,60)')) %>%
+  add_trace(y = ~covid_bills, name = "difficult to pay bills", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  add_trace(y = ~covid_open, name = "other", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+busy_what
+```
+
+</div>
+  <div class="col-md-6" markdown="1">
+  
+  **What keeps our clients busy**
+  
+```{r time spend on clients, echo=F, eval=T, fig.align='left', fig.width=5.8, fig.height=4, message=F, warning=FALSE}
+
+covid <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, covid_time_finances,
+                covid_no_time_finances, covid_income_drop, covid_online, covid_invest, covid_business_impact, covid_more_time, 
+                covid_bills, covid_open, corona_support, ING_clients_no_impact, ING_clients_impact, covid_bills_ING,
+                covid_business_impact_ING, covid_income_drop_ING, covid_invest_ING,
+                covid_more_time_ING, covid_online_ING, covid_open_ING) %>%
+  dplyr::filter(!is.na(corona_support)) 
+covid1 <- covid %>%
+  dplyr::filter(b_value==1)
+
+busy_what <- plot_ly(covid1, x = ~labels_countries, y = ~covid_income_drop_ING, type = 'bar', name = 'income drop', 
+                 marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~covid_online_ING, name = "online banking", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~covid_business_impact_ING, name = "impact business", 
+            marker = list(color = 'rgb(96,166,218)')) %>%
+  add_trace(y = ~covid_more_time_ING, name = "time for finances", 
+            marker = list(color = 'rgb(171,0,102)')) %>%
+  add_trace(y = ~covid_invest_ING, name = "investing", 
+            marker = list(color = 'rgb(208,217,60)')) %>%
+  add_trace(y = ~covid_bills_ING, name = "difficult to pay bills", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  add_trace(y = ~covid_open_ING, name = "other", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+busy_what
+```
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6" markdown="1">
+
+  **Supported by your bank, all banks**
+
+```{r support , echo=F, eval=T, fig.align='left', fig.width=5.0, fig.height=4, message=F, warning=FALSE}
+covid_support <- covid %>%
+  dplyr::filter(quarter_measurement==max(quarter_measurement)) %>%
+  plot_ly(x= ~labels_countries, y=~corona_support, type = 'scatter', color ='rgb(255,098,000)',
+           mode = 'text+markers', text = ~label, textposition = 'middle right',
+           textfont = list(family = "ING me", color = 'rgb(105, 105, 105)', size = 11)) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'group', title= "",
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+covid_support
+
+```
+</div>
+  <div class="col-md-6" markdown="1">
+  
+  **Supported by your bank**
+```{r supportp , echo=F, eval=T, fig.align='left', fig.width=5.8, fig.height=4, message=F, warning=FALSE}
+covid_support_oth <- covid %>%
+  dplyr::filter(quarter_measurement==max(quarter_measurement)) %>%
+  dplyr::group_by(labels_countries) %>%
+  dplyr::mutate(
+    min_client_support = min(corona_support),
+    max_client_support = max(corona_support),
+    client_support_ING = case_when(
+      b_value ==1 ~ corona_support,
+      TRUE ~ NA_real_
+    )) %>%
+  dplyr::filter(b_value==1) %>%
+  dplyr::filter(!is.na(max_client_support)) 
+
+
+covid_support_oth_p <- plot_ly(covid_support_oth, x = ~labels_countries, y = ~min_client_support , type = 'scatter', mode= 'markers',
+          name = 'min', marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~max_client_support, type = 'scatter', mode= 'markers',
+            name = 'max', marker = list(color = 'rgb(96,166,218)', type='scatter', width = 4, mode = 'markers')) %>%
+  add_trace(y= ~client_support_ING, type = 'scatter', mode= 'markers',
+            name = 'ING', marker = list(color = 'rgb(255,098,000)', type='scatter', width = 4, mode = 'markers')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+
+covid_support_oth_p
+
+```
+
+  </div>
+</div>
+
+
+### **Negative interest**
+
+<div class="row">
+  <div class="col-md-4" markdown="1">
+
+  **Interest awareness AUS**
+  
+```{r negative interest awareness AUS , echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==1) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+</div>
+  <div class="col-md-4" markdown="1">
+
+  **Interest Awareness AUT**
+
+```{r negative interest awareness AUT, echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==2) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+</div>
+  <div class="col-md-4" markdown="1">
+
+  **Interest Awareness BE**
+```{r negative interest awareness BE, echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==3) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4" markdown="1">
+
+  **Interest awareness CZ**
+```{r negative interest awareness CZ , echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==4) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+</div>
+  <div class="col-md-4" markdown="1">
+
+  **Interest Awareness FR**
+
+```{r negative interest awareness FR, echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==5) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+</div>
+  <div class="col-md-4" markdown="1">
+
+  **Interest Awareness GE**
+```{r negative interest awareness GE, echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==6) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4" markdown="1">
+
+  **Interest awareness IT**
+```{r negative interest awareness IT , echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==7) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+</div>
+  <div class="col-md-4" markdown="1">
+
+  **Interest Awareness LU**
+
+```{r negative interest awareness LU, echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==8) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+</div>
+  <div class="col-md-4" markdown="1">
+
+  **Interest Awareness NL**
+```{r negative interest awareness NL, echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==9) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4" markdown="1">
+
+  **Interest awareness PL**
+```{r negative interest awareness PL , echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==10) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+</div>
+  <div class="col-md-4" markdown="1">
+
+  **Interest Awareness RO**
+
+```{r negative interest awareness RO, echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==11) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+</div>
+  <div class="col-md-4" markdown="1">
+
+  **Interest Awareness SP**
+```{r negative interest awareness SP, echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==12) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4" markdown="1">
+
+  **Interest awareness TU**
+```{r negative interest awareness TU , echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==13) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+</div>
+  <div class="col-md-4" markdown="1">
+
+  **Interest Awareness PH**
+
+```{r negative interest awareness PH, echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_known,
+                interest_notsure, interest_notaware, interest_action, interest_action) %>%
+  dplyr::filter(country==14) %>%
+  dplyr::filter(b_value<6)
+
+interest_awareness <- interest %>%
+  plot_ly(x = ~label, y = ~interest_known, type = 'bar', name = 'aware', 
+          marker = list(color = 'rgb(255,098,000)')) %>%
+  add_trace(y = ~interest_notsure, name = "not sure", 
+            marker = list(color = 'rgb(52,150,81)')) %>%
+  add_trace(y = ~interest_notaware, name = "not aware", 
+            marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'stack', title= "",
+         legend =list(font = list(family = "ING me", 
+                                  size = 12, color = 'rgb(105, 105, 105)'
+         )))
+interest_awareness
+
+```
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4" markdown="1">
+
+  **Interest action**
+```{r negative interest action, echo=F, eval=T, fig.align='left', fig.width=4, fig.height=4, message=F, warning=FALSE}
+interest <- data_April %>%
+  dplyr::select(label, country, quarter_measurement, labels_quarters, b_value, labels_countries, label, interest_action) %>%
+  dplyr::filter(!is.na(interest_action)) %>%
+  dplyr::filter(b_value==1)
+  #dplyr::filter(country==1)
+
+p1 <- plot_ly(interest, x = ~labels_countries, y = ~interest_action, type = 'bar', name = '', 
+              marker = list(color = 'rgb(82,81,153)')) %>%
+  layout(xaxis = xaxis,
+         yaxis = yaxis,
+         barmode = 'group', title= "",
+         legend =list(font = list(family = "ING me", size = 12, color = 'rgb(105, 105, 105)')))
+p1
+```
+
+ </div>
+</div>
