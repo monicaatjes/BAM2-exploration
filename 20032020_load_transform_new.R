@@ -6,7 +6,7 @@ source("changed_messed_up_variable_names.R")
 ## Load and transform BAM data Q1
 
 # Throw away columns specifically for ML
-raw_data2 <- raw_data2 %>%
+raw_data2 <- raw_data3 %>%
   dplyr::select(-contains("SPSS"))
 
 # Add in X1 which is a row count
@@ -16,7 +16,7 @@ raw_data1 <- raw_data2 %>%
   )
 
 ID_char1 <- c("X1", "quarter_measurement", "country", "age", "age_groups", "gender", 
-              "weight", "Love_ING", "Love_Google", "freedom_segment")#, #"corona_statement_1", "corona_statement_2")
+              "weight", "Love_ING", "Love_Google", "freedom_segment", "corona_statement_1", "corona_statement_2")
 
 base_data1 <- raw_data1 %>% 
   dplyr::select(ID_char1)
@@ -28,7 +28,7 @@ categories <- c("unaided", "toma", "aided", "fami", "consideration", "preference
                 "trust4", "image20", "freedom_statement", "digital_experience", "app_usage", "client", 
                 "ad_awareness", "main_bank", "product_usage_p1", "product_usage_p2", "product_usage_p3", 
                 "product_usage_p4", "product_usage_p5", "product_usage_p6", "product_usage_p7", 
-                "product_usage_p8", "product_usage_p9", "freedom_statement_3") #, "interest", "interest_action", "corona_support")
+                "product_usage_p8", "product_usage_p9", "freedom_statement_3", "interest", "interest_action", "corona_support")
                 
               
 # Confirm that categories has distinct arguments
@@ -46,7 +46,7 @@ for (x in categories) {
     result <- raw_data1 %>%
       dplyr::select(X1, quarter_measurement, country, 
                     age, age_groups, gender, weight, Love_ING, 
-                    freedom_segment, Love_Google) %>% #, corona_statement_1, corona_statement_2) %>%
+                    freedom_segment, Love_Google, corona_statement_1, corona_statement_2) %>%
       add_questionaire_responds_category(raw_data1, x) 
   }
   else{
@@ -338,31 +338,46 @@ easy_overview <- result %>%
 data1 <- full_join(data1, easy_overview, by=c("country", "quarter_measurement", "b_value"))
 rm(easy_overview) 
 
-## meets my needs
-meets_needs_overview <- result %>%
-  dplyr::select(country, quarter_measurement, b_value, meets_needs_value, weight) %>%
-  dplyr::filter(!is.na(meets_needs_value)) %>%
+easy_client <- result %>%
+  dplyr::select(country, quarter_measurement, b_value, easy_value, weight, client_value) %>%
+  dplyr::filter(!is.na(easy_value)) %>%
+  dplyr::filter(client_value==1) %>%
   dplyr::group_by(country, quarter_measurement, b_value) %>% 
   dplyr::summarise(
-    meets_needs_mean = mean(meets_needs_value * weight, na.rm = T) 
+    easy_client = mean(easy_value * weight, na.rm = T) 
   ) %>%
   dplyr::ungroup()
 
-data1 <- full_join(data1, meets_needs_overview, by=c("country", "quarter_measurement", "b_value"))
-rm(meets_needs_overview) 
+data1 <- full_join(data1, easy_client, by=c("country", "quarter_measurement", "b_value"))
+rm(easy_client) 
+
+## meets my needs
+meets_needs_client <- result %>%
+  dplyr::select(country, quarter_measurement, b_value, meets_needs_value, weight, client_value) %>%
+  dplyr::filter(!is.na(meets_needs_value)) %>%
+  dplyr::filter(client_value==1) %>%
+  dplyr::group_by(country, quarter_measurement, b_value) %>% 
+  dplyr::summarise(
+    meets_needs_client = mean(meets_needs_value * weight, na.rm = T) 
+  ) %>%
+  dplyr::ungroup()
+
+data1 <- full_join(data1, meets_needs_client, by=c("country", "quarter_measurement", "b_value"))
+rm(meets_needs_client) 
 
 ## smart
-smart_overview <- result %>%
-  dplyr::select(country, quarter_measurement, b_value, smart_value, weight) %>%
+smart_client <- result %>%
+  dplyr::select(country, quarter_measurement, b_value, smart_value, weight, client_value) %>%
   dplyr::filter(!is.na(smart_value)) %>%
+  dplyr::filter(client_value==1) %>%
   dplyr::group_by(country, quarter_measurement, b_value) %>% 
   dplyr::summarise(
-    smart_mean = mean(smart_value * weight, na.rm = T) 
+    smart_client = mean(smart_value * weight, na.rm = T) 
   ) %>%
   dplyr::ungroup()
 
-data1 <- full_join(data1, smart_overview, by=c("country", "quarter_measurement", "b_value"))
-rm(smart_overview) 
+data1 <- full_join(data1, smart_client, by=c("country", "quarter_measurement", "b_value"))
+rm(smart_client) 
 
 ### image20
 temp4 <- temp %>%
@@ -1559,8 +1574,8 @@ covid_1 <- temp %>%
   ) %>%
   dplyr::ungroup() %>% 
   dplyr::mutate(
-    covid_time_finances= (score_one + score_two) / score_total,
-    covid_no_time_finances = (score_three + score_four + score_five) / score_total,
+    covid_time_finances= round(((score_one + score_two) / score_total) *100, digits=2),
+    covid_no_time_finances = round(((score_three + score_four + score_five) / score_total) *100, digits=2)
  ) %>% 
   dplyr::filter(type == "corona_statement_1")
 
@@ -1608,13 +1623,13 @@ covid_2 <- temp %>%
   ) %>%
   dplyr::ungroup() %>% 
   dplyr::mutate(
-    covid_income_drop= score_one / score_total,
-    covid_online = score_two / score_total,
-    covid_invest = score_three / score_total,
-    covid_business_impact = score_four / score_total,
-    covid_more_time = score_five / score_total,
-    covid_bills = score_six / score_total,
-    covid_open = score_seven / score_total
+    covid_income_drop= round((score_one / score_total) * 100, digits=2),
+    covid_online = round((score_two / score_total) * 100, digits=2),
+    covid_invest = round((score_three / score_total) *100, digits=2),
+    covid_business_impact = round((score_four / score_total) * 100, digits=2),
+    covid_more_time = round((score_five / score_total) * 100, digits=2),
+    covid_bills = round((score_six / score_total) * 100, digits=2),
+    covid_open = round((score_seven / score_total) * 100, digits=2),
   ) %>% 
   dplyr::filter(type == "corona_statement_2")
 
@@ -1658,7 +1673,7 @@ corona_support <- temp %>%
   ) %>%
   dplyr::ungroup() %>% 
   dplyr::mutate(
-    corona_support = (score_four + score_five) / score_total
+    corona_support = round(((score_four + score_five) / score_total) *100, digits=2),
   ) %>% 
   dplyr::filter(type == "corona_support_value")
 
@@ -1672,6 +1687,107 @@ corona_support$type <- NULL
 
 data1 <- full_join(data1, corona_support, by=c("b_value", "country", "quarter_measurement"))
 rm(corona_support)  
+
+# corona_support_clients
+#corona_support_clients <- result %>%
+#  dplyr::select(b_value, quarter_measurement, country, weight, corona_support_value, client_value) %>%
+#  dplyr::filter(!is.na(corona_support_value) & client_value==1) %>%
+#  dplyr::mutate(client_support = case_when(
+#    corona_support_value==1 ~ 0,
+#    corona_support_value==2 ~ 0,
+#    corona_support_value==3 ~ 0,
+#    corona_support_value==4 ~ 1,
+#    corona_support_value==5 ~ 1,
+#    TRUE ~ NA_real_
+#  )) %>%
+#  dplyr::group_by(country, quarter_measurement, b_value, client_support) %>%
+#  dplyr::tally(wt=weight) %>%
+#  dplyr::mutate(
+#    client_support_corona = n /sum(n) *100
+#  ) %>%
+#  dplyr::filter(client_support==1)
+
+# corona_support_clients$client_support <- NULL
+# corona_support_clients$n <- NULL
+
+# data1 <- full_join(data1, corona_support_clients, by=c("b_value", "country", "quarter_measurement"))
+
+# ING clients thinking/ more about finances
+corona_time_spend_clients <- result %>%
+  dplyr::select(b_value, quarter_measurement, country, weight, corona_statement_1, client_value) %>%
+  dplyr::filter(!is.na(corona_statement_1) & client_value==1 & b_value==1) %>%
+  dplyr::mutate(
+    corona_statement_1_cat = case_when(
+      corona_statement_1 == 1 ~ "One",
+      corona_statement_1 == 2 ~ "Two",
+      corona_statement_1 == 3 ~ "Three",
+      corona_statement_1 == 4 ~ "Four",
+      corona_statement_1 == 5 ~ "Five",
+      TRUE ~ "No Score"
+    )) %>%
+  dplyr::group_by(country, quarter_measurement, b_value, corona_statement_1_cat) %>%
+  dplyr::tally(wt=weight) %>%
+  tidyr::spread(corona_statement_1_cat, n) 
+  corona_time_spend_clients[is.na(corona_time_spend_clients)] <- 0
+  corona_time_spend_clients <- corona_time_spend_clients %>%
+    dplyr::group_by(country) %>%
+    dplyr::mutate(
+      no_impact = Four + Five + Three,
+      impact = One + Two
+    ) %>%
+    dplyr::mutate(
+      ING_clients_no_impact = no_impact / (impact + no_impact) *100,
+      ING_clients_impact = impact / (impact + no_impact) *100
+    )
+  
+data1 <- full_join(data1, corona_time_spend_clients, by=c("b_value", "country", "quarter_measurement"))
+
+# corona_busy_clients
+corona_busy_clients <- result %>%
+  dplyr::select(b_value, quarter_measurement, country, weight, corona_statement_2, client_value) %>%
+  dplyr::filter(!is.na(corona_statement_2) & client_value==1 & b_value==1) %>%
+  dplyr::mutate(ING_clients_busy = case_when(
+    corona_statement_2 == 1 ~ "covid_income_drop_clients_ING",
+    corona_statement_2 == 2 ~ "covid_online_clients_ING",
+    corona_statement_2 == 3 ~ "covid_invest_clients_ING",
+    corona_statement_2 == 4 ~ "covid_business_impact_clients_ING",
+    corona_statement_2 == 5 ~ "covid_more_time_clients_ING",
+    corona_statement_2 == 6 ~ "covid_bills_clients_ING",
+    corona_statement_2 == 7 ~ "covid_open_clients_ING",
+    TRUE ~ "No score " )
+  ) %>%
+  dplyr::group_by(country, quarter_measurement, b_value, ING_clients_busy) %>%
+  dplyr::tally(wt=weight) %>%
+  tidyr::spread(ING_clients_busy, n) 
+  corona_busy_clients[is.na(corona_busy_clients)] <- 0
+  corona_busy_clients <- corona_busy_clients %>%
+  #dplyr::group_by(country) %>%
+  dplyr::mutate(
+    total_clients_ING = covid_income_drop_clients_ING + covid_online_clients_ING+ covid_invest_clients_ING + 
+      covid_business_impact_clients_ING + covid_more_time_clients_ING + covid_bills_clients_ING +
+      covid_open_clients_ING
+    ) %>%
+    dplyr::mutate(
+      covid_income_drop_ING = (covid_income_drop_clients_ING / total_clients_ING) *100,
+      covid_online_ING = (covid_online_clients_ING / total_clients_ING) *100,
+      covid_invest_ING = (covid_invest_clients_ING  / total_clients_ING) *100,
+      covid_business_impact_ING = (covid_business_impact_clients_ING / total_clients_ING) *100,
+      covid_more_time_ING = (covid_more_time_clients_ING / total_clients_ING) *100,
+      covid_bills_ING = (covid_bills_clients_ING / total_clients_ING) *100,
+      covid_open_ING = (covid_open_clients_ING / total_clients_ING) *100
+    )
+    
+corona_busy_clients$covid_bills_clients_ING <- NULL
+corona_busy_clients$covid_business_impact_clients_ING <- NULL
+corona_busy_clients$covid_income_drop_clients_ING <- NULL
+corona_busy_clients$covid_invest_clients_ING<- NULL
+corona_busy_clients$covid_more_time_clients_ING <- NULL
+corona_busy_clients$covid_online_clients_ING <- NULL
+corona_busy_clients$covid_open_clients_ING <- NULL
+corona_busy_clients$total_clients_ING <- NULL
+
+  
+data1 <- full_join(data1, corona_busy_clients, by=c("b_value", "country", "quarter_measurement"))
 
 ### Interest
 interest <- temp %>% 
@@ -1697,9 +1813,9 @@ interest <- temp %>%
   ) %>%
   dplyr::ungroup() %>% 
   dplyr::mutate(
-    interest_known = score_one / score_total,
-    interest_notsure = score_two / score_total,
-    interest_notaware = score_three / score_total,
+    interest_known = (score_one / score_total) *100,
+    interest_notsure = (score_two / score_total) *100,
+    interest_notaware = (score_three / score_total) *100,
   ) %>% 
   dplyr::filter(type == "interest_value")
 
@@ -1711,6 +1827,27 @@ interest$type <- NULL
 
 data1 <- full_join(data1, interest, by=c("b_value", "country", "quarter_measurement"))
 rm(interest)  
+
+#interest_awareness_clients_ING <- result %>%
+#  dplyr::select(interest_value, client_value, b_value, quarter_measurement, country, weight) %>%
+#  dplyr::filter(!is.na(interest_value)) %>%
+#  dplyr::filter(b_value==1 & client_value ==1) %>%
+#  dplyr::mutate(interest_awareness = case_when(
+#    interest_value ==1 ~ "interest_known_ING_clients",
+#    interest_value ==2 ~ "interest_notsure_ING_clients",
+#    interest_value ==3 ~ "interest_notaware_ING_clients",
+#  )) %>%
+#  dplyr::group_by(country, quarter_measurement, b_value, interest_awareness) %>%
+#  dplyr::tally(wt=weight) %>%
+#  dplyr::mutate(percentage_ING_clients_interest_aw = case_when(
+#    interest_awareness == "interest_known_ING_clients" ~ n /sum(n) *100,
+#    interest_awareness == "interest_notsure_ING_clients" ~ n /sum(n) *100,
+#    interest_awareness == "interest_notaware_ING_clients" ~ n /sum(n) *100,
+#  )) %>%
+#  dplyr::select(country, quarter_measurement, b_value, interest_awareness, percentage_ING_clients_interest_aw) %>%
+#  tidyr::spread(interest_awareness, percentage_ING_clients_interest_aw)
+  
+#data1 <- full_join(data1, interest_awareness_clients_ING, by=c("b_value", "country", "quarter_measurement"))
 
 interest_action <- temp %>% 
   dplyr::filter(!is.na(score)) %>%
@@ -1739,9 +1876,9 @@ interest_action <- temp %>%
   ) %>%
   dplyr::ungroup() %>% 
   dplyr::mutate(
-    interest_action = (score_one + score_two) / score_total
+    interest_action = ((score_one + score_two) / score_total) *100
   ) %>% 
-  dplyr::filter(type == "corona_support_value")
+  dplyr::filter(type == "interest_action_value")
 
 interest_action$score_one <- NULL
 interest_action$score_two <- NULL
@@ -1920,8 +2057,11 @@ X20200209_Competitorlist <- read.csv("20200209_Competitorlist.csv", sep=";")
 
 X20200209_Competitorlist$label <-str_replace_all(X20200209_Competitorlist$label, "[^[:alnum:]]", " ")
 data1 <-left_join(data1, X20200209_Competitorlist, by=c("country", "b_value"))
-rm(X20200209_Competitorlist)     
+rm(X20200209_Competitorlist)    
 
+# name it data1 differently 
+data_April <- data1
+data_April <- write_csv(data_April, "data_April")
 data1 <-write_csv(data1, "data1.csv")
 #resulthis <- write_csv(result, "resulthis.csv")
 
