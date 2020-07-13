@@ -25,10 +25,11 @@ base_data1 <- raw_data1 %>%
 categories <- c("unaided", "toma", "aided", "fami", "consideration", "preference", "relationship", "desirability",
                 "price_perception", "easy", "smart", "meets_needs", "nps", "reptrak1", "reptrak2", "reptrak3", 
                 "reptrak4", "reptrak5", "reptrak6", "reptrak7", "reptrak8", "reptrak9", "reptrak10", "reptrak11",  
-                "trust4", "image20", "freedom_statement", "digital_experience", "app_usage", "client", 
-                "ad_awareness", "main_bank", "product_usage_p1", "product_usage_p2", "product_usage_p3", 
-                "product_usage_p4", "product_usage_p5", "product_usage_p6", "product_usage_p7", 
-                "product_usage_p8", "product_usage_p9", "freedom_statement_3", "interest", "interest_action", "corona_support")
+                "trust4", "image20", "empower_1", "empower_2", "empower_3", "empower_4",
+                "digital_experience", "app_usage", "client", "ad_awareness", "main_bank", "product_usage_p1", 
+                "product_usage_p2", "product_usage_p3", "product_usage_p4", "product_usage_p5", "product_usage_p6", 
+                "product_usage_p7", "product_usage_p8", "product_usage_p9", "freedom_statement_2",
+                "freedom_statement_3", "interest", "interest_action", "corona_support")
                 
               
 # Confirm that categories has distinct arguments
@@ -1740,6 +1741,15 @@ corona_time_spend_clients <- result %>%
       ING_clients_impact = impact / (impact + no_impact) *100
     )
   
+corona_time_spend_clients$Five <- NULL
+corona_time_spend_clients$Four <- NULL
+corona_time_spend_clients$Three <- NULL
+corona_time_spend_clients$Two <- NULL
+corona_time_spend_clients$One <- NULL
+corona_time_spend_clients$no_impact <- NULL
+corona_time_spend_clients$impact <- NULL
+
+  
 data1 <- full_join(data1, corona_time_spend_clients, by=c("b_value", "country", "quarter_measurement"))
 
 # corona_busy_clients
@@ -1952,7 +1962,7 @@ App_usage <- result %>%
   dplyr::group_by(country, quarter_measurement, b_value, app_usage) %>%
   dplyr::tally(wt=weight) %>%
   dplyr::mutate(
-    percentage = n /sum(n) *100
+    percentage = n /sum(n) *100,
   ) %>%
   dplyr::ungroup() %>%
   dplyr::select(country, quarter_measurement, b_value, app_usage, percentage) %>%
@@ -1961,6 +1971,7 @@ App_usage <- result %>%
   tidyr::spread(app_usage, percentage) 
 
 data1 <- full_join(data1, App_usage, by=c("b_value", "country", "quarter_measurement"))
+rm(App_usage)
 
 App_usage <- result %>%
   dplyr::select(weight, country, quarter_measurement, b_value, nps_value, client_value, app_usage_value, main_bank_value) %>%
@@ -1988,6 +1999,70 @@ App_usage <- result %>%
 
 # to add Q figures to data set, split for clients
 data1 <- full_join(data1, App_usage, by=c("b_value", "country", "quarter_measurement"))
+
+App_usage_easy <- result %>%
+  dplyr::select(weight, country, quarter_measurement, b_value, client_value, app_usage_value, easy_value, meets_needs_value) %>%
+  dplyr::filter(client_value==1 & !is.na(app_usage_value) & b_value <6 & !is.na(easy_value)) %>%
+  dplyr::mutate(app_usage = case_when(
+    app_usage_value==1 ~ 1,
+    app_usage_value==2 ~ 1,
+    app_usage_value==3 ~ 0,
+    app_usage_value==4 ~ 0,
+    app_usage_value==5 ~ 0,
+    TRUE ~ 0)
+  ) %>% 
+  dplyr::mutate(
+    personal = meets_needs_value * weight,
+    easy = easy_value * weight
+  ) %>%
+  dplyr::select(country, quarter_measurement, b_value, app_usage, easy, weight) %>%
+  dplyr::group_by(quarter_measurement, country, b_value, app_usage) %>%
+  dplyr::summarize(
+    easy = mean(easy) / mean(weight)
+  ) %>%
+  dplyr::filter(!is.na(easy)) %>%
+  dplyr::ungroup() %>%
+  tidyr::spread(app_usage, easy) %>%
+  dplyr::mutate(
+    easy_non_app_users =App_usage_easy$`0`,
+    easy_app_users =App_usage_easy$`1`
+  )
+
+App_usage_easy$`0` <- NULL
+App_usage_easy$`1` <- NULL
+
+data1 <- full_join(data1, App_usage_easy, by=c("b_value", "country", "quarter_measurement"))
+
+
+price_awareness <- result %>%
+  dplyr::select(weight, country, quarter_measurement, b_value, client_value, interest_value, price_perception_value) %>%
+  dplyr::filter(client_value==1 & !is.na(price_perception_value) & b_value <6 & !is.na(interest_value)) %>%
+  dplyr::mutate(interest_awareness = case_when(
+    interest_value==1 ~ 1,
+    interest_value==2 ~ 0,
+    interest_value==3 ~ 0,
+    TRUE ~ 0)
+  ) %>% 
+  dplyr::mutate(
+    price_perception_awareness = price_perception_value * weight
+  ) %>%
+  dplyr::select(country, quarter_measurement, b_value, interest_awareness, price_perception_awareness, weight) %>%
+  dplyr::group_by(quarter_measurement, country, b_value, interest_awareness) %>%
+  dplyr::summarize(
+    price_perception_awareness = mean(price_perception_awareness) / mean(weight)
+  ) %>%
+  dplyr::filter(!is.na(price_perception_awareness)) %>%
+  dplyr::ungroup() %>%
+  tidyr::spread(interest_awareness, price_perception_awareness) %>%
+  dplyr::mutate(
+    price_unaware_interest =price_awareness$`0`,
+    price_aware_interest =price_awareness$`1`
+  )
+
+price_awareness$`0` <- NULL
+price_awareness$`1` <- NULL
+
+data1 <- full_join(data1, price_awareness, by=c("b_value", "country", "quarter_measurement"))
 
 
 ### Labels
@@ -2037,13 +2112,13 @@ main_competition <- data1 %>%
       country == 3 & b_value < 5 ~ 1,
       country == 4 & b_value < 6 ~ 1,
       country == 5 & b_value < 8 ~ 1,
-      country == 6 & b_value < 6 ~ 1,
-      country == 7 & (b_value < 8 | b_value == 10) ~ 1,
+      country == 6 & b_value < 7 ~ 1,
+      country == 7 & b_value < 9 ~ 1,
       country == 8 & b_value < 7 ~ 1,
       country == 9 & b_value < 5 ~ 1,
       country == 10 & b_value < 7 ~ 1,
       country == 11 & b_value < 6 ~ 1,
-      country == 12 & b_value < 5 ~ 1,
+      country == 12 & b_value < 7 ~ 1,
       country == 13 & b_value < 7 ~ 1,
       country == 14 & b_value < 8 ~ 1,
       TRUE ~ 0
@@ -2061,7 +2136,7 @@ rm(X20200209_Competitorlist)
 
 # name it data1 differently 
 data_April <- data1
-data_April <- write_csv(data_April, "data_April")
+data_April <- write_excel_csv(data_April, "data_April")
 data1 <-write_csv(data1, "data1.csv")
 #resulthis <- write_csv(result, "resulthis.csv")
 
